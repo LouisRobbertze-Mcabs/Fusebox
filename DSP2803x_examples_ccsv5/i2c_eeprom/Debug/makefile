@@ -21,7 +21,7 @@ $(GEN_CMDS__FLAG) \
 "./DSP2803x_CpuTimers.obj" \
 "./DSP2803x_CodeStartBranch.obj" \
 "./DSP2803x_Adc.obj" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_headers/cmd/DSP2803x_Headers_nonBIOS.cmd" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_headers/cmd/DSP2803x_Headers_nonBIOS.cmd" \
 "../F28035.cmd" \
 "../IQmath.lib" \
 -l"rts2800_ml.lib" \
@@ -136,7 +136,7 @@ all: Example_2803xI2C_eeprom.out
 Example_2803xI2C_eeprom.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C2000 Linker'
-	"c:/ti/ccsv6/tools/compiler/c2000_6.2.5/bin/cl2000" -v28 -ml -mt --cla_support=cla0 -g --define="_DEBUG" --define="LARGE_MODEL" --quiet --verbose_diagnostics --diag_warning=225 --issue_remarks --output_all_syms --cdebug_asm_data -z -m"Example_2803xI2C_eeprom.map" --stack_size=0x380 --warn_sections -i"c:/ti/ccsv6/tools/compiler/c2000_6.2.5/lib" -i"c:/ti/ccsv6/tools/compiler/c2000_6.2.5/include" -i"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_examples_ccsv5/i2c_eeprom" -i"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/lib" -i"C:/Users/Bartho/libs/math/IQmath/v160/lib" --reread_libs --verbose_diagnostics --issue_remarks --xml_link_info="Example_2803xI2C_eeprom_linkInfo.xml" --entry_point=code_start --rom_model -o "Example_2803xI2C_eeprom.out" $(ORDERED_OBJS)
+	"c:/ti/ccsv6/tools/compiler/c2000_6.2.5/bin/cl2000" -v28 -ml -mt --cla_support=cla0 -g --define="_DEBUG" --define="LARGE_MODEL" --quiet --verbose_diagnostics --diag_warning=225 --issue_remarks --output_all_syms --cdebug_asm_data -z -m"Example_2803xI2C_eeprom.map" --stack_size=0x380 --warn_sections -i"c:/ti/ccsv6/tools/compiler/c2000_6.2.5/lib" -i"c:/ti/ccsv6/tools/compiler/c2000_6.2.5/include" -i"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_examples_ccsv5/i2c_eeprom" -i"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/lib" -i"C:/Users/Bartho/Documents/libs/math/IQmath/v160/lib" --reread_libs --verbose_diagnostics --issue_remarks --xml_link_info="Example_2803xI2C_eeprom_linkInfo.xml" --entry_point=code_start --rom_model -o "Example_2803xI2C_eeprom.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

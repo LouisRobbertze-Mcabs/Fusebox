@@ -4,27 +4,27 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_headers/cmd/DSP2803x_Headers_nonBIOS.cmd \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_headers/cmd/DSP2803x_Headers_nonBIOS.cmd \
 ../F28035.cmd 
 
 LIB_SRCS += \
 ../IQmath.lib 
 
 ASM_SRCS += \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CodeStartBranch.asm \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_usDelay.asm 
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CodeStartBranch.asm \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_usDelay.asm 
 
 C_SRCS += \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Adc.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CpuTimers.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_DefaultIsr.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Adc.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CpuTimers.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_DefaultIsr.c \
 ../DSP2803x_ECan.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_headers/source/DSP2803x_GlobalVariableDefs.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_I2C.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieCtrl.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieVect.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Spi.c \
-C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_SysCtrl.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_headers/source/DSP2803x_GlobalVariableDefs.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_I2C.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieCtrl.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieVect.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Spi.c \
+C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_SysCtrl.c \
 ../Example_2803xI2C_eeprom.c 
 
 OBJS += \
@@ -92,20 +92,20 @@ ASM_DEPS__QUOTED += \
 "DSP2803x_usDelay.pp" 
 
 C_SRCS__QUOTED += \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Adc.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CpuTimers.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_DefaultIsr.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Adc.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CpuTimers.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_DefaultIsr.c" \
 "../DSP2803x_ECan.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_headers/source/DSP2803x_GlobalVariableDefs.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_I2C.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieCtrl.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieVect.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Spi.c" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_SysCtrl.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_headers/source/DSP2803x_GlobalVariableDefs.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_I2C.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieCtrl.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_PieVect.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_Spi.c" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_SysCtrl.c" \
 "../Example_2803xI2C_eeprom.c" 
 
 ASM_SRCS__QUOTED += \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CodeStartBranch.asm" \
-"C:/Users/Bartho/Documents/Coding/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_usDelay.asm" 
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_CodeStartBranch.asm" \
+"C:/Users/Bartho/Documents/GitHub/BatteryBestuurStelsel/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_usDelay.asm" 
 
 

@@ -410,7 +410,9 @@ void  Read_CellVol(void)
 
 		temp_V = I2CA_ReadData(&I2cMsgIn1,0x0C+(i*0x02), 2);
 
-		V[i] = (ADCgain * temp_V) + ADCoffset;
+		temp_V = (ADCgain * temp_V) + ADCoffset;
+
+		V[i] = temp_V;
 		Vt = Vt +  V[i];
 
 		if(Vhigh<V[i])

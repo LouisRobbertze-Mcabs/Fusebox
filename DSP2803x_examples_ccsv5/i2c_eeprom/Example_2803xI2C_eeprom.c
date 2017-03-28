@@ -213,7 +213,7 @@ void main(void)
 	//Turn on and initialise Bq76940
 	Bq76940_Init();
 
-//	Shut_D_BQ();
+	//	Shut_D_BQ();
 
 
 	// Application loop
@@ -236,7 +236,7 @@ void main(void)
 
 			GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;		//toggle led
 
-			//			Balance(5,3.36);
+			//Balance(5,3.31);
 
 			system_status = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
 			if(system_status != 00)
@@ -314,7 +314,7 @@ void   Init_Gpio(void)
 	EDIS;
 
 	//turn on contactor
-	//ContactorOut = 1;
+	ContactorOut = 1;
 
 	CSControl = 0;	//turn CScontrol on for current measurement
 }
@@ -413,6 +413,7 @@ void  Read_CellVol(void)
 		temp_V = (ADCgain * temp_V) + ADCoffset;
 
 		V[i] = temp_V;
+
 		Vt = Vt +  V[i];
 
 		if(Vhigh<V[i])
@@ -444,7 +445,6 @@ void  Read_CellVol(void)
 
 	if(Vlow>2.8 )
 		flagDischarged = 0;
-
 }
 
 void Read_Temp()
@@ -459,7 +459,7 @@ void Read_Temp()
 	for(i = 0; i<3; i++)
 	{
 		temp_T = I2CA_ReadData(&I2cMsgIn1, 0x2C+(i*0x02), 2);
-//		test_blah[i] = T[i];
+		//		test_blah[i] = T[i];
 
 		if(i == 0)
 			Vts = (temp_T*ADCgain) + 0.27;
@@ -471,7 +471,7 @@ void Read_Temp()
 		//test2 = Rts;
 
 		T[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
-	//	T[i] = T[i] -273;
+		//	T[i] = T[i] -273;
 
 		if(T[i]> 70 || T[i]<0)
 		{
@@ -978,8 +978,8 @@ void CANChargerReception(void)
 	Uint16 temp = 0;
 	Uint16 temp2 = 0;
 
-	static Uint16 PI = 0;
 
+	static volatile float Current_max = 28;
 	//	float Vreference = 52;
 
 	static volatile int delay = 0;  // miskien >> count 1 cycle from contactor closes till charger starts
@@ -1003,8 +1003,6 @@ void CANChargerReception(void)
 	//Read Charger Status
 	ChgStatus = RxDataH & 0xFF;
 
-
-
 	if(ChgStatus == 0)																	//Charger ready to charge. No flags set
 	{
 		if(flagCurrent == 0 && flagTemp == 0 && flagCharged == 0 && KeySwitch == 0)		//check flags to ensure charging is allowed   haal flagvoltage uit
@@ -1018,32 +1016,23 @@ void CANChargerReception(void)
 			{
 				//calculate maximum allowed voltage and possibly current
 				//- make function with PI control loop
-				if(Vhigh < 3.55 && PI==0)
+				if(Vhigh < 3.55)
 				{
 					//Ireference = 52.5;
-					CANTransmit(0x618, 0, ChgCalculator(54, 28), 8);				//charging started.. maybe reveiw..
+					CANTransmit(0x618, 0, ChgCalculator(54, Current_max), 8);				//charging started.. maybe reveiw..
 				}
 				else
 				{
-					Ireference = ChgCurrent + (3.55-Vhigh)*5;									//ChgVoltage + error*Kp (1) Proposionele beheerder
-					PI = 1;
-
-					if(ChgCurrent>1 )														//sit stroom check in om charger te stop blah blah , sit charged flag = 1 /balance
-					{
-						if(Ireference<30)
-						{
-							CANTransmit(0x618, 0, ChgCalculator(53, Ireference), 8);			//charging started.. maybe reveiw..
-						}
-						else
-							CANTransmit(0x618, 1, ChgCalculator(53, 18), 8);					//charging stops
-
-					}
+					//					Ireference = ChgCurrent + (3.55-Vhigh)*5;									//ChgVoltage + error*Kp (1) Proposionele beheerder
+					//					PI = 1;
+					if(ChgCurrent>4 )														//sit stroom check in om charger te stop blah blah , sit charged flag = 1 /balance
+						CANTransmit(0x618, 0, ChgCalculator(54, Current_max-=2), 8);		//charging started.. maybe reveiw..
 					else
 					{
-						flagCharged = 1;										//balance
-						balance = 1;
-						CANTransmit(0x618,1,ChgCalculator(52, 15),8);							//disconnect charger
-						PI = 0;
+						CANTransmit(0x618, 1, ChgCalculator(54, 18), 8);					//charging stops
+						Current_max = 28;
+						flagCharged = 1;													//status charged
+						balance = 1;														//balance
 					}
 				}
 
@@ -1054,13 +1043,13 @@ void CANChargerReception(void)
 		{
 			if(delay == 1)																//sit miskien check in om met die charger Vbat te meet
 			{
-				CANTransmit(0x618,1,ChgCalculator(52, 15),8);							//disconnect charger
+				CANTransmit(0x618,1,ChgCalculator(54, 0),8);							//disconnect charger
 				delay--;
 			}
 			else if(delay == 0)
 			{
 				ContactorOut = 0;														//turn off contactor
-				CANTransmit(0x618,1,ChgCalculator(52, 15),8);							//disconnect charger
+				CANTransmit(0x618,1,ChgCalculator(54, 0),8);							//disconnect charger
 			}
 		}
 	}
@@ -1068,13 +1057,13 @@ void CANChargerReception(void)
 	{
 		if(delay == 1)
 		{
-			CANTransmit(0x618,1,ChgCalculator(52, 15),8);								//disconnect charger
+			CANTransmit(0x618,1,ChgCalculator(54, 0),8);								//disconnect charger
 			delay--;
 		}
 		else if(delay == 0)
 		{
 			ContactorOut = 0;															//turn off contactor
-			CANTransmit(0x618,1,ChgCalculator(52, 15),8);								//disconnect charger
+			CANTransmit(0x618,1,ChgCalculator(54, 0),8);								//disconnect charger
 		}
 	}
 
@@ -1131,12 +1120,12 @@ __interrupt void  adc_isr(void)
 	test_current = current_p + (0.00314*(AdcResult.ADCRESULT1-current_p));     //	0.00314-1Hz     //  0.01249 - 4 Hz		//0.27-100Hz
 	current_p=test_current;
 
-	/*	if(test_current > 4000 || test_current < 100)						////////////////////////////////////////////////
+	if(AdcResult.ADCRESULT1 > 3500 || AdcResult.ADCRESULT1 < 700)						////////////////////////////////////////////////
 	{
 		//sit uittree af
 		ContactorOut = 0;		//turn off contactor
 		flagCurrent = 1;
-	}*/																	////////////////////////////////////////////////
+	}																////////////////////////////////////////////////
 
 	//}
 	AdcRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;		//Clear ADCINT1 flag reinitialize for next SOC
@@ -1190,7 +1179,13 @@ __interrupt void cpu_timer1_isr(void)
 	else if(KeySwitch == 0)	//keyswitch == 0
 	{
 		flagCurrent = 0;
-//		ContactorOut = 0;		//turn off contactor
+		//		ContactorOut = 0;		//turn off contactor
+
+		/*	if((flagDischarged == 0) || (flagCurrent == 0)	||(flagTemp == 0))
+		{
+
+			ContactorOut = 0;			//turn on contactor
+		}*/
 
 		//	led3 = 0;		//turn off red led
 	}

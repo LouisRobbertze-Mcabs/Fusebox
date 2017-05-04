@@ -5,9 +5,7 @@
  *      Author: Sonja
  */
 
-#include "User_Prototypes.h"
-#include "User_Globals.h"
-#include "User_CAN.h"
+#include "User_Defines.h"
 
 void Initialise_BMS(void)
 {
@@ -81,12 +79,6 @@ void Initialise_BMS(void)
     //  Shut_D_BQ();
 }
 
-void Reset_ADC(void)
-{
-    I2CA_WriteData(0x04,0x8);
-    I2CA_WriteData(0x04,0x18);
-}
-
 void Init_Gpio(void)
 {
     EALLOW;
@@ -142,190 +134,8 @@ void Init_Gpio(void)
     CSControl = 0;  //turn CScontrol on for current measurement
 }
 
-void I2CA_Init(void)
-{
-    // Initialize I2C
-    I2caRegs.I2CSAR = 0x08;         // Slave address - EEPROM control code              0x08
-    I2caRegs.I2CPSC.all = 6;        // Prescaler - need 7-12 Mhz on module clk          8Mhz
-    I2caRegs.I2CCLKL = 40;          // NOTE: must be non zero                           40
-    I2caRegs.I2CCLKH = 40;          // NOTE: must be non zero                           40  Moet 95.238kHz tot gevolg hê..
-    I2caRegs.I2CIER.all = 0x24;     // Enable SCD & ARDY interrupts     0x24
-    I2caRegs.I2CMDR.all = 0x0020;   // Take I2C out of reset
-    I2caRegs.I2CFFTX.all = 0x6000;  // Enable FIFO mode and TXFIFO
-    I2caRegs.I2CFFRX.all = 0x2040;  // Enable RXFIFO, clear RXFFINT,
-}
 
 
-Uint16 I2CA_WriteData(unsigned char Register, unsigned char Data)
-{
-    unsigned char DataBuffer[4];
-
-    while(I2caRegs.I2CMDR.bit.STP == 1);
-
-    // Setup slave address
-    I2caRegs.I2CSAR = 0x08;
-
-    // Check if bus busy
-    while(I2caRegs.I2CSTR.bit.BB == 1);
-
-    CurrentMsgPtr = &I2cMsgOut1;
-
-    // Setup number of bytes to send
-    I2caRegs.I2CCNT = 3;
-
-    DataBuffer[0] = (0x08) << 1;
-    DataBuffer[1] = Register;
-    DataBuffer[2] = Data;
-    DataBuffer[3] = CRC8(DataBuffer, 3, 7); //bereken crc
-
-    // Setup data to send
-    I2caRegs.I2CDXR = Register;
-    I2caRegs.I2CDXR = Data;
-    I2caRegs.I2CDXR = DataBuffer[3];                            //send crc
-
-    // Send start as master transmitter
-    I2caRegs.I2CMDR.all = 0x6E20;
-
-    I2cMsgOut1.MsgStatus = I2C_MSGSTAT_WRITE_BUSY;
-
-    //while(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_WRITE_BUSY);
-
-    return I2C_SUCCESS;
-}// end of write section
-
-Uint16 I2CA_ReadData(struct I2CMSG *msg, unsigned char Register, Uint16 amount)
-{
-    while(I2caRegs.I2CMDR.bit.STP == 1);
-
-    // Check if bus busy
-    while(I2caRegs.I2CSTR.bit.BB == 1);
-
-    // Setup slave address
-    I2caRegs.I2CSAR = 0x08;
-
-    // Setup number of bytes to send
-    I2caRegs.I2CCNT = 1;
-
-    // Setup data to send
-    I2caRegs.I2CDXR = Register;
-
-    I2caRegs.I2CMDR.all = 0x2E20;
-
-    CurrentMsgPtr = &I2cMsgIn1;
-    I2cMsgIn1.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP_BUSY;
-
-    while(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY);
-
-    if(msg->MsgStatus == I2C_MSGSTAT_RESTART)
-    {
-        while(I2caRegs.I2CMDR.bit.STP == 1);
-
-        // Check if bus busy
-        while(I2caRegs.I2CSTR.bit.BB == 1);
-
-        // Setup slave address
-        I2caRegs.I2CSAR = 0x08;
-
-        I2caRegs.I2CCNT = 2;                    // Setup how many bytes to expect
-        I2caRegs.I2CMDR.all = 0x2C20;           // Send restart as master receiver
-
-        // Update current message pointer and message status
-        CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_READ_BUSY;
-
-        while(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY);
-
-        Received = DataOut;
-
-        if(amount == 2)
-        {
-            Received = Received<<8;
-
-            while(I2caRegs.I2CMDR.bit.STP == 1);
-
-            // Setup slave address
-            I2caRegs.I2CSAR = 0x08;
-
-            I2caRegs.I2CCNT = 2;                    // Setup how many bytes to expect
-            I2caRegs.I2CMDR.all = 0x2C20;           // Send restart as master receiver
-
-            // Update current message pointer and message status
-            CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_READ_BUSY;
-
-            while(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY);
-            Received = Received | DataOut;
-        }
-        return Received;
-    }
-    return I2C_SUCCESS;
-}
-void Shut_D_BQ(void)                        //bq turn off sequence
-{
-    I2CA_WriteData(0x04,0x00);
-    I2CA_WriteData(0x04,0x02);
-    I2CA_WriteData(0x04,0x01);
-    I2CA_WriteData(0x04,0x02);
-}
-
-
-void  Bq76940_Init(void)
-{
-    Uint16 temp;
-    Uint16 temp2;
-    int OV;
-    int UV;
-    Uint16 Reset;
-
-    BQEnable = 1;                                           //turn on BQ chip
-    while(counter_2Hz != 1);                                      //toets delay
-
-    Reset = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
-
-    if(Reset != 00)
-        I2CA_WriteData(0x00,(char)Reset);
-
-    I2CA_WriteData(0x04,0x18);                                  //Sit metings aan
-
-    I2CA_WriteData(0x01,0x00);
-    I2CA_WriteData(0x02,0x00);
-    I2CA_WriteData(0x03,0x00);
-
-    I2CA_WriteData(0x08,0x08);                                  //protect 3
-
-    I2CA_WriteData(0x0B,0x19);
-
-    I2CA_WriteData(0x05,0x03);                                  //turn on outputs (CHG+DSG)       sit miskien eers op 'n latere stadium dit aan? ?
-
-    //lees adc gain en offset
-    temp = I2CA_ReadData(&I2cMsgIn1,0x50, 1);
-
-    temp2 = I2CA_ReadData(&I2cMsgIn1,0x59, 1);
-
-    temp2 = temp2 >> 5;
-    temp2= temp2 & 0x07;
-
-    temp = temp<<1;
-    temp = temp & 0x0C;
-
-    temp = temp2 | temp;
-
-    ADCgain = ((float)temp + 365)* 0.000001;
-
-    ADCoffset = ((I2CA_ReadData(&I2cMsgIn1,0x51, 1))) * 0.001;
-
-    //Over voltage = 3.7 V
-    OV = (3.7-ADCoffset)/ADCgain;
-    OV = (OV>>4) & 0xFF;
-
-    I2CA_WriteData(0x09, (char)OV);                             //Stel OV_trip op
-
-    //Under voltage = 2.5 V
-    UV = (2.5-ADCoffset)/ADCgain;
-    UV = (UV>>4) & 0xFF;
-
-    I2CA_WriteData(0x0A,(char)UV);                              //Stel UV_trip op
-
-    BQEnable = 0;                                               //pull low to allow BQ to measure temp
-}
 
 void  Read_Cell_Voltages(void)
 {
@@ -610,22 +420,6 @@ unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key)
         ptr++;
     }
     return(crc);
-}
-
-void configADC(void)
-{
-    EALLOW;
-    AdcRegs.ADCCTL1.bit.INTPULSEPOS = 1;    //ADCINT1 trips after AdcResults latch
-    AdcRegs.INTSEL1N2.bit.INT1E     = 1;    //Enabled ADCINT1
-    AdcRegs.INTSEL1N2.bit.INT1CONT  = 0;    //Disable ADCINT1 Continuous mode
-    AdcRegs.INTSEL1N2.bit.INT1SEL   = 1;    //setup EOC1 to trigger ADCINT1 to fire
-    AdcRegs.ADCSOC0CTL.bit.CHSEL    = 0x0B; //0     set SOC0 channel select to ADCINB3(dummy sample for rev0 errata workaround)
-    AdcRegs.ADCSOC1CTL.bit.CHSEL    = 0x0B; //0     set SOC1 channel select to ADCINB3
-    AdcRegs.ADCSOC0CTL.bit.TRIGSEL  = 0x03; //  CPU Timer 0  // hierdie was 2
-    AdcRegs.ADCSOC1CTL.bit.TRIGSEL  = 0x03; //
-    AdcRegs.ADCSOC0CTL.bit.ACQPS    = 20;   //set SOC0 S/H Window to 7 ADC Clock Cycles, (6 ACQPS plus 1)
-    AdcRegs.ADCSOC1CTL.bit.ACQPS    = 20;   //set SOC1 S/H Window to 7 ADC Clock Cycles, (6 ACQPS plus 1)
-    EDIS;
 }
 
 

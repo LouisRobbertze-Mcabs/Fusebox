@@ -129,11 +129,8 @@ void CANMailboxConfig(void)
     ECanaMboxes.MBOX2.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
     ECanaMboxes.MBOX2.MSGID.bit.STDMSGID = 0x0611;  // Current address loaded                                           //bartho
     ECanaLAMRegs.LAM2.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
-
     ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000008; // Receive 8 bytes of data                                              //bartho
-
     ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000008; // Transmit 8 bytes of data
-
     ECanaRegs.CANME.all = 0x00000006;               // Enable Rx Mailbox                                                //bartho    0x00000002
 
     // The Tx Mailbox MSGID has to be set as required and then enabled

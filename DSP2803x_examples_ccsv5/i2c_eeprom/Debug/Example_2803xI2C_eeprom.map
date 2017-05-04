@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v16.9.1                     
 ******************************************************************************
->> Linked Thu May 04 10:04:07 2017
+>> Linked Thu May 04 10:14:32 2017
 
 OUTPUT FILE NAME:   <Example_2803xI2C_eeprom.out>
 ENTRY POINT SYMBOL: "code_start"  address: 003f7ff6
@@ -98,15 +98,15 @@ ramfuncs   0    003f0000    00000004     RUN ADDR = 00008000
                   003f2100    00000010     rts2800_ml.lib : e_logf.obj (.econst)
 
 .switch    0    003f2110    00000028     
-                  003f2110    00000028     Example_2803xI2C_eeprom.obj (.switch:_CANSlaveReception)
+                  003f2110    00000028     Main.obj (.switch:_CANSlaveReception)
 
 .text      0    003f6000    000014b7     
-                  003f6000    00000997     Example_2803xI2C_eeprom.obj (.text)
+                  003f6000    00000997     Main.obj (.text)
                   003f6997    000001aa     DSP2803x_Adc.obj (.text)
                   003f6b41    00000186     rts2800_ml.lib : e_logf.obj (.text)
                   003f6cc7    0000017c     DSP2803x_DefaultIsr.obj (.text:retain)
                   003f6e43    0000013c     DSP2803x_SysCtrl.obj (.text)
-                  003f6f7f    00000106     Example_2803xI2C_eeprom.obj (.text:retain)
+                  003f6f7f    00000106     Main.obj (.text:retain)
                   003f7085    00000083     rts2800_ml.lib : fs_div28.obj (.text)
                   003f7108    00000078                    : fs_add28.obj (.text)
                   003f7180    00000073     DSP2803x_CpuTimers.obj (.text)
@@ -133,7 +133,7 @@ ramfuncs   0    003f0000    00000004     RUN ADDR = 00008000
                   003f74b6    00000001                    : startup.obj (.text)
 
 .cinit     0    003f74b7    000000a5     
-                  003f74b7    00000087     Example_2803xI2C_eeprom.obj (.cinit)
+                  003f74b7    00000087     Main.obj (.cinit)
                   003f753e    0000000e     rts2800_ml.lib : exit.obj (.cinit)
                   003f754c    00000005                    : _lock.obj (.cinit:__lock)
                   003f7551    00000005                    : _lock.obj (.cinit:__unlock)
@@ -332,7 +332,7 @@ I2caRegsFile
                   00007900    00000022     DSP2803x_GlobalVariableDefs.obj (I2caRegsFile)
 
 .ebss      1    00008c00    00000099     UNINITIALIZED
-                  00008c00    00000076     Example_2803xI2C_eeprom.obj (.ebss)
+                  00008c00    00000076     Main.obj (.ebss)
                   00008c76    00000006     rts2800_ml.lib : exit.obj (.ebss)
                   00008c7c    00000002                    : _lock.obj (.ebss:__lock)
                   00008c7e    00000002                    : _lock.obj (.ebss:__unlock)
@@ -359,7 +359,13 @@ MODULE SUMMARY
        Module                            code   initialized data   uninitialized data
        ------                            ----   ----------------   ------------------
     .\
-       Example_2803xI2C_eeprom.obj       2717   175                118               
+       Main.obj                          2717   175                118               
+       DSP2803x_CodeStartBranch.obj      10     0                  0                 
+       DSP2803x_usDelay.obj              8      0                  0                 
+    +--+---------------------------------+------+------------------+--------------------+
+       Total:                            2735   175                118               
+                                                                                     
+    .\Source\
        DSP2803x_GlobalVariableDefs.obj   0      0                  2024              
        DSP2803x_Adc.obj                  426    0                  0                 
        DSP2803x_DefaultIsr.obj           380    0                  0                 
@@ -369,10 +375,8 @@ MODULE SUMMARY
        DSP2803x_Spi.obj                  82     0                  0                 
        DSP2803x_PieCtrl.obj              40     0                  0                 
        DSP2803x_I2C.obj                  25     0                  0                 
-       DSP2803x_CodeStartBranch.obj      10     0                  0                 
-       DSP2803x_usDelay.obj              8      0                  0                 
     +--+---------------------------------+------+------------------+--------------------+
-       Total:                            4157   431                2166              
+       Total:                            1422   256                2048              
                                                                                      
     C:/ti/ccsv7/tools/compiler/ti-cgt-c2000_16.9.1.LTS/lib/rts2800_ml.lib
        e_logf.obj                        390    16                 0                 

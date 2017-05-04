@@ -17,15 +17,21 @@ C:/Users/Sonja/Documents/GitHub/BatteryBestuurStelsel/DSP2803x_common/source/DSP
 C:/Users/Sonja/Documents/GitHub/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_usDelay.asm 
 
 C_SRCS += \
-../Main.c 
+../Main.c \
+../User_Functions.c \
+../User_Globals.c 
 
 C_DEPS += \
-./Main.d 
+./Main.d \
+./User_Functions.d \
+./User_Globals.d 
 
 OBJS += \
 ./DSP2803x_CodeStartBranch.obj \
 ./DSP2803x_usDelay.obj \
-./Main.obj 
+./Main.obj \
+./User_Functions.obj \
+./User_Globals.obj 
 
 ASM_DEPS += \
 ./DSP2803x_CodeStartBranch.d \
@@ -34,10 +40,14 @@ ASM_DEPS += \
 OBJS__QUOTED += \
 "DSP2803x_CodeStartBranch.obj" \
 "DSP2803x_usDelay.obj" \
-"Main.obj" 
+"Main.obj" \
+"User_Functions.obj" \
+"User_Globals.obj" 
 
 C_DEPS__QUOTED += \
-"Main.d" 
+"Main.d" \
+"User_Functions.d" \
+"User_Globals.d" 
 
 ASM_DEPS__QUOTED += \
 "DSP2803x_CodeStartBranch.d" \
@@ -48,6 +58,8 @@ ASM_SRCS__QUOTED += \
 "C:/Users/Sonja/Documents/GitHub/BatteryBestuurStelsel/DSP2803x_common/source/DSP2803x_usDelay.asm" 
 
 C_SRCS__QUOTED += \
-"../Main.c" 
+"../Main.c" \
+"../User_Functions.c" \
+"../User_Globals.c" 
 
 

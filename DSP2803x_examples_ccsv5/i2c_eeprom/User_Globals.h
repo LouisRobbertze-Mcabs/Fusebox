@@ -42,7 +42,7 @@ extern volatile Uint16 Charger_status;
 
 extern volatile float toets;
 extern volatile float toets2;
-extern volatile float current;
+extern volatile float Current;
 extern volatile int current_int;
 
 extern volatile float Voltages[15];
@@ -68,8 +68,6 @@ extern volatile float test_blah[3];
 extern int Cell_B1;
 extern int Cell_B2;
 extern int Cell_B3;
-
-extern volatile int system_status;
 
 extern Uint16 NodeID;
 extern volatile Uint16 counter_50Hz;

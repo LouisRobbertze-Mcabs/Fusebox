@@ -22,6 +22,9 @@ union bits32
 };
 
 void initialise_BMS(void);
+void Reset_ADC(void);
+void Toggle_LED(void);
+
 
 void Init_Gpio(void);
 void I2CA_Init(void);
@@ -39,7 +42,7 @@ void CANInterruptConfig(void);
 void CANSlaveReception(void);
 void CANChargerReception(void);
 Uint32 ChgCalculator(float Voltage, float Current);
-void  Read_CellVol(void);
+void  Read_Cell_Voltages(void);
 void Read_Temp(void);
 void Balance(int period, float reference);
 unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key);

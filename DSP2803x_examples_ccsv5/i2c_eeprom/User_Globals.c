@@ -41,13 +41,13 @@ volatile Uint16 balance = 0;
 
 volatile Uint16 counter_2Hz = 0;
 
-float Ireference;
+float current_reference;
 
 volatile Uint16 Charger_status = 0;
 
 volatile float toets=0;
 volatile float toets2=0;
-volatile float current;
+volatile float Current;
 volatile int current_int;
 
 volatile float Voltages[15];
@@ -73,8 +73,6 @@ volatile float test_blah[3];
 int Cell_B1 = 0;
 int Cell_B2 = 0;
 int Cell_B3 = 0;
-
-volatile int system_status= 0;
 
 Uint16 NodeID = 1;
 volatile Uint16 counter_50Hz = 0;

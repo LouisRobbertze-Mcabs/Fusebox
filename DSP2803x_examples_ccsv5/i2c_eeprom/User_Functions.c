@@ -82,6 +82,12 @@ void initialise_BMS(void)
     //  Shut_D_BQ();
 }
 
+void Reset_ADC(void)
+{
+    I2CA_WriteData(0x04,0x8);
+    I2CA_WriteData(0x04,0x18);
+}
+
 void Init_Gpio(void)
 {
     EALLOW;
@@ -302,7 +308,7 @@ void CANSlaveReception(void)
     case 14: {TxData.asFloat=Voltages[13]; CANTransmit(0, 14, TxData.asUint,5); break;}
     case 15: {TxData.asFloat=Voltages[14]; CANTransmit(0, 15, TxData.asUint,5); break;}
 
-    case 16: {TxData.asFloat=current; CANTransmit(0, 16, TxData.asUint,5); break;}
+    case 16: {TxData.asFloat=Current; CANTransmit(0, 16, TxData.asUint,5); break;}
 
     case 17: {TxData.asFloat=Temperatures[0]; CANTransmit(0, 17, TxData.asUint,5); break;}
     case 18: {TxData.asFloat=Temperatures[1]; CANTransmit(0, 18, TxData.asUint,5); break;}
@@ -371,7 +377,7 @@ void  Bq76940_Init(void)
     BQEnable = 0;                                               //pull low to allow BQ to measure temp
 }
 
-void  Read_CellVol(void)
+void  Read_Cell_Voltages(void)
 {
     // Read data from EEPROM section //
     int i;
@@ -422,6 +428,11 @@ void  Read_CellVol(void)
 
     if(Voltage_low>2.8 )
         flagDischarged = 0;
+}
+
+void Toggle_LED(void)
+{
+    GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;
 }
 
 void Read_Temp()
@@ -842,12 +853,12 @@ void CANChargerReception(void)
                 //- make function with PI control loop
                 if(Voltage_high < 3.55)
                 {
-                    //Ireference = 52.5;
+                    //current_reference = 52.5;
                     CANTransmit(0x618, 0, ChgCalculator(54, Current_max), 8);               //charging started.. maybe reveiw..
                 }
                 else
                 {
-                    //                  Ireference = ChgCurrent + (3.55-Vhigh)*5;                                   //ChgVoltage + error*Kp (1) Proposionele beheerder
+                    //                  current_reference = ChgCurrent + (3.55-Vhigh)*5;                                   //ChgVoltage + error*Kp (1) Proposionele beheerder
                     //                  PI = 1;
                     if(ChgCurrent>4 )                                                       //sit stroom check in om charger te stop blah blah , sit charged flag = 1 /balance
                         CANTransmit(0x618, 0, ChgCalculator(54, Current_max-=2), 8);        //charging started.. maybe reveiw..
@@ -933,13 +944,13 @@ __interrupt void  adc_isr(void)
     //contactor oop:
     /*  if(ContactorOut == 0)
     {
-        current = 0;
+        Current = 0;
     }
     else    //contactor toe
     {*/
-    //current = (measure_C-1820)* 0.131;                    //2035    maal, moenie deel nie!!!!     0.0982--200/2048
+    //Current = (measure_C-1820)* 0.131;                    //2035    maal, moenie deel nie!!!!     0.0982--200/2048
 
-    //  current = measure_C;
+    //  Current = measure_C;
 
     test_current = current_p + (0.00314*(AdcResult.ADCRESULT1-current_p));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
     current_p=test_current;

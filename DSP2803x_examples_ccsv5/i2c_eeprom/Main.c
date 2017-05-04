@@ -12,6 +12,8 @@
 #include "User_Prototypes.h"
 #include "User_Globals.h"
 
+volatile int system_status= 0;
+
 void main(void)
 {
     initialise_BMS();
@@ -20,14 +22,14 @@ void main(void)
     {
         if(counter_2Hz == 2)
         {
-            Read_CellVol();
+            Read_Cell_Voltages();
             //calculate current										//maak miskien funksie
-            current = (test_current-2085)* 0.125;					//2035    maal, moenie deel nie!!!!     0.0982--200/2048
-            //Ah = Ah + current*0.00027778;
+            Current = (test_current-2085)* 0.125;					//2035    maal, moenie deel nie!!!!     0.0982--200/2048
+            //Ah = Ah + Current*0.00027778;
             //ContactorOut = 1;
             Read_Temp();
 
-            GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;		//toggle led
+            Toggle_LED();
             //Balance(5,3.31);
 
             system_status = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
@@ -37,8 +39,7 @@ void main(void)
             }
             counter_2Hz = 0;
 
-            I2CA_WriteData(0x04,0x8);											//reset adc
-            I2CA_WriteData(0x04,0x18);
+            Reset_ADC();
         }
     }
 }

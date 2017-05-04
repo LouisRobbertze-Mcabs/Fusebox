@@ -58,7 +58,7 @@ volatile float Temperatures[3];
 volatile float ADCgain;
 volatile float ADCoffset;
 volatile float I;
-volatile float Vt;
+volatile float Voltage_total;
 volatile float Ah= 0;
 volatile int rus = 0;
 

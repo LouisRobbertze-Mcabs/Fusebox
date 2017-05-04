@@ -14,6 +14,7 @@
 
 void main(void)
 {
+    initialise_BMS();
     // Application loop
     for(;;)
     {

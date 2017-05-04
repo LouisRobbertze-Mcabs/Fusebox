@@ -375,7 +375,7 @@ void  Read_CellVol(void)
 {
     // Read data from EEPROM section //
     int i;
-    Vt = 0;
+    Voltage_total = 0;
     Voltage_high = 0;                      //reset values
     Voltage_low = 10;
 
@@ -391,7 +391,7 @@ void  Read_CellVol(void)
 
         Voltages[i] = temp_V;
 
-        Vt = Vt +  Voltages[i];
+        Voltage_total = Voltage_total +  Voltages[i];
 
         if(Voltage_high<Voltages[i])
             Voltage_high = Voltages[i];

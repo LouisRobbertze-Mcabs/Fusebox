@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v16.9.1                     
 ******************************************************************************
->> Linked Thu May 04 11:57:58 2017
+>> Linked Thu May 04 12:19:54 2017
 
 OUTPUT FILE NAME:   <Example_2803xI2C_eeprom.out>
 ENTRY POINT SYMBOL: "code_start"  address: 003f7ff6
@@ -21,7 +21,7 @@ PAGE 0:
   FLASHE                003ee000   00002000  00000000  00002000  RWIX
   FLASHD                003f0000   00002000  00000004  00001ffc  RWIX
   FLASHC                003f2000   00002000  00000138  00001ec8  RWIX
-  FLASHA                003f6000   00001f80  0000159a  000009e6  RWIX
+  FLASHA                003f6000   00001f80  0000159c  000009e4  RWIX
   CSM_RSVD              003f7f80   00000076  00000000  00000076  RWIX
   BEGIN                 003f7ff6   00000002  00000002  00000000  RWIX
   CSM_PWL_P0            003f7ff8   00000008  00000000  00000008  RWIX
@@ -100,7 +100,7 @@ ramfuncs   0    003f0000    00000004     RUN ADDR = 00008000
 .switch    0    003f2110    00000028     
                   003f2110    00000028     User_Functions.obj (.switch:_CANSlaveReception)
 
-.text      0    003f6000    000014f9     
+.text      0    003f6000    000014fb     
                   003f6000    00000996     User_Functions.obj (.text)
                   003f6996    000001aa     DSP2803x_Adc.obj (.text)
                   003f6b40    00000186     rts2800_ml.lib : e_logf.obj (.text)
@@ -113,34 +113,34 @@ ramfuncs   0    003f0000    00000004     RUN ADDR = 00008000
                   003f71f8    0000005a     rts2800_ml.lib : fs_mpy28.obj (.text)
                   003f7252    00000054                    : boot28.obj (.text)
                   003f72a6    00000052     DSP2803x_Spi.obj (.text)
-                  003f72f8    0000003d     Main.obj (.text)
-                  003f7335    00000029     rts2800_ml.lib : exit.obj (.text)
-                  003f735e    00000029                    : fs_tol28.obj (.text)
-                  003f7387    00000028     DSP2803x_PieCtrl.obj (.text)
-                  003f73af    00000026     DSP2803x_PieVect.obj (.text)
-                  003f73d5    00000025     rts2800_ml.lib : fs_toi28.obj (.text)
-                  003f73fa    00000024                    : cpy_tbl.obj (.text)
-                  003f741e    0000001d                    : fs_tou28.obj (.text)
-                  003f743b    0000001d                    : memcpy.obj (.text)
-                  003f7458    0000001a                    : i_tofs28.obj (.text)
-                  003f7472    0000001a                    : l_tofs28.obj (.text)
-                  003f748c    00000019     DSP2803x_I2C.obj (.text)
-                  003f74a5    00000019     rts2800_ml.lib : args_main.obj (.text)
-                  003f74be    00000017                    : fs_cmp28.obj (.text)
-                  003f74d5    00000010                    : u_tofs28.obj (.text)
-                  003f74e5    00000009                    : _lock.obj (.text)
-                  003f74ee    00000008     DSP2803x_CodeStartBranch.obj (.text)
-                  003f74f6    00000002     rts2800_ml.lib : pre_init.obj (.text)
-                  003f74f8    00000001                    : startup.obj (.text)
+                  003f72f8    0000003f     Main.obj (.text)
+                  003f7337    00000029     rts2800_ml.lib : exit.obj (.text)
+                  003f7360    00000029                    : fs_tol28.obj (.text)
+                  003f7389    00000028     DSP2803x_PieCtrl.obj (.text)
+                  003f73b1    00000026     DSP2803x_PieVect.obj (.text)
+                  003f73d7    00000025     rts2800_ml.lib : fs_toi28.obj (.text)
+                  003f73fc    00000024                    : cpy_tbl.obj (.text)
+                  003f7420    0000001d                    : fs_tou28.obj (.text)
+                  003f743d    0000001d                    : memcpy.obj (.text)
+                  003f745a    0000001a                    : i_tofs28.obj (.text)
+                  003f7474    0000001a                    : l_tofs28.obj (.text)
+                  003f748e    00000019     DSP2803x_I2C.obj (.text)
+                  003f74a7    00000019     rts2800_ml.lib : args_main.obj (.text)
+                  003f74c0    00000017                    : fs_cmp28.obj (.text)
+                  003f74d7    00000010                    : u_tofs28.obj (.text)
+                  003f74e7    00000009                    : _lock.obj (.text)
+                  003f74f0    00000008     DSP2803x_CodeStartBranch.obj (.text)
+                  003f74f8    00000002     rts2800_ml.lib : pre_init.obj (.text)
+                  003f74fa    00000001                    : startup.obj (.text)
 
-.cinit     0    003f74f9    000000a1     
-                  003f74f9    00000075     User_Globals.obj (.cinit)
-                  003f756e    0000000e     User_Functions.obj (.cinit)
-                  003f757c    0000000e     rts2800_ml.lib : exit.obj (.cinit)
-                  003f758a    00000005                    : _lock.obj (.cinit:__lock)
-                  003f758f    00000005                    : _lock.obj (.cinit:__unlock)
-                  003f7594    00000004                    : errno.obj (.cinit)
-                  003f7598    00000002     --HOLE-- [fill = 0]
+.cinit     0    003f74fb    000000a1     
+                  003f74fb    00000075     User_Globals.obj (.cinit)
+                  003f7570    0000000e     User_Functions.obj (.cinit)
+                  003f757e    0000000e     rts2800_ml.lib : exit.obj (.cinit)
+                  003f758c    00000005                    : _lock.obj (.cinit:__lock)
+                  003f7591    00000005                    : _lock.obj (.cinit:__unlock)
+                  003f7596    00000004                    : errno.obj (.cinit)
+                  003f759a    00000002     --HOLE-- [fill = 0]
 
 codestart 
 *          0    003f7ff6    00000002     
@@ -364,11 +364,11 @@ MODULE SUMMARY
     .\
        User_Functions.obj                2722   54                 8                 
        User_Globals.obj                  0      117                112               
-       Main.obj                          61     0                  0                 
+       Main.obj                          63     0                  0                 
        DSP2803x_CodeStartBranch.obj      10     0                  0                 
        DSP2803x_usDelay.obj              8      0                  0                 
     +--+---------------------------------+------+------------------+--------------------+
-       Total:                            2801   171                120               
+       Total:                            2803   171                120               
                                                                                      
     .\Source\
        DSP2803x_GlobalVariableDefs.obj   0      0                  2024              
@@ -409,7 +409,7 @@ MODULE SUMMARY
                                                                                      
        Stack:                            0      0                  896               
     +--+---------------------------------+------+------------------+--------------------+
-       Grand Total:                      5379   471                3075              
+       Grand Total:                      5381   471                3075              
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -518,7 +518,7 @@ address     data page           name
 00008c11     230 (00008c00)     _flagDischarged
 00008c12     230 (00008c00)     _DataOut
 00008c13     230 (00008c00)     _CANcounter
-00008c14     230 (00008c00)     _Vt
+00008c14     230 (00008c00)     _Voltage_total
 00008c16     230 (00008c00)     _Ah
 00008c18     230 (00008c00)     _CurrentMsgPtr
 00008c1a     230 (00008c00)     _test_current
@@ -561,18 +561,18 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 page  address   name                            
 ----  -------   ----                            
 0     003f6000  .text                           
-0     003f7335  C$$EXIT                         
+0     003f7337  C$$EXIT                         
 0     003f7112  FS$$ADD                         
-0     003f74be  FS$$CMP                         
+0     003f74c0  FS$$CMP                         
 0     003f708a  FS$$DIV                         
 0     003f71f8  FS$$MPY                         
 0     003f710d  FS$$SUB                         
-0     003f73d5  FS$$TOI                         
-0     003f735e  FS$$TOL                         
-0     003f741e  FS$$TOU                         
-0     003f7458  I$$TOFS                         
-0     003f7472  L$$TOFS                         
-0     003f74d5  U$$TOFS                         
+0     003f73d7  FS$$TOI                         
+0     003f7360  FS$$TOL                         
+0     003f7420  FS$$TOU                         
+0     003f745a  I$$TOFS                         
+0     003f7474  L$$TOFS                         
+0     003f74d7  U$$TOFS                         
 0     003f6d25  _ADCINT1_ISR                    
 0     003f6d2a  _ADCINT2_ISR                    
 0     003f6dde  _ADCINT3_ISR                    
@@ -670,7 +670,7 @@ page  address   name
 1     00006b00  _EQep1Regs                      
 1     00000d01  _EmuBMode                       
 1     00000d00  _EmuKey                         
-0     003f73a6  _EnableInterrupts               
+0     003f73a8  _EnableInterrupts               
 0     003f6f68  _ExtOscSel                      
 1     00000a80  _FlashRegs                      
 1     00000d04  _Flash_CPUScaleFactor           
@@ -697,11 +697,11 @@ page  address   name
 0     003f6996  _InitAdc                        
 0     003f69bc  _InitAdcAio                     
 0     003f7185  _InitCpuTimers                  
-0     003f748c  _InitI2C                        
-0     003f748d  _InitI2CGpio                    
+0     003f748e  _InitI2C                        
+0     003f748f  _InitI2CGpio                    
 0     003f6ec3  _InitPeripheralClocks           
-0     003f7387  _InitPieCtrl                    
-0     003f73af  _InitPieVectTable               
+0     003f7389  _InitPieCtrl                    
+0     003f73b1  _InitPieVectTable               
 0     003f6e6e  _InitPll                        
 0     003f72a6  _InitSpi                        
 0     003f72a7  _InitSpiGpio                    
@@ -761,8 +761,8 @@ page  address   name
 0     003f6d11  _USER9_ISR                      
 1     00008c20  _Voltage_high                   
 1     00008c2e  _Voltage_low                    
+1     00008c14  _Voltage_total                  
 1     00008c52  _Voltages                       
-1     00008c14  _Vt                             
 0     003f6d43  _WAKEINT_ISR                    
 0     003f6d2f  _XINT1_ISR                      
 0     003f6d34  _XINT2_ISR                      
@@ -779,27 +779,27 @@ abs   ffffffff  ___TI_prof_data_size
 abs   ffffffff  ___TI_prof_data_start           
 abs   ffffffff  ___binit__                      
 abs   ffffffff  ___c_args__                     
-0     003f74f9  ___cinit__                      
-0     003f74f9  ___etext__                      
+0     003f74fb  ___cinit__                      
+0     003f74fb  ___etext__                      
 abs   ffffffff  ___pinit__                      
 0     003f6000  ___text__                       
-0     003f74a5  __args_main                     
+0     003f74a7  __args_main                     
 1     00008c7e  __lock                          
-0     003f74ed  __nop                           
-0     003f74e9  __register_lock                 
-0     003f74e5  __register_unlock               
+0     003f74ef  __nop                           
+0     003f74eb  __register_lock                 
+0     003f74e7  __register_unlock               
 1     00000050  __stack                         
-0     003f74f8  __system_post_cinit             
-0     003f74f6  __system_pre_init               
+0     003f74fa  __system_post_cinit             
+0     003f74f8  __system_pre_init               
 1     00008c98  __unlock                        
-0     003f7335  _abort                          
+0     003f7337  _abort                          
 0     003f6f7e  _adc_isr                        
 1     00008c05  _balance                        
 0     003f7252  _c_int00                        
 0     003f7054  _can_rx_isr                     
 0     003f707c  _can_tx_isr                     
 0     003f6714  _configADC                      
-0     003f73fa  _copy_in                        
+0     003f73fc  _copy_in                        
 1     00008c03  _counter_2Hz                    
 1     00008c00  _counter_50Hz                   
 0     003f6fd5  _cpu_timer0_isr                 
@@ -808,7 +808,7 @@ abs   ffffffff  ___pinit__
 1     00008c1e  _current                        
 1     00008c02  _current_int                    
 1     00008c9a  _errno                          
-0     003f7337  _exit                           
+0     003f7339  _exit                           
 1     00008c10  _flagCharged                    
 1     00008c0e  _flagCurrent                    
 1     00008c11  _flagDischarged                 
@@ -819,7 +819,7 @@ abs   ffffffff  ___pinit__
 0     003f6b40  _log                            
 0     003f6b40  _logf                           
 0     003f72f8  _main                           
-0     003f743b  _memcpy                         
+0     003f743d  _memcpy                         
 1     00008c2a  _ref                            
 0     003f6e3d  _rsvd_ISR                       
 1     00008c01  _rus                            
@@ -829,9 +829,9 @@ abs   ffffffff  ___pinit__
 1     00008c22  _toets                          
 1     00008c24  _toets2                         
 abs   ffffffff  binit                           
-0     003f74f9  cinit                           
+0     003f74fb  cinit                           
 0     003f7ff6  code_start                      
-0     003f74f9  etext                           
+0     003f74fb  etext                           
 abs   ffffffff  pinit                           
 
 
@@ -977,33 +977,33 @@ page  address   name
 0     003f72ac  _InitSpiaGpio                   
 0     003f72da  _InitSpibGpio                   
 0     003f72f8  _main                           
-0     003f7335  C$$EXIT                         
-0     003f7335  _abort                          
-0     003f7337  _exit                           
-0     003f735e  FS$$TOL                         
-0     003f7387  _InitPieCtrl                    
-0     003f73a6  _EnableInterrupts               
-0     003f73af  _InitPieVectTable               
-0     003f73d5  FS$$TOI                         
-0     003f73fa  _copy_in                        
-0     003f741e  FS$$TOU                         
-0     003f743b  _memcpy                         
-0     003f7458  I$$TOFS                         
-0     003f7472  L$$TOFS                         
-0     003f748c  _InitI2C                        
-0     003f748d  _InitI2CGpio                    
-0     003f74a5  __args_main                     
-0     003f74be  FS$$CMP                         
-0     003f74d5  U$$TOFS                         
-0     003f74e5  __register_unlock               
-0     003f74e9  __register_lock                 
-0     003f74ed  __nop                           
-0     003f74f6  __system_pre_init               
-0     003f74f8  __system_post_cinit             
-0     003f74f9  ___cinit__                      
-0     003f74f9  ___etext__                      
-0     003f74f9  cinit                           
-0     003f74f9  etext                           
+0     003f7337  C$$EXIT                         
+0     003f7337  _abort                          
+0     003f7339  _exit                           
+0     003f7360  FS$$TOL                         
+0     003f7389  _InitPieCtrl                    
+0     003f73a8  _EnableInterrupts               
+0     003f73b1  _InitPieVectTable               
+0     003f73d7  FS$$TOI                         
+0     003f73fc  _copy_in                        
+0     003f7420  FS$$TOU                         
+0     003f743d  _memcpy                         
+0     003f745a  I$$TOFS                         
+0     003f7474  L$$TOFS                         
+0     003f748e  _InitI2C                        
+0     003f748f  _InitI2CGpio                    
+0     003f74a7  __args_main                     
+0     003f74c0  FS$$CMP                         
+0     003f74d7  U$$TOFS                         
+0     003f74e7  __register_unlock               
+0     003f74eb  __register_lock                 
+0     003f74ef  __nop                           
+0     003f74f8  __system_pre_init               
+0     003f74fa  __system_post_cinit             
+0     003f74fb  ___cinit__                      
+0     003f74fb  ___etext__                      
+0     003f74fb  cinit                           
+0     003f74fb  etext                           
 0     003f7ff6  code_start                      
 1     00000050  __stack                         
 1     000003d0  __STACK_END                     
@@ -1073,7 +1073,7 @@ page  address   name
 1     00008c11  _flagDischarged                 
 1     00008c12  _DataOut                        
 1     00008c13  _CANcounter                     
-1     00008c14  _Vt                             
+1     00008c14  _Voltage_total                  
 1     00008c16  _Ah                             
 1     00008c18  _CurrentMsgPtr                  
 1     00008c1a  _test_current                   

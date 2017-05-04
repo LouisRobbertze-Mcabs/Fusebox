@@ -53,7 +53,7 @@ extern volatile float Temperatures[3];
 extern volatile float ADCgain;
 extern volatile float ADCoffset;
 extern volatile float I;
-extern volatile float Vt;
+extern volatile float Voltage_total;
 extern volatile float Ah;
 extern volatile int rus;
 

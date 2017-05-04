@@ -22,43 +22,31 @@ union bits32
 };
 
 void Initialise_BMS(void);
-void Reset_ADC(void);
 void Toggle_LED(void);
-void Process_Voltages(void);
 void Calculate_Current(void);
 void Read_System_Status(void);
 void Process_System_Status(void);
 
-
 void Init_Gpio(void);
 void I2CA_Init(void);
-void CANSetup(void);
-void CANTransmit(Uint16 Destination, Uint32 TxDataH, Uint32 TxDataL, Uint16 Bytes);
 Uint16 I2CA_WriteData(unsigned char Register, unsigned char Data);
 Uint16 I2CA_ReadData(struct I2CMSG *msg, unsigned char Register, Uint16 amount);
+
+void Bq76940_Init(void);
 void Shut_D_BQ(void);
 
-// Prototype statements for functions found within this file.
-void Bq76940_Init(void);
 void configADC(void);
-void CANMailboxConfig(void);
-void CANInterruptConfig(void);
-void CANSlaveReception(void);
-void CANChargerReception(void);
+void Reset_ADC(void);
+
 Uint32 ChgCalculator(float Voltage, float Current);
 void  Read_Cell_Voltages(void);
+void Process_Voltages(void);
+
 void Read_Temperatures(void);
 void Balance(int period, float reference);
 unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key);
 
 //#pragma CODE_SECTION(DELAY_US, "ramfuncs");
-__interrupt void cpu_timer0_isr(void);
-__interrupt void cpu_timer1_isr(void);
-__interrupt void cpu_timer2_isr(void);
-__interrupt void i2c_int1a_isr(void);
-__interrupt void adc_isr(void);
-__interrupt void spiRxFifoIsr(void);
-__interrupt void can_rx_isr(void);
-__interrupt void can_tx_isr(void);
+
 
 #endif /* USER_PROTOTYPES_H_ */

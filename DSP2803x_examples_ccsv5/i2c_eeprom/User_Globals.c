@@ -6,6 +6,8 @@
  */
 #include "User_Globals.h"
 
+// Two bytes will be used for the outgoing address,
+// thus only setup 2 bytes maximum
 struct I2CMSG I2cMsgOut1={I2C_MSGSTAT_SEND_WITHSTOP,
                           I2C_SLAVE_ADDR,
                           I2C_NUMBYTES,

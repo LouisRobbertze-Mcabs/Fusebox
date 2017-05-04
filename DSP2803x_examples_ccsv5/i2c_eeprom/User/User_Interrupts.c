@@ -9,7 +9,7 @@
 
 __interrupt void  adc_isr(void)
 {
-    //gee aandag hieraan. doen 'n stroom meting conversion elke teen 1 Hz soos spanning
+    //gee aandag hieraan. doen 'n stroom meting conversion teen 1 Hz soos spanning
     //Sit dit dalk deur 'n laag deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^WcTs
 
     //  float measure_C;
@@ -52,14 +52,12 @@ __interrupt void cpu_timer0_isr(void)
 {
     counter_2Hz++;
     CpuTimer0.InterruptCount++;
-    // Acknowledge this interrupt to receive more interrupts from group 1
     PieCtrlRegs.PIEACK.bit.ACK1 = 1/* PIEACK_GROUP1*/;
 }
 
 __interrupt void cpu_timer1_isr(void)
 {
     //check status of all flags as well as the key switch
-
     counter_50Hz++;
 
     if(KeySwitch == 1)  //keyswitch == 1
@@ -104,7 +102,6 @@ __interrupt void cpu_timer1_isr(void)
     }
 
     CpuTimer1.InterruptCount++;
-    // The CPU acknowledges the interrupt.
     EDIS;
 }
 
@@ -113,7 +110,6 @@ __interrupt void cpu_timer2_isr(void)
     EALLOW;
 
     CpuTimer2.InterruptCount++;
-    // The CPU acknowledges the interrupt.
     EDIS;
 }
 
@@ -177,12 +173,10 @@ __interrupt void can_rx_isr(void)
     }
     else if (ECanaRegs.CANRMP.all == 0x00000004)
     {
-
         CANChargerReception();
     }
 
     ECanaRegs.CANRMP.all = 0xFFFFFFFF;          // Reset receive mailbox flags
-
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
 }
 
@@ -195,7 +189,6 @@ __interrupt void can_tx_isr(void)
 
 
     ECanaRegs.CANTA.all = 0xFFFFFFFF;           // Reset tranmission flags
-
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
 }
 

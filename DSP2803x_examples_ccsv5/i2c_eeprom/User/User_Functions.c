@@ -45,8 +45,6 @@ void Initialise_BMS(void)
     CpuTimer1Regs.TCR.all = 0x4000; // Use write-only instruction to set TSS bit = 0
     CpuTimer2Regs.TCR.all = 0x4000; // Use write-only instruction to set TSS bit = 0
 
-    // Enable interrupts required for this example
-
     // Enable ADC interrupt 10 in the PIE: Group 10 interrupt 1
     PieCtrlRegs.PIEIER10.bit.INTx1 = 1;
     IER |= M_INT10;
@@ -62,20 +60,14 @@ void Initialise_BMS(void)
     // Enable I2C INT8 which is connected to PIE group 8
     IER |= M_INT8;
 
-    ////////////////////////////B. Horn
     EnableInterrupts();
-    ////////////////////////////B. Horn
 
     EINT;
     ERTM;   // Enable Global realtime interrupt DBGM
 
     CAN_Init();
-
     configADC();
-
-    //Turn on and initialise Bq76940
     Bq76940_Init();
-
     //  Shut_D_BQ();
 }
 
@@ -134,8 +126,10 @@ void Init_Gpio(void)
     CSControl = 0;  //turn CScontrol on for current measurement
 }
 
-
-
+void Toggle_LED(void)
+{
+    GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;
+}
 
 void  Read_Cell_Voltages(void)
 {
@@ -149,10 +143,7 @@ void  Read_Cell_Voltages(void)
 
     for(i = 0; i<15; i++)
     {
-        //V[i] = I2CA_ReadData(&I2cMsgIn1,0x0C+(i*0x02), 2);
-
         temp_V = I2CA_ReadData(&I2cMsgIn1,0x0C+(i*0x02), 2);
-
         temp_V = (ADCgain * temp_V) + ADCoffset;
 
         Voltages[i] = temp_V;
@@ -165,11 +156,6 @@ void  Read_Cell_Voltages(void)
         if(Voltage_low>Voltages[i])
             Voltage_low = Voltages[i];
     }
-}
-
-void Toggle_LED(void)
-{
-    GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;
 }
 
 void Process_Voltages(void)
@@ -421,8 +407,6 @@ unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key)
     }
     return(crc);
 }
-
-
 
 Uint32 ChgCalculator(float Voltage, float Current)
 {

@@ -3,14 +3,7 @@
 // $Release Date: March 30, 2013 $
 //###########################################################################
 
-#include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
-#include "math.h"
-#include <stdio.h>
-#include <float.h>
-#include <string.h>
 #include "User\User_Defines.h"
-#include "User\User_Prototypes.h"
-#include "User\User_Globals.h"
 
 void main(void)
 {

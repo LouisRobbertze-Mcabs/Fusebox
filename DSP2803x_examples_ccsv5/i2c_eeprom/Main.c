@@ -12,33 +12,29 @@
 #include "User_Prototypes.h"
 #include "User_Globals.h"
 
-volatile int system_status= 0;
-
 void main(void)
 {
-    initialise_BMS();
-    // Application loop
+    Initialise_BMS();
+
     for(;;)
     {
         if(counter_2Hz == 2)
         {
+            Toggle_LED();
+
             Read_Cell_Voltages();
-            //calculate current										//maak miskien funksie
-            Current = (test_current-2085)* 0.125;					//2035    maal, moenie deel nie!!!!     0.0982--200/2048
+            Process_Voltages();
+            Calculate_Current();
             //Ah = Ah + Current*0.00027778;
             //ContactorOut = 1;
             Read_Temp();
 
-            Toggle_LED();
             //Balance(5,3.31);
 
-            system_status = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
-            if(system_status != 00)
-            {
-                I2CA_WriteData(0x00, 0x3F);
-            }
-            counter_2Hz = 0;
+            Read_System_Status();
+            Process_System_Status();
 
+            counter_2Hz = 0;
             Reset_ADC();
         }
     }

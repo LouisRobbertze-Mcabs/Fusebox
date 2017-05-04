@@ -39,6 +39,7 @@ extern volatile Uint16 counter_2Hz;
 extern float Ireference;
 
 extern volatile Uint16 Charger_status;
+extern volatile int system_status;
 
 extern volatile float toets;
 extern volatile float toets2;

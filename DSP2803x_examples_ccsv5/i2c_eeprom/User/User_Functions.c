@@ -8,7 +8,7 @@
 #include "User_Prototypes.h"
 #include "User_Globals.h"
 
-void initialise_BMS(void)
+void Initialise_BMS(void)
 {
     flagCurrent = 0;
 
@@ -405,7 +405,15 @@ void  Read_Cell_Voltages(void)
         if(Voltage_low>Voltages[i])
             Voltage_low = Voltages[i];
     }
+}
 
+void Toggle_LED(void)
+{
+    GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;
+}
+
+void Process_Voltages(void)
+{
     if(Voltage_high > 3.6)         //3.65
     {
         balance = 1;            //start balancing
@@ -430,9 +438,23 @@ void  Read_Cell_Voltages(void)
         flagDischarged = 0;
 }
 
-void Toggle_LED(void)
+void Calculate_Current(void)
 {
-    GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;
+    Current = (test_current-2085)* 0.125;                   //2035    maal, moenie deel nie!!!!     0.0982--200/2048
+}
+
+void Read_System_Status(void)
+{
+    system_status = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
+
+}
+
+void Process_System_Status(void)
+{
+    if(system_status != 00)
+    {
+        I2CA_WriteData(0x00, 0x3F);
+    }
 }
 
 void Read_Temp()

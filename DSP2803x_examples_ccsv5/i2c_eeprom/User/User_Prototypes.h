@@ -21,10 +21,13 @@ union bits32
     float32 asFloat;
 };
 
-void initialise_BMS(void);
+void Initialise_BMS(void);
 void Reset_ADC(void);
 void Toggle_LED(void);
-
+void Process_Voltages(void);
+void Calculate_Current(void);
+void Read_System_Status(void);
+void Process_System_Status(void);
 
 void Init_Gpio(void);
 void I2CA_Init(void);

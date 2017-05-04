@@ -44,6 +44,7 @@ volatile Uint16 counter_2Hz = 0;
 float current_reference;
 
 volatile Uint16 Charger_status = 0;
+volatile int system_status= 0;
 
 volatile float toets=0;
 volatile float toets2=0;

@@ -15,6 +15,12 @@
 #include <string.h>
 #include "User_Defines.h"
 
+union bits32
+{
+    Uint32 asUint;
+    float32 asFloat;
+};
+
 void Init_Gpio(void);
 void I2CA_Init(void);
 void CANSetup(void);

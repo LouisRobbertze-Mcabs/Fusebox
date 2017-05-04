@@ -17,7 +17,7 @@ void main(void)
     // Application loop
     for(;;)
     {
-        if(count == 2)
+        if(counter_2Hz == 2)
         {
             Read_CellVol();
             //calculate current										//maak miskien funksie
@@ -34,9 +34,7 @@ void main(void)
             {
                 I2CA_WriteData(0x00, 0x3F);
             }
-
-            count1= count1+2;
-            count = 0;
+            counter_2Hz = 0;
 
             I2CA_WriteData(0x04,0x8);											//reset adc
             I2CA_WriteData(0x04,0x18);

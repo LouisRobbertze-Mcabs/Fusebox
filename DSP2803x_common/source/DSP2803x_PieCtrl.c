@@ -62,7 +62,6 @@ void InitPieCtrl(void)
 //
 void EnableInterrupts()
 {
-
     // Enable the PIE
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1;
     		
@@ -71,7 +70,6 @@ void EnableInterrupts()
 
 	// Enable Interrupts at the CPU level 
     EINT;
-
 }
 
 //===========================================================================

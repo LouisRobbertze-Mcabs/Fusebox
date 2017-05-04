@@ -150,8 +150,6 @@ void I2CA_Init(void)
     I2caRegs.I2CFFRX.all = 0x2040;  // Enable RXFIFO, clear RXFFINT,
 }
 
-
-
 void CANTransmit(Uint16 Destination, Uint32 TxDataH, Uint32 TxDataL, Uint16 Bytes)      //destination, txdataH, txdataL,  bytes
 {
     ECanaRegs.CANME.all = 0x00000006;                   // Disable Tx Mailbox
@@ -168,6 +166,7 @@ void CANTransmit(Uint16 Destination, Uint32 TxDataH, Uint32 TxDataL, Uint16 Byte
 
     ECanaRegs.CANTRS.all = 0x00000001;                  // Set transmit request
 }
+
 Uint16 I2CA_WriteData(unsigned char Register, unsigned char Data)
 {
     unsigned char DataBuffer[4];
@@ -287,27 +286,27 @@ void CANSlaveReception(void)
 
     switch (RxData)
     {
-    case 1: {TxData.asFloat=V[0]; CANTransmit(0, 1, TxData.asUint,5); break;}
-    case 2: {TxData.asFloat=V[1]; CANTransmit(0, 2, TxData.asUint,5); break;}
-    case 3: {TxData.asFloat=V[2]; CANTransmit(0, 3, TxData.asUint,5); break;}
-    case 4: {TxData.asFloat=V[3]; CANTransmit(0, 4, TxData.asUint,5); break;}
-    case 5: {TxData.asFloat=V[4]; CANTransmit(0, 5, TxData.asUint,5); break;}
-    case 6: {TxData.asFloat=V[5]; CANTransmit(0, 6, TxData.asUint,5); break;}
-    case 7: {TxData.asFloat=V[6]; CANTransmit(0, 7, TxData.asUint,5); break;}
-    case 8: {TxData.asFloat=V[7]; CANTransmit(0, 8, TxData.asUint,5); break;}
-    case 9: {TxData.asFloat=V[8]; CANTransmit(0, 9, TxData.asUint,5); break;}
-    case 10: {TxData.asFloat=V[9]; CANTransmit(0, 10, TxData.asUint,5); break;}
-    case 11: {TxData.asFloat=V[10]; CANTransmit(0, 11, TxData.asUint,5); break;}
-    case 12: {TxData.asFloat=V[11]; CANTransmit(0, 12, TxData.asUint,5); break;}
-    case 13: {TxData.asFloat=V[12]; CANTransmit(0, 13, TxData.asUint,5); break;}
-    case 14: {TxData.asFloat=V[13]; CANTransmit(0, 14, TxData.asUint,5); break;}
-    case 15: {TxData.asFloat=V[14]; CANTransmit(0, 15, TxData.asUint,5); break;}
+    case 1: {TxData.asFloat=Voltages[0]; CANTransmit(0, 1, TxData.asUint,5); break;}
+    case 2: {TxData.asFloat=Voltages[1]; CANTransmit(0, 2, TxData.asUint,5); break;}
+    case 3: {TxData.asFloat=Voltages[2]; CANTransmit(0, 3, TxData.asUint,5); break;}
+    case 4: {TxData.asFloat=Voltages[3]; CANTransmit(0, 4, TxData.asUint,5); break;}
+    case 5: {TxData.asFloat=Voltages[4]; CANTransmit(0, 5, TxData.asUint,5); break;}
+    case 6: {TxData.asFloat=Voltages[5]; CANTransmit(0, 6, TxData.asUint,5); break;}
+    case 7: {TxData.asFloat=Voltages[6]; CANTransmit(0, 7, TxData.asUint,5); break;}
+    case 8: {TxData.asFloat=Voltages[7]; CANTransmit(0, 8, TxData.asUint,5); break;}
+    case 9: {TxData.asFloat=Voltages[8]; CANTransmit(0, 9, TxData.asUint,5); break;}
+    case 10: {TxData.asFloat=Voltages[9]; CANTransmit(0, 10, TxData.asUint,5); break;}
+    case 11: {TxData.asFloat=Voltages[10]; CANTransmit(0, 11, TxData.asUint,5); break;}
+    case 12: {TxData.asFloat=Voltages[11]; CANTransmit(0, 12, TxData.asUint,5); break;}
+    case 13: {TxData.asFloat=Voltages[12]; CANTransmit(0, 13, TxData.asUint,5); break;}
+    case 14: {TxData.asFloat=Voltages[13]; CANTransmit(0, 14, TxData.asUint,5); break;}
+    case 15: {TxData.asFloat=Voltages[14]; CANTransmit(0, 15, TxData.asUint,5); break;}
 
     case 16: {TxData.asFloat=current; CANTransmit(0, 16, TxData.asUint,5); break;}
 
-    case 17: {TxData.asFloat=T[0]; CANTransmit(0, 17, TxData.asUint,5); break;}
-    case 18: {TxData.asFloat=T[1]; CANTransmit(0, 18, TxData.asUint,5); break;}
-    case 19: {TxData.asFloat=T[2]; CANTransmit(0, 19, TxData.asUint, 5); break;}
+    case 17: {TxData.asFloat=Temperatures[0]; CANTransmit(0, 17, TxData.asUint,5); break;}
+    case 18: {TxData.asFloat=Temperatures[1]; CANTransmit(0, 18, TxData.asUint,5); break;}
+    case 19: {TxData.asFloat=Temperatures[2]; CANTransmit(0, 19, TxData.asUint, 5); break;}
 
     case 20: {TxData.asFloat=test_current; CANTransmit(0, 20, TxData.asUint, 5); break;}
     }
@@ -321,7 +320,7 @@ void  Bq76940_Init(void)
     Uint16 Reset;
 
     BQEnable = 1;                                           //turn on BQ chip
-    while(count != 1);                                      //toets delay
+    while(counter_2Hz != 1);                                      //toets delay
 
     Reset = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
 
@@ -377,8 +376,8 @@ void  Read_CellVol(void)
     // Read data from EEPROM section //
     int i;
     Vt = 0;
-    Vhigh = 0;                      //reset values
-    Vlow = 10;
+    Voltage_high = 0;                      //reset values
+    Voltage_low = 10;
 
     float temp_V = 0;
 
@@ -390,38 +389,38 @@ void  Read_CellVol(void)
 
         temp_V = (ADCgain * temp_V) + ADCoffset;
 
-        V[i] = temp_V;
+        Voltages[i] = temp_V;
 
-        Vt = Vt +  V[i];
+        Vt = Vt +  Voltages[i];
 
-        if(Vhigh<V[i])
-            Vhigh = V[i];
+        if(Voltage_high<Voltages[i])
+            Voltage_high = Voltages[i];
 
-        if(Vlow>V[i])
-            Vlow = V[i];
+        if(Voltage_low>Voltages[i])
+            Voltage_low = Voltages[i];
     }
 
-    if(Vhigh > 3.6)         //3.65
+    if(Voltage_high > 3.6)         //3.65
     {
         balance = 1;            //start balancing
         flagCharged = 1;        //charged flag to to stop charging
     }
 
-    if(Vlow < 2.8 && Vlow > 2.6)
+    if(Voltage_low < 2.8 && Voltage_low > 2.6)
     {
         flagDischarged = 1;
         led3 = 1;               //turn on red led
         ContactorOut = 0;       //turn off contactor            //turn off output
     }
-    else if(Vlow < 2.6)
+    else if(Voltage_low < 2.6)
     {
         flagDischarged = 2;
     }
 
-    if(Vhigh<3.35 )
+    if(Voltage_high<3.35 )
         flagCharged = 0;
 
-    if(Vlow>2.8 )
+    if(Voltage_low>2.8 )
         flagDischarged = 0;
 }
 
@@ -448,10 +447,10 @@ void Read_Temp()
         Rts = (10000*Vts)/(3.3-Vts);
         //test2 = Rts;
 
-        T[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
+        Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
         //  T[i] = T[i] -273;
 
-        if(T[i]> 70 || T[i]<0)
+        if(Temperatures[i]> 70 || Temperatures[i]<0)
         {
             flag = 1;
         }
@@ -484,7 +483,7 @@ void Balance(int period, float reference)
             //setup balancing
             for(i = 0; i<5; i+=2)
             {
-                if(V[i] > Cell_B_Voltage)
+                if(Voltages[i] > Cell_B_Voltage)
                 {
                     Cell_B1 = (Cell_B1 | (0x01 << i));
                 }
@@ -492,7 +491,7 @@ void Balance(int period, float reference)
 
             for(i = 5; i<10; i+=2)
             {
-                if(V[i] > Cell_B_Voltage)
+                if(Voltages[i] > Cell_B_Voltage)
                 {
 
                     Cell_B2 = (Cell_B2 | (0x01 << (i-5)));
@@ -501,7 +500,7 @@ void Balance(int period, float reference)
 
             for(i = 10; i<15; i+=2)
             {
-                if(V[i] > Cell_B_Voltage)
+                if(Voltages[i] > Cell_B_Voltage)
                 {
 
                     Cell_B3 = (Cell_B3 | (0x01 << (i-10)));
@@ -534,7 +533,7 @@ void Balance(int period, float reference)
             //setup balancing
             for(i = 1; i<5; i+=2)
             {
-                if(V[i] > Cell_B_Voltage)
+                if(Voltages[i] > Cell_B_Voltage)
                 {
                     Cell_B1 = (Cell_B1 | (0x01 << i));
                 }
@@ -542,7 +541,7 @@ void Balance(int period, float reference)
 
             for(i = 6; i<10; i+=2)
             {
-                if(V[i] > Cell_B_Voltage)
+                if(Voltages[i] > Cell_B_Voltage)
                 {
 
                     Cell_B2 = (Cell_B2 | (0x01 << (i-5)));
@@ -551,7 +550,7 @@ void Balance(int period, float reference)
 
             for(i = 11; i<15; i+=2)
             {
-                if(V[i] > Cell_B_Voltage)
+                if(Voltages[i] > Cell_B_Voltage)
                 {
 
                     Cell_B3 = (Cell_B3 | (0x01 << (i-10)));
@@ -576,7 +575,7 @@ void Balance(int period, float reference)
 
             for(i = 0; i<15; i++)
             {
-                if(V[i] > Cell_B_Voltage)
+                if(Voltages[i] > Cell_B_Voltage)
                 {
                     balance++;
                 }
@@ -841,7 +840,7 @@ void CANChargerReception(void)
             {
                 //calculate maximum allowed voltage and possibly current
                 //- make function with PI control loop
-                if(Vhigh < 3.55)
+                if(Voltage_high < 3.55)
                 {
                     //Ireference = 52.5;
                     CANTransmit(0x618, 0, ChgCalculator(54, Current_max), 8);               //charging started.. maybe reveiw..
@@ -961,8 +960,7 @@ __interrupt void  adc_isr(void)
 
 __interrupt void cpu_timer0_isr(void)
 {
-    count++;
-
+    counter_2Hz++;
     CpuTimer0.InterruptCount++;
     // Acknowledge this interrupt to receive more interrupts from group 1
     PieCtrlRegs.PIEACK.bit.ACK1 = 1/* PIEACK_GROUP1*/;

@@ -39,8 +39,7 @@ volatile Uint16 flagDischarged=0;
 volatile Uint16 balance = 0;
 /////////////////////////////////////////////
 
-volatile Uint16 count = 0;
-volatile Uint16 count1 = 0;
+volatile Uint16 counter_2Hz = 0;
 
 float Ireference;
 
@@ -51,10 +50,10 @@ volatile float toets2=0;
 volatile float current;
 volatile int current_int;
 
-volatile float V[15];
-volatile float Vhigh=0;
-volatile float Vlow=10;
-volatile float T[3];
+volatile float Voltages[15];
+volatile float Voltage_high=0;
+volatile float Voltage_low=10;
+volatile float Temperatures[3];
 
 volatile float ADCgain;
 volatile float ADCoffset;
@@ -62,7 +61,6 @@ volatile float I;
 volatile float Vt;
 volatile float Ah= 0;
 volatile int rus = 0;
-
 
 Uint32 ref = 0;
 

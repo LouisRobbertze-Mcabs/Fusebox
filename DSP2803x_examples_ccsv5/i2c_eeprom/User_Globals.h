@@ -34,8 +34,7 @@ extern volatile Uint16 flagDischarged;
 extern volatile Uint16 balance;
 /////////////////////////////////////////////
 
-extern volatile Uint16 count;
-extern volatile Uint16 count1;
+extern volatile Uint16 counter_2Hz;
 
 extern float Ireference;
 
@@ -46,10 +45,10 @@ extern volatile float toets2;
 extern volatile float current;
 extern volatile int current_int;
 
-extern volatile float V[15];
-extern volatile float Vhigh;
-extern volatile float Vlow;
-extern volatile float T[3];
+extern volatile float Voltages[15];
+extern volatile float Voltage_high;
+extern volatile float Voltage_low;
+extern volatile float Temperatures[3];
 
 extern volatile float ADCgain;
 extern volatile float ADCoffset;

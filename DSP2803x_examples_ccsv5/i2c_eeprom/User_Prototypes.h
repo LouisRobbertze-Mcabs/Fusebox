@@ -21,6 +21,8 @@ union bits32
     float32 asFloat;
 };
 
+void initialise_BMS(void);
+
 void Init_Gpio(void);
 void I2CA_Init(void);
 void CANSetup(void);

@@ -13,8 +13,6 @@ ORDERED_OBJS += \
 "./DSP2803x_CodeStartBranch.obj" \
 "./DSP2803x_usDelay.obj" \
 "./Main.obj" \
-"./User_Functions.obj" \
-"./User_Globals.obj" \
 "./Source/DSP2803x_Adc.obj" \
 "./Source/DSP2803x_CpuTimers.obj" \
 "./Source/DSP2803x_DefaultIsr.obj" \
@@ -25,6 +23,8 @@ ORDERED_OBJS += \
 "./Source/DSP2803x_PieVect.obj" \
 "./Source/DSP2803x_Spi.obj" \
 "./Source/DSP2803x_SysCtrl.obj" \
+"./User/User_Functions.obj" \
+"./User/User_Globals.obj" \
 "C:/Users/Sonja/Documents/GitHub/BatteryBestuurStelsel/DSP2803x_headers/cmd/DSP2803x_Headers_nonBIOS.cmd" \
 "../F28035.cmd" \
 "../IQmath.lib" \
@@ -41,8 +41,10 @@ RMDIR := RMDIR /S/Q
 -include sources.mk
 -include subdir_vars.mk
 -include Source/subdir_vars.mk
+-include User/subdir_vars.mk
 -include subdir_rules.mk
 -include Source/subdir_rules.mk
+-include User/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -159,8 +161,8 @@ Example_2803xI2C_eeprom.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "DSP2803x_CodeStartBranch.obj" "DSP2803x_usDelay.obj" "Main.obj" "User_Functions.obj" "User_Globals.obj" "Source\DSP2803x_Adc.obj" "Source\DSP2803x_CpuTimers.obj" "Source\DSP2803x_DefaultIsr.obj" "Source\DSP2803x_ECan.obj" "Source\DSP2803x_GlobalVariableDefs.obj" "Source\DSP2803x_I2C.obj" "Source\DSP2803x_PieCtrl.obj" "Source\DSP2803x_PieVect.obj" "Source\DSP2803x_Spi.obj" "Source\DSP2803x_SysCtrl.obj" 
-	-$(RM) "Main.d" "User_Functions.d" "User_Globals.d" "Source\DSP2803x_Adc.d" "Source\DSP2803x_CpuTimers.d" "Source\DSP2803x_DefaultIsr.d" "Source\DSP2803x_ECan.d" "Source\DSP2803x_GlobalVariableDefs.d" "Source\DSP2803x_I2C.d" "Source\DSP2803x_PieCtrl.d" "Source\DSP2803x_PieVect.d" "Source\DSP2803x_Spi.d" "Source\DSP2803x_SysCtrl.d" 
+	-$(RM) "DSP2803x_CodeStartBranch.obj" "DSP2803x_usDelay.obj" "Main.obj" "Source\DSP2803x_Adc.obj" "Source\DSP2803x_CpuTimers.obj" "Source\DSP2803x_DefaultIsr.obj" "Source\DSP2803x_ECan.obj" "Source\DSP2803x_GlobalVariableDefs.obj" "Source\DSP2803x_I2C.obj" "Source\DSP2803x_PieCtrl.obj" "Source\DSP2803x_PieVect.obj" "Source\DSP2803x_Spi.obj" "Source\DSP2803x_SysCtrl.obj" "User\User_Functions.obj" "User\User_Globals.obj" 
+	-$(RM) "Main.d" "Source\DSP2803x_Adc.d" "Source\DSP2803x_CpuTimers.d" "Source\DSP2803x_DefaultIsr.d" "Source\DSP2803x_ECan.d" "Source\DSP2803x_GlobalVariableDefs.d" "Source\DSP2803x_I2C.d" "Source\DSP2803x_PieCtrl.d" "Source\DSP2803x_PieVect.d" "Source\DSP2803x_Spi.d" "Source\DSP2803x_SysCtrl.d" "User\User_Functions.d" "User\User_Globals.d" 
 	-$(RM) "DSP2803x_CodeStartBranch.d" "DSP2803x_usDelay.d" 
 	-@echo 'Finished clean'
 	-@echo ' '

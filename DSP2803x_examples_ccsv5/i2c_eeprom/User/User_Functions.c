@@ -457,7 +457,7 @@ void Process_System_Status(void)
     }
 }
 
-void Read_Temp()
+void Read_Temperatures(void)
 {
     int i;
     int flag = 0;
@@ -637,8 +637,6 @@ void Balance(int period, float reference)
         }
     }
 }
-
-
 
 unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key)
 {

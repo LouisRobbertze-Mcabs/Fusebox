@@ -1,6 +1,6 @@
 # Debug folder
-Debug/*
-Debug:w
+/Debug/*
+/Debug/
 
 # Windows image file caches
 Thumbs.db

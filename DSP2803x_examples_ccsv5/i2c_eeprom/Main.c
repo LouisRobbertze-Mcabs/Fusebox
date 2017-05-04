@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <float.h>
 #include <string.h>
-#include "User_Defines.h"
-#include "User_Prototypes.h"
-#include "User_Globals.h"
+#include "User\User_Defines.h"
+#include "User\User_Prototypes.h"
+#include "User\User_Globals.h"
 
 void main(void)
 {
@@ -27,7 +27,7 @@ void main(void)
             Calculate_Current();
             //Ah = Ah + Current*0.00027778;
             //ContactorOut = 1;
-            Read_Temp();
+            Read_Temperatures();
 
             //Balance(5,3.31);
 

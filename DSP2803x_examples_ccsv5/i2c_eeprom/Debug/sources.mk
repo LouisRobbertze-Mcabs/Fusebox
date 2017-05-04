@@ -108,4 +108,5 @@ PDE_DEPS__QUOTED :=
 SUBDIRS := \
 . \
 Source \
+User \
 

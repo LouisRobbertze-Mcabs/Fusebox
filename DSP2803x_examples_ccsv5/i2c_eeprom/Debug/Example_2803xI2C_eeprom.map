@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v16.9.1                     
 ******************************************************************************
->> Linked Thu May 04 12:57:22 2017
+>> Linked Thu May 04 14:06:15 2017
 
 OUTPUT FILE NAME:   <Example_2803xI2C_eeprom.out>
 ENTRY POINT SYMBOL: "code_start"  address: 003f7ff6
@@ -362,13 +362,11 @@ MODULE SUMMARY
        Module                            code   initialized data   uninitialized data
        ------                            ----   ----------------   ------------------
     .\
-       User_Functions.obj                2781   54                 8                 
-       User_Globals.obj                  0      117                112               
        Main.obj                          27     0                  0                 
        DSP2803x_CodeStartBranch.obj      10     0                  0                 
        DSP2803x_usDelay.obj              8      0                  0                 
     +--+---------------------------------+------+------------------+--------------------+
-       Total:                            2826   171                120               
+       Total:                            45     0                  0                 
                                                                                      
     .\Source\
        DSP2803x_GlobalVariableDefs.obj   0      0                  2024              
@@ -382,6 +380,12 @@ MODULE SUMMARY
        DSP2803x_I2C.obj                  25     0                  0                 
     +--+---------------------------------+------+------------------+--------------------+
        Total:                            1422   256                2048              
+                                                                                     
+    .\User\
+       User_Functions.obj                2781   54                 8                 
+       User_Globals.obj                  0      117                112               
+    +--+---------------------------------+------+------------------+--------------------+
+       Total:                            2781   171                120               
                                                                                      
     C:/ti/ccsv7/tools/compiler/ti-cgt-c2000_16.9.1.LTS/lib/rts2800_ml.lib
        e_logf.obj                        390    16                 0                 
@@ -735,7 +739,7 @@ page  address   name
 0     00008000  _RamfuncsRunStart               
 0     003f639b  _Read_Cell_Voltages             
 0     003f64a0  _Read_System_Status             
-0     003f64b3  _Read_Temp                      
+0     003f64b3  _Read_Temperatures              
 1     00008c0d  _Received                       
 0     003f6088  _Reset_ADC                      
 0     003f6dfb  _SCIRXINTA_ISR                  
@@ -868,7 +872,7 @@ page  address   name
 0     003f6489  _Calculate_Current              
 0     003f64a0  _Read_System_Status             
 0     003f64aa  _Process_System_Status          
-0     003f64b3  _Read_Temp                      
+0     003f64b3  _Read_Temperatures              
 0     003f6561  _Balance                        
 0     003f6726  _CRC8                           
 0     003f674f  _configADC                      

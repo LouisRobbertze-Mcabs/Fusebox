@@ -95,6 +95,8 @@ volatile Uint16 balance = 0;
 volatile Uint16 count = 0;
 volatile Uint16 count1 = 0;
 
+
+
 float Ireference;
 
 volatile Uint16 Charger_status = 0;
@@ -121,15 +123,20 @@ Uint32 ref = 0;
 
 volatile int CANcounter = 0;
 
+
+volatile float AuxVoltage = 0;
+volatile Uint16 AuxCounter = 0;
+
+
 volatile float test_current= 0;
+
+volatile float current_100Hz= 0;
 
 volatile float test_blah[3];
 
 int Cell_B1 = 0;
 int Cell_B2 = 0;
 int Cell_B3 = 0;
-
-
 
 volatile int system_status= 0;
 
@@ -215,7 +222,6 @@ void main(void)
 
 	//	Shut_D_BQ();
 
-
 	// Application loop
 	for(;;)
 	{
@@ -225,7 +231,7 @@ void main(void)
 			Read_CellVol();
 
 			//calculate current										//maak miskien funksie
-			current = (test_current-2085)* 0.125;					//2035    maal, moenie deel nie!!!!     0.0982--200/2048
+			current = (test_current-2090)* 0.125;					//2035    maal, moenie deel nie!!!!     0.0982--200/2048
 
 
 			//Ah = Ah + current*0.00027778;
@@ -236,7 +242,7 @@ void main(void)
 
 			GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;		//toggle led
 
-			//Balance(5,3.31);
+			//Balance(5,3.2);
 
 			system_status = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
 			if(system_status != 00)
@@ -283,7 +289,7 @@ void   Init_Gpio(void)
 
 	GpioCtrlRegs.GPAMUX1.bit.GPIO15 = 0;	//12 Aux drive
 	GpioCtrlRegs.GPADIR.bit.GPIO15 = 1;		// 12 Aux drive (verander miskien)
-	Aux_Control = 1;
+	Aux_Control = 0;
 
 	GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;	//KeyDrive
 	GpioCtrlRegs.GPADIR.bit.GPIO19 = 0;		//(input) key drive (verander miskien)
@@ -406,8 +412,6 @@ void  Read_CellVol(void)
 
 	for(i = 0; i<15; i++)
 	{
-		//V[i] = I2CA_ReadData(&I2cMsgIn1,0x0C+(i*0x02), 2);
-
 		temp_V = I2CA_ReadData(&I2cMsgIn1,0x0C+(i*0x02), 2);
 
 		temp_V = (ADCgain * temp_V) + ADCoffset;
@@ -423,21 +427,37 @@ void  Read_CellVol(void)
 			Vlow = V[i];
 	}
 
-	if(Vhigh > 3.6)			//3.65
+	if(Vhigh > 3.65)			//3.65
 	{
-		balance = 1;			//start balancing
 		flagCharged = 1;		//charged flag to to stop charging
+		balance = 1;
+		ContactorOut = 0;		//turn off contactor
 	}
 
-	if(Vlow < 2.8 && Vlow > 2.6)
+
+	if(Vlow > 3 && AuxVoltage < 12.3)     			//780 = 0.63 = 13.2V
+	{
+		Aux_Control = 1;		//Turn on aux supply
+		AuxCounter = 0;			//reset auxcounter terug na 0
+	}
+	else if (AuxCounter > 1800)
+	{
+		Aux_Control = 0;		//Turn off aux supply
+	}
+	AuxCounter++;			//reset auxcounter terug na 0
+
+	if(Vlow < 2.8 && Vlow > 2.6 && Charger_status == 0)  // add charging status
 	{
 		flagDischarged = 1;
 		led3 = 1;				//turn on red led
-		ContactorOut = 0;		//turn off contactor			//turn off output
+		ContactorOut = 0;		//turn off contactor      moet die ding nie op 'n ander plek af skakel nie????????
+		Aux_Control = 0;		//Turn off aux supply
 	}
-	else if(Vlow < 2.6)
+	else if(Vlow < 2.6 && Charger_status == 0)
 	{
 		flagDischarged = 2;
+		led3 = 1;				//turn on red led
+		Aux_Control = 0;		//Turn off aux supply
 	}
 
 	if(Vhigh<3.35 )
@@ -461,10 +481,7 @@ void Read_Temp()
 		temp_T = I2CA_ReadData(&I2cMsgIn1, 0x2C+(i*0x02), 2);
 		//		test_blah[i] = T[i];
 
-		if(i == 0)
-			Vts = (temp_T*ADCgain) + 0.27;
-		else
-			Vts = temp_T*ADCgain;
+		Vts = temp_T*ADCgain;
 
 		//test1 = Vts;
 		Rts = (10000*Vts)/(3.3-Vts);
@@ -473,14 +490,17 @@ void Read_Temp()
 		T[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
 		//	T[i] = T[i] -273;
 
-		if(T[i]> 70 || T[i]<0)
+		if(T[i]> 60 || T[i]<0)
 		{
 			flag = 1;
 		}
 	}
 
 	if(flag == 1)
+	{
 		flagTemp = 1;
+		ContactorOut = 0;
+	}
 	else if(flag == 0)
 		flagTemp = 0;
 }
@@ -764,11 +784,18 @@ void configADC(void)
 	AdcRegs.INTSEL1N2.bit.INT1SEL	= 1;	//setup EOC1 to trigger ADCINT1 to fire
 	AdcRegs.ADCSOC0CTL.bit.CHSEL 	= 0x0B;	//0		set SOC0 channel select to ADCINB3(dummy sample for rev0 errata workaround)
 	AdcRegs.ADCSOC1CTL.bit.CHSEL 	= 0x0B;	//0		set SOC1 channel select to ADCINB3
-	AdcRegs.ADCSOC0CTL.bit.TRIGSEL 	= 0x03;	//	CPU Timer 0  // hierdie was 2
+	AdcRegs.ADCSOC0CTL.bit.TRIGSEL 	= 0x03;	//	CPU Timer  2
 	AdcRegs.ADCSOC1CTL.bit.TRIGSEL 	= 0x03;	//
 	AdcRegs.ADCSOC0CTL.bit.ACQPS 	= 20;	//set SOC0 S/H Window to 7 ADC Clock Cycles, (6 ACQPS plus 1)
 	AdcRegs.ADCSOC1CTL.bit.ACQPS 	= 20;	//set SOC1 S/H Window to 7 ADC Clock Cycles, (6 ACQPS plus 1)
+
+
+	AdcRegs.ADCSOC2CTL.bit.CHSEL 	= 0x0C;	//0		set SOC2 channel select to ADCINB4
+	AdcRegs.ADCSOC2CTL.bit.TRIGSEL 	= 0x01;	//	CPU Timer 0  /
+	AdcRegs.ADCSOC2CTL.bit.ACQPS 	= 20;	//set SOC1 S/H Window to 7 ADC Clock Cycles, (6 ACQPS plus 1)
+
 	EDIS;
+
 }
 
 void CANSetup(void)
@@ -942,7 +969,7 @@ void CANSlaveReception(void)
 
 	switch (RxData)
 	{
-	case 1: {TxData.asFloat=V[0]; CANTransmit(0, 1, TxData.asUint,5); break;}
+	case 1: {TxData.asFloat=V[0]; CANTransmit(0, 1, TxData.asUint,5); break;}				//Voltage measurement
 	case 2: {TxData.asFloat=V[1]; CANTransmit(0, 2, TxData.asUint,5); break;}
 	case 3: {TxData.asFloat=V[2]; CANTransmit(0, 3, TxData.asUint,5); break;}
 	case 4: {TxData.asFloat=V[3]; CANTransmit(0, 4, TxData.asUint,5); break;}
@@ -958,13 +985,13 @@ void CANSlaveReception(void)
 	case 14: {TxData.asFloat=V[13]; CANTransmit(0, 14, TxData.asUint,5); break;}
 	case 15: {TxData.asFloat=V[14]; CANTransmit(0, 15, TxData.asUint,5); break;}
 
-	case 16: {TxData.asFloat=current; CANTransmit(0, 16, TxData.asUint,5); break;}
+	case 16: {TxData.asFloat=current; CANTransmit(0, 16, TxData.asUint,5); break;}				//Current measurement
 
-	case 17: {TxData.asFloat=T[0]; CANTransmit(0, 17, TxData.asUint,5); break;}
+	case 17: {TxData.asFloat=T[0]; CANTransmit(0, 17, TxData.asUint,5); break;}					//Temp measurement
 	case 18: {TxData.asFloat=T[1]; CANTransmit(0, 18, TxData.asUint,5); break;}
 	case 19: {TxData.asFloat=T[2]; CANTransmit(0, 19, TxData.asUint, 5); break;}
 
-	case 20: {TxData.asFloat=test_current; CANTransmit(0, 20, TxData.asUint, 5); break;}
+	case 20: {TxData.asFloat=AuxVoltage; CANTransmit(0, 20, TxData.asUint, 5); break;}			//12V aux
 	}
 }
 
@@ -978,8 +1005,7 @@ void CANChargerReception(void)
 	Uint16 temp = 0;
 	Uint16 temp2 = 0;
 
-
-	static volatile float Current_max = 28;
+	static volatile float Current_max = 25;
 	//	float Vreference = 52;
 
 	static volatile int delay = 0;  // miskien >> count 1 cycle from contactor closes till charger starts
@@ -1005,6 +1031,7 @@ void CANChargerReception(void)
 
 	if(ChgStatus == 0)																	//Charger ready to charge. No flags set
 	{
+		Charger_status = 1; 															//charger connected
 		if(flagCurrent == 0 && flagTemp == 0 && flagCharged == 0 && KeySwitch == 0)		//check flags to ensure charging is allowed   haal flagvoltage uit
 		{
 			if(delay == 0)																//sit miskien check in om met die charger Vbat te meet
@@ -1023,14 +1050,12 @@ void CANChargerReception(void)
 				}
 				else
 				{
-					//					Ireference = ChgCurrent + (3.55-Vhigh)*5;									//ChgVoltage + error*Kp (1) Proposionele beheerder
-					//					PI = 1;
-					if(ChgCurrent>4 )														//sit stroom check in om charger te stop blah blah , sit charged flag = 1 /balance
+					if(ChgCurrent>5 )														//sit stroom check in om charger te stop blah blah , sit charged flag = 1 /balance
 						CANTransmit(0x618, 0, ChgCalculator(54, Current_max-=2), 8);		//charging started.. maybe reveiw..
 					else
 					{
 						CANTransmit(0x618, 1, ChgCalculator(54, 18), 8);					//charging stops
-						Current_max = 28;
+						Current_max = 25;
 						flagCharged = 1;													//status charged
 						balance = 1;														//balance
 					}
@@ -1062,12 +1087,13 @@ void CANChargerReception(void)
 		}
 		else if(delay == 0)
 		{
+			Charger_status = 0;
 			ContactorOut = 0;															//turn off contactor
 			CANTransmit(0x618,1,ChgCalculator(54, 0),8);								//disconnect charger
 		}
 	}
 
-	Charger_status = ChgStatus;
+//	Charger_status = ChgStatus;
 	toets = ChgVoltage;
 	toets2 = ChgCurrent;
 }
@@ -1093,13 +1119,14 @@ Uint32 ChgCalculator(float Voltage, float Current)
 	return answer;
 }
 
-__interrupt void  adc_isr(void)
+__interrupt void  adc_isr(void)						//current measure loop
 {
 	//gee aandag hieraan. doen 'n stroom meting conversion elke teen 1 Hz soos spanning
 	//Sit dit dalk deur 'n laag deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^WcTs
 
 	//	float measure_C;
 	static float current_p;
+	static float current_p2=0;
 	//	int toets_stroom = 0;
 
 	//test_current = AdcResult.ADCRESULT1;
@@ -1120,7 +1147,10 @@ __interrupt void  adc_isr(void)
 	test_current = current_p + (0.00314*(AdcResult.ADCRESULT1-current_p));     //	0.00314-1Hz     //  0.01249 - 4 Hz		//0.27-100Hz
 	current_p=test_current;
 
-	if(AdcResult.ADCRESULT1 > 3500 || AdcResult.ADCRESULT1 < 700)						////////////////////////////////////////////////
+	current_100Hz = current_p2 + (0.27*(AdcResult.ADCRESULT1-current_p2));
+	current_p2 = current_100Hz;
+
+	if(current_100Hz > 3700 || current_100Hz < 500)						////////////////////////////////////////////////
 	{
 		//sit uittree af
 		ContactorOut = 0;		//turn off contactor
@@ -1138,6 +1168,9 @@ __interrupt void cpu_timer0_isr(void)
 {
 	count++;
 
+	AuxVoltage = (AdcResult.ADCRESULT2)*0.00442;				//adc/4096 * 3.3 * 10.51 /0.51    12.2/2.2
+
+
 	CpuTimer0.InterruptCount++;
 	// Acknowledge this interrupt to receive more interrupts from group 1
 	PieCtrlRegs.PIEACK.bit.ACK1 = 1/* PIEACK_GROUP1*/;
@@ -1154,40 +1187,17 @@ __interrupt void cpu_timer1_isr(void)
 		//	led3 = 1;		//turn on red led
 
 		//binne die keydrive if
-		if((flagDischarged == 0) && (flagCurrent == 0)	&&(flagTemp == 0))
+		if((flagDischarged == 0) && (flagCurrent == 0)	&&(flagTemp == 0) && Charger_status == 0)
 		{
 
 			ContactorOut = 1;			//turn on contactor
 		}
 
-		//////////////////////////////////////////////
-		/*
-		if(KeyDrive == 0)	//keydrive == 0
-		{
-
-
-		}
-		else if(KeyDrive == 1)	//keydrive == 1
-		{
-			ContactorOut = 0;		//turn off contactor
-
-			//led3 = 0;		//turn off red led
-		}*/
-		////////////////////////////////////////////
-
 	}
-	else if(KeySwitch == 0)	//keyswitch == 0
+	else if(KeySwitch == 0 && Charger_status == 0)	//keyswitch == 0
 	{
 		flagCurrent = 0;
-		//		ContactorOut = 0;		//turn off contactor
-
-		/*	if((flagDischarged == 0) || (flagCurrent == 0)	||(flagTemp == 0))
-		{
-
-			ContactorOut = 0;			//turn on contactor
-		}*/
-
-		//	led3 = 0;		//turn off red led
+		ContactorOut = 0;		//turn off contactor
 	}
 
 	CpuTimer1.InterruptCount++;

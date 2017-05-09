@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v16.9.1                     
 ******************************************************************************
->> Linked Thu May 04 17:18:16 2017
+>> Linked Mon May 08 13:48:16 2017
 
 OUTPUT FILE NAME:   <Example_2803xI2C_eeprom.out>
 ENTRY POINT SYMBOL: "code_start"  address: 003f7ff6
@@ -750,7 +750,7 @@ page  address   name
 0     003f0004  _RamfuncsLoadEnd                
 0     003f0000  _RamfuncsLoadStart              
 0     00008000  _RamfuncsRunStart               
-0     003f60dc  _Read_Cell_Voltages             
+0     003f60e1  _Read_Cell_Voltages             
 0     003f61e1  _Read_System_Status             
 0     003f61f4  _Read_Temperatures              
 1     00008c0d  _Received                       
@@ -770,7 +770,7 @@ page  address   name
 1     00000985  _SysPwrCtrlRegs                 
 0     003f6bc9  _TINT0_ISR                      
 1     00008c36  _Temperatures                   
-0     003f615d  _Toggle_LED                     
+0     003f60dc  _Toggle_LED                     
 0     003f6ba1  _USER10_ISR                     
 0     003f6ba6  _USER11_ISR                     
 0     003f6bab  _USER12_ISR                     
@@ -871,8 +871,8 @@ page  address   name
 0     003f6000  _Initialise_BMS                 
 0     003f6000  ___text__                       
 0     003f6084  _Init_Gpio                      
-0     003f60dc  _Read_Cell_Voltages             
-0     003f615d  _Toggle_LED                     
+0     003f60dc  _Toggle_LED                     
+0     003f60e1  _Read_Cell_Voltages             
 0     003f6162  _Process_Voltages               
 0     003f61ca  _Calculate_Current              
 0     003f61e1  _Read_System_Status             

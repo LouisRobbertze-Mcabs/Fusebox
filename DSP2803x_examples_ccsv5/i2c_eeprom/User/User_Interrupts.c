@@ -59,9 +59,15 @@ __interrupt void cpu_timer1_isr(void)
 {
     //check status of all flags as well as the key switch
     counter_50Hz++;
+    static float Aux_Voltage_temp = 0;
 
-    Auxilliary_Voltage = (AdcResult.ADCRESULT2)* 0.00442;					//adc/4096 *3.3* 10.51/10.51      12.2/2.2
+    //Sit dit dalk deur 'n laag deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^WcTs
 
+	//adc/4096 *3.3* 10.51/10.51      12.2/2.2
+
+
+    Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));
+    Aux_Voltage_temp = Auxilliary_Voltage;
 
 
     if(KeySwitch == 1)  //keyswitch == 1
@@ -75,20 +81,12 @@ __interrupt void cpu_timer1_isr(void)
             ContactorOut = 1;           //turn on contactor
         }
 
-
-
     }
     else if((KeySwitch == 0) && (Charger_status == 0)) //keyswitch == 0
     {
         flagCurrent = 0;
 
         ContactorOut = 0;       //turn off contactor
-
-        /*  if((flagDischarged == 0) || (flagCurrent == 0)  ||(flagTemp == 0))
-        {
-
-            ContactorOut = 0;           //turn on contactor
-        }*/
 
         //  led3 = 0;       //turn off red led
     }

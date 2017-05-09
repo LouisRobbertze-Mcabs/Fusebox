@@ -434,7 +434,6 @@ void  Read_CellVol(void)
 		ContactorOut = 0;		//turn off contactor
 	}
 
-
 	if(Vlow > 3 && AuxVoltage < 12.3)     			//780 = 0.63 = 13.2V
 	{
 		Aux_Control = 1;		//Turn on aux supply

@@ -77,3 +77,6 @@ int Cell_B3 = 0;
 
 Uint16 NodeID = 1;
 volatile Uint16 counter_50Hz = 0;
+
+volatile float Auxilliary_Voltage = 0;
+volatile Uint16 Auxilliary_counter = 0;

@@ -73,4 +73,7 @@ extern int Cell_B3;
 extern Uint16 NodeID;
 extern volatile Uint16 counter_50Hz;
 
+extern volatile float Auxilliary_Voltage;
+extern volatile Uint16 Auxilliary_counter;
+
 #endif /* USER_GLOBALS_H_ */

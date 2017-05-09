@@ -60,37 +60,29 @@ __interrupt void cpu_timer1_isr(void)
     //check status of all flags as well as the key switch
     counter_50Hz++;
 
+    Auxilliary_Voltage = (AdcResult.ADCRESULT2)* 0.00442;					//adc/4096 *3.3* 10.51/10.51      12.2/2.2
+
+
+
     if(KeySwitch == 1)  //keyswitch == 1
     {
         //  led3 = 1;       //turn on red led
 
         //binne die keydrive if
-        if((flagDischarged == 0) && (flagCurrent == 0)  &&(flagTemp == 0))
+        if((flagDischarged == 0) && (flagCurrent == 0)  && (flagTemp == 0) && (Charger_status == 0))
         {
 
             ContactorOut = 1;           //turn on contactor
         }
 
-        //////////////////////////////////////////////
-        /*
-        if(KeyDrive == 0)   //keydrive == 0
-        {
 
-
-        }
-        else if(KeyDrive == 1)  //keydrive == 1
-        {
-            ContactorOut = 0;       //turn off contactor
-
-            //led3 = 0;     //turn off red led
-        }*/
-        ////////////////////////////////////////////
 
     }
-    else if(KeySwitch == 0) //keyswitch == 0
+    else if((KeySwitch == 0) && (Charger_status == 0)) //keyswitch == 0
     {
         flagCurrent = 0;
-        //      ContactorOut = 0;       //turn off contactor
+
+        ContactorOut = 0;       //turn off contactor
 
         /*  if((flagDischarged == 0) || (flagCurrent == 0)  ||(flagTemp == 0))
         {

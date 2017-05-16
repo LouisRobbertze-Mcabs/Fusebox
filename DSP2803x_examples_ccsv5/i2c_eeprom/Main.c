@@ -22,7 +22,7 @@ void main(void)
             //ContactorOut = 1;
             Read_Temperatures();
 
-            //Balance(5,3.31);
+            //Balance(4,3.34);
 
             Read_System_Status();
             Process_System_Status();

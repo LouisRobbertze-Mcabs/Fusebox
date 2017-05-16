@@ -52,6 +52,7 @@ volatile float Current;
 volatile int current_int;
 
 volatile float Voltages[15];
+
 volatile float Voltage_high=0;
 volatile float Voltage_low=10;
 volatile float Temperatures[3];

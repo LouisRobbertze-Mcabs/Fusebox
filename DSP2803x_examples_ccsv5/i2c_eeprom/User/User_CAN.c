@@ -193,6 +193,7 @@ void CANChargerReception(void)
 
     if(ChgStatus == 0)                                                                  //Charger ready to charge. No flags set
     {
+    	Charger_status = 1;
         if(flagCurrent == 0 && flagTemp == 0 && flagCharged == 0 && KeySwitch == 0)     //check flags to ensure charging is allowed   haal flagvoltage uit
         {
             if(delay == 0)                                                              //sit miskien check in om met die charger Vbat te meet
@@ -220,11 +221,12 @@ void CANChargerReception(void)
                         CANTransmit(0x618, 1, ChgCalculator(54, 18), 8);                    //charging stops
                         Current_max = 28;
                         flagCharged = 1;                                                    //status charged
-                        balance = 1;                                                        //balance
+                        balance = 1; 														//balance
+                        led3 = 0;
                     }
                 }
 
-                flagDischarged = 0;
+                flagDischarged = 0;													//verander op 'n ander plek
             }
         }
         else
@@ -238,6 +240,7 @@ void CANChargerReception(void)
             {
                 ContactorOut = 0;                                                       //turn off contactor
                 CANTransmit(0x618,1,ChgCalculator(54, 0),8);                            //disconnect charger
+                Charger_status = 0;
             }
         }
     }
@@ -252,10 +255,11 @@ void CANChargerReception(void)
         {
             ContactorOut = 0;                                                           //turn off contactor
             CANTransmit(0x618,1,ChgCalculator(54, 0),8);                                //disconnect charger
+            Charger_status = 0;
         }
     }
 
-    Charger_status = ChgStatus;
+//    Charger_status = ChgStatus;
     toets = ChgVoltage;
     toets2 = ChgCurrent;
 }

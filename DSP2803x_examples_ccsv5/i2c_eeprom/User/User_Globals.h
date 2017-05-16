@@ -47,6 +47,7 @@ extern volatile float Current;
 extern volatile int current_int;
 
 extern volatile float Voltages[15];
+
 extern volatile float Voltage_high;
 extern volatile float Voltage_low;
 extern volatile float Temperatures[3];

@@ -12,36 +12,28 @@ __interrupt void  adc_isr(void)
     //gee aandag hieraan. doen 'n stroom meting conversion teen 1 Hz soos spanning
     //Sit dit dalk deur 'n laag deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^WcTs
 
-    //  float measure_C;
+    static float Filter_100HZ;
+    static float Filter_100HZ_past = 0;
     static float current_p;
     //  int toets_stroom = 0;
 
-    //test_current = AdcResult.ADCRESULT1;
-
-    //current_ADC = current_ADC_p + (test_current - current_ADC_p)/2;
-
-    //contactor oop:
-    /*  if(ContactorOut == 0)
-    {
-        Current = 0;
-    }
-    else    //contactor toe
-    {*/
-    //Current = (measure_C-1820)* 0.131;                    //2035    maal, moenie deel nie!!!!     0.0982--200/2048
-
-    //  Current = measure_C;
 
     test_current = current_p + (0.00314*(AdcResult.ADCRESULT1-current_p));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
     current_p=test_current;
 
-    if(AdcResult.ADCRESULT1 > 3500 || AdcResult.ADCRESULT1 < 700)                       ////////////////////////////////////////////////
+
+    Filter_100HZ = Filter_100HZ_past + (0.27*(AdcResult.ADCRESULT1-Filter_100HZ_past));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
+    Filter_100HZ_past=Filter_100HZ;
+
+ //   Filter_100HZ = (test_current-2109)* 0.122;
+
+    if(Filter_100HZ > 3800 || Filter_100HZ < 500)                       ////////////////////////////////////////////////
     {
         //sit uittree af
         ContactorOut = 0;       //turn off contactor
         flagCurrent = 1;
-    }                                                               ////////////////////////////////////////////////
+    }                                                               					////////////////////////////////////////////////
 
-    //}
     AdcRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;       //Clear ADCINT1 flag reinitialize for next SOC
     PieCtrlRegs.PIEACK.bit.ACK10 = 1;   // Acknowledge interrupt to PIE
 
@@ -69,7 +61,7 @@ __interrupt void cpu_timer1_isr(void)
     Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));
     Aux_Voltage_temp = Auxilliary_Voltage;
 
-
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// testing
     if(KeySwitch == 1)  //keyswitch == 1
     {
         //  led3 = 1;       //turn on red led
@@ -90,7 +82,7 @@ __interrupt void cpu_timer1_isr(void)
 
         //  led3 = 0;       //turn off red led
     }
-
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     CpuTimer1.InterruptCount++;
     EDIS;
 }

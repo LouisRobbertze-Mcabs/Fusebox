@@ -138,6 +138,8 @@ void  Read_Cell_Voltages(void)
 	Voltage_total = 0;
 	Voltage_high = 0;                      //reset values
 	Voltage_low = 10;
+	float Voltages_backup5 = Voltages[5];
+	float Voltages_backup10 = Voltages[10];
 
 	float temp_V = 0;
 
@@ -146,7 +148,18 @@ void  Read_Cell_Voltages(void)
 		temp_V = I2CA_ReadData(&I2cMsgIn1,0x0C+(i*0x02), 2);
 		temp_V = (ADCgain * temp_V) + ADCoffset;
 
-		Voltages[i] = temp_V;
+		if((i == 5) && ((Cell_B1 & 0x10)>>4 == 1))
+			Voltages[i] = Voltages_backup5;
+		else if(i == 5)
+			Voltages[i] = temp_V;
+
+		if((i == 10) && ((Cell_B2&0x10)>>4 == 1))
+			Voltages[i] = Voltages_backup10;
+		else if (i==10)
+			Voltages[i] = temp_V;
+
+		if(i != 5 && i != 10)
+			Voltages[i] = temp_V;
 
 		Voltage_total = Voltage_total +  Voltages[i];
 
@@ -160,7 +173,7 @@ void  Read_Cell_Voltages(void)
 
 void Process_Voltages(void)
 {
-	if(Voltage_high > 3.65)         //3.65
+	if(Voltage_high > 3.60)         //3.65
 	{
 		balance = 1;            //start balancing
 		flagCharged = 1;        //charged flag to to stop charging
@@ -202,7 +215,7 @@ void Process_Voltages(void)
 
 void Calculate_Current(void)
 {
-	Current = (test_current-2085)* 0.125;                   //2035    maal, moenie deel nie!!!!     0.0982--200/2048
+	Current = (test_current-2109)* 0.122;                   //2035    maal, moenie deel nie!!!!     0.0982--200/2048
 }
 
 void Read_System_Status(void)
@@ -381,9 +394,9 @@ void Balance(int period, float reference)
 				balance = 1;
 			}
 			else if(balance ==0)                //sit miskien else hier             hierdie is toets fase
-					{
+			{
 				balance = 0;
-					}
+			}
 
 			count = 0;
 			I2CA_WriteData(0x01,0x00);

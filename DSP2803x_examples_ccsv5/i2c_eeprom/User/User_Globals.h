@@ -77,4 +77,27 @@ extern volatile Uint16 counter_50Hz;
 extern volatile float Auxilliary_Voltage;
 extern volatile Uint16 Auxilliary_counter;
 
+
+//defines:
+extern volatile float Vmax;
+extern volatile float Vmin;
+extern volatile float Vcritical;
+extern volatile float Vcharge;
+extern volatile float Vbalance;
+
+extern volatile float Imin;
+extern volatile float Imax;
+extern volatile float Ifilter;
+
+extern volatile float Tmax;
+extern volatile float Tmin;
+
+extern volatile float Vauxmin;
+extern volatile float AuxChargeTime;
+
+extern volatile float Vchargedflagreset;
+extern volatile float Vdischargedflagreset;
+
+
+
 #endif /* USER_GLOBALS_H_ */

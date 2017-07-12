@@ -22,12 +22,12 @@ __interrupt void  adc_isr(void)
     current_p=test_current;
 
 
-    Filter_100HZ = Filter_100HZ_past + (0.27*(AdcResult.ADCRESULT1-Filter_100HZ_past));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
+    Filter_100HZ = Filter_100HZ_past + (Ifilter*(AdcResult.ADCRESULT1-Filter_100HZ_past));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
     Filter_100HZ_past=Filter_100HZ;
 
  //   Filter_100HZ = (test_current-2109)* 0.122;
 
-    if(Filter_100HZ > 3800 || Filter_100HZ < 500)                       ////////////////////////////////////////////////
+    if(Filter_100HZ > Imax || Filter_100HZ < Imin)                       ////////////////////////////////////////////////
     {
         //sit uittree af
         ContactorOut = 0;       //turn off contactor
@@ -58,7 +58,7 @@ __interrupt void cpu_timer1_isr(void)
 	//adc/4096 *3.3* 10.51/10.51      12.2/2.2
 
 
-    Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));
+    Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));					//maak miskien gebruik van die config leer
     Aux_Voltage_temp = Auxilliary_Voltage;
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// testing
@@ -149,13 +149,17 @@ __interrupt void i2c_int1a_isr(void)     // I2C-A
 
 __interrupt void can_rx_isr(void)
 {
-    if (ECanaRegs.CANRMP.all == 0x00000002)
+    if (ECanaRegs.CANRMP.bit.RMP1 == 1)
     {
         CANSlaveReception();                        // Handle the received message
     }
-    else if (ECanaRegs.CANRMP.all == 0x00000004)
+    else if (ECanaRegs.CANRMP.bit.RMP2 == 1)
     {
         CANChargerReception();
+    }
+    else if(ECanaRegs.CANRMP.bit.RMP3 == 1)
+    {
+    	CANSlaveConfig();
     }
 
     ECanaRegs.CANRMP.all = 0xFFFFFFFF;          // Reset receive mailbox flags

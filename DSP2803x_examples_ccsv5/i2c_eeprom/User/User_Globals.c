@@ -81,3 +81,28 @@ volatile Uint16 counter_50Hz = 0;
 
 volatile float Auxilliary_Voltage = 0;
 volatile Uint16 Auxilliary_counter = 0;
+
+
+//defines:
+volatile float Vmax = 3.6;
+volatile float Vmin = 2.6;
+volatile float Vcritical = 2.55;
+volatile float Vcharge = 3.5;
+volatile float Vbalance = 3.46;
+
+volatile float Imin = 500;
+volatile float Imax = 3800;
+volatile float Ifilter = 0.27;
+
+volatile float Tmax = 60;
+volatile float Tmin = 0;
+
+volatile float Vauxmin = 12.3;
+volatile float AuxChargeTime = 1800;
+
+volatile float Vchargedflagreset = 3.35;
+volatile float Vdischargedflagreset = 2.7;
+
+
+
+

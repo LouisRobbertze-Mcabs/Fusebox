@@ -7,28 +7,32 @@
 
 void main(void)
 {
-    Initialise_BMS();
+	Initialise_BMS();
 
-    for(;;)
-    {
-        if(counter_2Hz == 2)
-        {
-            Toggle_LED();
+	for(;;)
+	{
+		if(counter_2Hz == 1)
+		{
+			ServiceDog();
+		}
+		if(counter_2Hz == 2)
+		{
+			Toggle_LED();
 
-            Read_Cell_Voltages();
-            Process_Voltages();
-            Calculate_Current();
-            //Ah = Ah + Current*0.00027778;
-            //ContactorOut = 1;
-            Read_Temperatures();
+			Read_Cell_Voltages();
+			Process_Voltages();
+			Calculate_Current();
 
-            //Balance(4,3.34);
+			ServiceDog();
 
-            Read_System_Status();
-            Process_System_Status();
+			Read_Temperatures();
+			Balance(5,Vbalance);
 
-            counter_2Hz = 0;
-            Reset_ADC();
-        }
-    }
+			Read_System_Status();
+			Process_System_Status();
+
+			counter_2Hz = 0;
+			Reset_ADC();
+		}
+	}
 }

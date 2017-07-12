@@ -69,6 +69,18 @@ void Initialise_BMS(void)
 	configADC();
 	Bq76940_Init();
 	//  Shut_D_BQ();
+
+	//	DisableDog();
+
+	// Reset the watchdog counter
+	ServiceDog();
+
+	// Enable the watchdog
+	EALLOW;
+	SysCtrlRegs.WDCR = 0x002F;
+	EDIS;
+	//watchdog timer>>>>>>>>
+
 }
 
 void Init_Gpio(void)
@@ -136,12 +148,17 @@ void  Read_Cell_Voltages(void)
 	// Read data from EEPROM section //
 	int i;
 	Voltage_total = 0;
-	Voltage_high = 0;                      //reset values
-	Voltage_low = 10;
+	//reset values
+	//Voltage_low = 10;
 	float Voltages_backup5 = Voltages[5];
 	float Voltages_backup10 = Voltages[10];
 
 	float temp_V = 0;
+	float temp_Voltage_high;
+	temp_Voltage_high = 0;
+	float temp_Voltage_low;
+	temp_Voltage_low = 10;
+
 
 	for(i = 0; i<15; i++)
 	{
@@ -163,59 +180,62 @@ void  Read_Cell_Voltages(void)
 
 		Voltage_total = Voltage_total +  Voltages[i];
 
-		if(Voltage_high<Voltages[i])
-			Voltage_high = Voltages[i];
+		if(temp_Voltage_high<Voltages[i])
+			temp_Voltage_high = Voltages[i];
 
-		if(Voltage_low>Voltages[i])
-			Voltage_low = Voltages[i];
+		if(temp_Voltage_low>Voltages[i])
+			temp_Voltage_low = Voltages[i];
 	}
+
+	Voltage_high = temp_Voltage_high;
+	Voltage_low = temp_Voltage_low;
 }
 
 void Process_Voltages(void)
 {
-	if(Voltage_high > 3.60)         //3.65
+	if(Voltage_high > Vmax)         //3.65
 	{
 		balance = 1;            //start balancing
 		flagCharged = 1;        //charged flag to to stop charging
 		ContactorOut = 0;
 	}
 
-	if(Voltage_low > 2.8 && Auxilliary_Voltage < 12.3)
+	if(Voltage_low > Vmin && Auxilliary_Voltage < Vauxmin && Auxilliary_Voltage > 8)
 	{
 		Auxilliary_counter = 0;
-		Aux_Control = 1;
+		Aux_Control = 1;										//turn on aux supply
 	}
-	else if(Auxilliary_counter > 1800)
+	else if(Auxilliary_counter > AuxChargeTime || Auxilliary_Voltage < 8)
 	{
-		Aux_Control = 0;
+		Aux_Control = 0;										//turn off aux supply
 	}
 
 	Auxilliary_counter++;
 
-	if(Voltage_low < 2.8 && Voltage_low > 2.6 && Charger_status == 0)
+	if(Voltage_low < Vmin && Voltage_low > Vcritical && Charger_status == 0)
 	{
 		Aux_Control = 0;
 		flagDischarged = 1;
 		led3 = 1;               //turn on red led
 		ContactorOut = 0;       //turn off contactor            //turn off output
 	}
-	else if(Voltage_low < 2.6 && Charger_status == 0)
+	else if(Voltage_low < Vcritical && Charger_status == 0)
 	{
 		Aux_Control = 0;
 		flagDischarged = 2;
 		led3 = 1;               //turn on red led
 	}
 
-	if(Voltage_high<3.35 )
+	if(Voltage_high<Vchargedflagreset )
 		flagCharged = 0;
 
-	if(Voltage_low>2.8 )
+	if(Voltage_low>Vdischargedflagreset )
 		flagDischarged = 0;
 }
 
 void Calculate_Current(void)
 {
-	Current = (test_current-2109)* 0.122;                   //2035    maal, moenie deel nie!!!!     0.0982--200/2048
+	Current = (test_current-2090)* 0.122;                   //2035    maal, moenie deel nie!!!!     0.0982--200/2048
 }
 
 void Read_System_Status(void)
@@ -246,10 +266,8 @@ void Read_Temperatures(void)
 		temp_T = I2CA_ReadData(&I2cMsgIn1, 0x2C+(i*0x02), 2);
 		//      test_blah[i] = T[i];
 
-		if(i == 0)
-			Vts = (temp_T*ADCgain) + 0.27;
-		else
-			Vts = temp_T*ADCgain;
+
+		Vts = temp_T*ADCgain;
 
 		//test1 = Vts;
 		Rts = (10000*Vts)/(3.3-Vts);
@@ -258,7 +276,7 @@ void Read_Temperatures(void)
 		Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
 		//  T[i] = T[i] -273;
 
-		if(Temperatures[i]> 70 || Temperatures[i]<0)
+		if(Temperatures[i]> Tmax || Temperatures[i]<Tmin)
 		{
 			flag = 1;
 		}
@@ -379,6 +397,7 @@ void Balance(int period, float reference)
 		}
 		else if(count == period*2)
 		{
+			//speel maar so bietjie
 			balance = 0;
 
 			for(i = 0; i<15; i++)
@@ -410,6 +429,15 @@ void Balance(int period, float reference)
 		{
 			count++;
 		}
+	}
+	else
+	{
+		I2CA_WriteData(0x01,0x00);
+		I2CA_WriteData(0x02,0x00);
+		I2CA_WriteData(0x03,0x00);
+		Cell_B1 = 0;
+		Cell_B2 = 0;
+		Cell_B3 = 0;
 	}
 }
 

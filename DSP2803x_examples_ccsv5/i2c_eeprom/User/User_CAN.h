@@ -16,6 +16,7 @@ void CANMailboxConfig(void);
 void CANInterruptConfig(void);
 void CANChargerReception(void);
 void CANSlaveReception(void);
+void CANSlaveConfig(void);
 void CANTransmit(Uint16 Destination, Uint32 TxDataH, Uint32 TxDataL, Uint16 Bytes);
 
 #endif /* USER_USER_CAN_H_ */

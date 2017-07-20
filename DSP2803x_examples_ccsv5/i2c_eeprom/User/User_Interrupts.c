@@ -133,15 +133,21 @@ __interrupt void i2c_int1a_isr(void)     // I2C-A
             }
         }
     }  // end of stop condition detected
-    else if(IntSource == 2)
+    else if(IntSource == 2)												//no acknowledge condition
     {
         // Generate some error due to invalid interrupt source
         __asm("   ESTOP0");
+
+    //	CurrentMsgPtr->MsgStatus = 0xFF;
+
     }
     else
     {
         // Generate some error due to invalid interrupt source
-        __asm("   ESTOP0");
+        //__asm("   ESTOP0");
+
+    	CurrentMsgPtr->MsgStatus = 0xFF;
+
     }
     // Enable future I2C (PIE Group 8) interrupts
     PieCtrlRegs.PIEACK.bit.ACK8 = 1;

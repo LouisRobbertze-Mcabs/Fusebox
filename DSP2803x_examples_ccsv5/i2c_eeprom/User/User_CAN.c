@@ -239,7 +239,7 @@ void CANChargerReception(void)
 					flagCharged = 1;
 				}
 
-				CANTransmit(0x618, 0, ChgCalculator(53, Current_max), 8);               //charging started
+				CANTransmit(0x618, 0, ChgCalculator(52.5, Current_max), 8);               //charging started
 
 
 			}
@@ -248,13 +248,13 @@ void CANChargerReception(void)
 		{
 			if(delay == 1)                                                              //sit miskien check in om met die charger Vbat te meet
 			{
-				CANTransmit(0x618,1,ChgCalculator(53, 0),8);                            //disconnect charger
+				CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                            //disconnect charger
 				delay--;
 			}
 			else if(delay == 0)
 			{
 				ContactorOut = 0;                                                       //turn off contactor
-				CANTransmit(0x618,1,ChgCalculator(53, 0),8);                            //disconnect charger
+				CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                            //disconnect charger
 				//Charger_status = 0;												//haal miskien uit
 
 			}
@@ -264,13 +264,13 @@ void CANChargerReception(void)
 	{
 		if(delay == 1)
 		{
-			CANTransmit(0x618,1,ChgCalculator(53, 0),8);                                //disconnect charger
+			CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                                //disconnect charger
 			delay--;
 		}
 		else if(delay == 0)
 		{
 			ContactorOut = 0;                                                           //turn off contactor
-			CANTransmit(0x618,1,ChgCalculator(53, 0),8);                                //disconnect charger
+			CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                                //disconnect charger
 			Charger_status = 0;
 			Current_max = 25;
 		}

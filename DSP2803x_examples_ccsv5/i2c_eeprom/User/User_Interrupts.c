@@ -136,9 +136,9 @@ __interrupt void i2c_int1a_isr(void)     // I2C-A
     else if(IntSource == 2)												//no acknowledge condition
     {
         // Generate some error due to invalid interrupt source
-        __asm("   ESTOP0");
+       // __asm("   ESTOP0");
 
-    //	CurrentMsgPtr->MsgStatus = 0xFF;
+    	CurrentMsgPtr->MsgStatus = 0xFF;
 
     }
     else

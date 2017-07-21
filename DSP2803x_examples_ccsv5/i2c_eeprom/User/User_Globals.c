@@ -88,7 +88,7 @@ volatile float Vmax = 3.6;
 volatile float Vmin = 2.6;
 volatile float Vcritical = 2.55;
 volatile float Vcharge = 3.5;
-volatile float Vbalance = 3.46;
+volatile float Vbalance = 3.47;
 
 volatile float Imin = 500;
 volatile float Imax = 3800;

@@ -229,11 +229,11 @@ void CANChargerReception(void)
 				Current_max = 25;
 				 */
 
-				if(Voltage_high> 3.48 && Voltage_low < 3.46)
+				if(Voltage_high> 3.48 && Voltage_low < 3.47)
 				{
 					balance = 1;
 				}
-				else if(Voltage_high> 3.48 && Voltage_low > 3.46)
+				else if(Voltage_high> 3.48 && Voltage_low > 3.47)
 				{
 					//balance = 0;
 					flagCharged = 1;

@@ -60,9 +60,6 @@ Uint16 I2CA_WriteData(unsigned char Register, unsigned char Data)
 		I2CA_WriteData(Register, Data);
 	}
 
-
-
-
 	return I2C_SUCCESS;
 }// end of write section
 
@@ -132,7 +129,6 @@ Uint16 I2CA_ReadData(struct I2CMSG *msg, unsigned char Register, Uint16 amount)
 		{
 			I2CA_ReadData(msg, Register, amount);
 		}
-
 
 		return Received;
 	}

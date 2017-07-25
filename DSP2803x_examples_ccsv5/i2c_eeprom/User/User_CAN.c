@@ -211,7 +211,7 @@ void CANChargerReception(void)
 			}
 			else if(delay == 1)
 			{
-				Current_max =  Current_max + 30*(3.5 - Voltage_high);								//kp constant
+				Current_max =  Current_max + kp_multiplier*(kp_constant - Voltage_high);								//kp controller constant & kp multiplier
 
 				if(Current_max <0)									//add max as well
 					Current_max = 0;
@@ -221,19 +221,13 @@ void CANChargerReception(void)
 				//determine if balancing should start
 				//if cell high > 3.48 balance
 				//if cell low > 3.48: stop balancing , stop charging
-				/*
-				balance = 1;
-				flagCharged = 1;
-				CANTransmit(0x618, 1, ChgCalculator(54, Current_max), 8);				//charging stopped
-				PI_status = 0;
-				Current_max = 25;
-				 */
 
-				if(Voltage_high> 3.48 && Voltage_low < 3.47)
+
+				if(Voltage_high> balancing_upper_level && Voltage_low < balancing_bottom_level)										//balancing upper level & balancing lower level
 				{
 					balance = 1;
 				}
-				else if(Voltage_high> 3.48 && Voltage_low > 3.47)
+				else if(Voltage_high> balancing_upper_level && Voltage_low > balancing_bottom_level)
 				{
 					//balance = 0;
 					flagCharged = 1;

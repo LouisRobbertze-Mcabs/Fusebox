@@ -98,6 +98,9 @@ extern volatile float AuxChargeTime;
 extern volatile float Vchargedflagreset;
 extern volatile float Vdischargedflagreset;
 
-
+extern volatile float kp_constant;
+extern volatile float kp_multiplier;
+extern volatile float balancing_upper_level;
+extern volatile float balancing_bottom_level;
 
 #endif /* USER_GLOBALS_H_ */

@@ -70,7 +70,7 @@ void Initialise_BMS(void)
 	Bq76940_Init();
 	//  Shut_D_BQ();
 
-	//	DisableDog();
+
 
 	// Reset the watchdog counter
 	ServiceDog();
@@ -80,7 +80,7 @@ void Initialise_BMS(void)
 	SysCtrlRegs.WDCR = 0x002F;
 	EDIS;
 	//watchdog timer>>>>>>>>
-
+	DisableDog();
 }
 
 void Init_Gpio(void)

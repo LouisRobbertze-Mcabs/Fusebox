@@ -13,7 +13,7 @@ void main(void)
 	{
 		if(counter_2Hz == 1)
 		{
-			//ServiceDog();
+			ServiceDog();
 		}
 		if(counter_2Hz == 2)
 		{
@@ -23,7 +23,7 @@ void main(void)
 			Process_Voltages();
 			Calculate_Current();
 
-			//ServiceDog();
+			ServiceDog();
 
 			Read_Temperatures();
 			Balance(5,Vbalance);

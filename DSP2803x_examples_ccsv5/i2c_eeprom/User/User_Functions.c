@@ -80,7 +80,7 @@ void Initialise_BMS(void)
 	SysCtrlRegs.WDCR = 0x002F;
 	EDIS;
 	//watchdog timer>>>>>>>>
-	DisableDog();
+	//DisableDog();
 }
 
 void Init_Gpio(void)

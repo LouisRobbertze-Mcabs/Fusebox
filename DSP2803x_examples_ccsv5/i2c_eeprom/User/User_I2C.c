@@ -86,6 +86,11 @@ Uint16 I2CA_ReadData(struct I2CMSG *msg, unsigned char Register, Uint16 amount)
 
 	while(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY);
 
+	if(CurrentMsgPtr->MsgStatus == 0xFF)									//dink dit moet voor die laaste return kom though
+	{
+		I2CA_ReadData(msg, Register, amount);
+	}
+
 	if(msg->MsgStatus == I2C_MSGSTAT_RESTART)
 	{
 		while(I2caRegs.I2CMDR.bit.STP == 1);
@@ -103,6 +108,11 @@ Uint16 I2CA_ReadData(struct I2CMSG *msg, unsigned char Register, Uint16 amount)
 		CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_READ_BUSY;
 
 		while(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY);
+
+		if(CurrentMsgPtr->MsgStatus == 0xFF)									//dink dit moet voor die laaste return kom though
+		{
+			I2CA_ReadData(msg, Register, amount);
+		}
 
 		Received = DataOut;
 
@@ -122,12 +132,12 @@ Uint16 I2CA_ReadData(struct I2CMSG *msg, unsigned char Register, Uint16 amount)
 			CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_READ_BUSY;
 
 			while(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY);
-			Received = Received | DataOut;
-		}
 
-		if(CurrentMsgPtr->MsgStatus == 0xFF)									//check to see if write was succesfull
-		{
-			I2CA_ReadData(msg, Register, amount);
+			if(CurrentMsgPtr->MsgStatus == 0xFF)									//dink dit moet voor die laaste return kom though
+			{
+				I2CA_ReadData(msg, Register, amount);
+			}
+			Received = Received | DataOut;
 		}
 
 		return Received;

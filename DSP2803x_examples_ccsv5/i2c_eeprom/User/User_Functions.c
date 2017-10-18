@@ -212,6 +212,7 @@ void Process_Voltages(void)
 
 	Auxilliary_counter++;
 
+
 	if(Voltage_low < Vmin && Voltage_low > Vcritical && Charger_status == 0)
 	{
 		Aux_Control = 0;
@@ -230,7 +231,11 @@ void Process_Voltages(void)
 		flagCharged = 0;
 
 	if(Voltage_low>Vdischargedflagreset )
+	{
 		flagDischarged = 0;
+		led3 = 0;               //turn off red led
+	}
+
 }
 
 void Calculate_Current(void)

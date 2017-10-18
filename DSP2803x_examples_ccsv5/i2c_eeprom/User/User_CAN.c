@@ -234,8 +234,6 @@ void CANChargerReception(void)
 				}
 
 				CANTransmit(0x618, 0, ChgCalculator(52.5, Current_max), 8);               //charging started
-
-
 			}
 		}
 		else																			//BMS flag high. Stop charging and disconnect blah blah

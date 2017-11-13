@@ -15,7 +15,7 @@ void Initialise_BMS(void)
 	InitI2CGpio();
 	Init_Gpio();
 	InitAdc();
-	InitSpiaGpio();
+	//	InitSpiaGpio();
 
 	DINT;
 
@@ -70,8 +70,6 @@ void Initialise_BMS(void)
 	Bq76940_Init();
 	//  Shut_D_BQ();
 
-
-
 	// Reset the watchdog counter
 	ServiceDog();
 
@@ -104,8 +102,10 @@ void Init_Gpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO15 = 1;     // 12 Aux drive (verander miskien)
 	Aux_Control = 1;
 
+	//	GpioCtrlRegs.GPAPUD.bit.GPIO19 = 1;    // Enable pull-up for GPIO19
 	GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;    //KeyDrive
-	GpioCtrlRegs.GPADIR.bit.GPIO19 = 0;     //(input) key drive (verander miskien)
+	GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;     //(Output) key drive (raak nou fan control)
+	Fan_Control = 0; 						//turn off fan for now
 
 	GpioCtrlRegs.GPAMUX2.bit.GPIO20 = 0;    //contactor output
 	GpioCtrlRegs.GPADIR.bit.GPIO20 = 1;     // contactor output
@@ -141,6 +141,7 @@ void Init_Gpio(void)
 void Toggle_LED(void)
 {
 	GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;
+	//GpioDataRegs.GPATOGGLE.bit.GPIO19 = 1;
 }
 
 void  Read_Cell_Voltages(void)
@@ -193,7 +194,8 @@ void  Read_Cell_Voltages(void)
 
 void Process_Voltages(void)
 {
-	if(Voltage_high > Vmax)         //3.65
+//	static int delay = 0;
+	if(Voltage_high > Vmax)         //3.6
 	{
 		balance = 1;            //start balancing
 		flagCharged = 1;        //charged flag to to stop charging
@@ -202,8 +204,8 @@ void Process_Voltages(void)
 
 	if(Voltage_low > Vmin && Auxilliary_Voltage < Vauxmin && Auxilliary_Voltage > 8)
 	{
-		Auxilliary_counter = 0;
-		Aux_Control = 1;										//turn on aux supply
+			Auxilliary_counter = 0;			//turn on aux supply
+			Aux_Control = 1;
 	}
 	else if(Auxilliary_counter > AuxChargeTime || Auxilliary_Voltage < 8)
 	{
@@ -263,34 +265,72 @@ void Read_Temperatures(void)
 	int flag = 0;
 	float Vts;
 	float Rts;
+	float temperature_avg=0;
 
 	float temp_T = 0;
 
-	for(i = 0; i<3; i++)
+	//cells 0-3
+	for(i = 0; i<4; i++)
 	{
-		temp_T = I2CA_ReadData(&I2cMsgIn1, 0x2C+(i*0x02), 2);
-		//      test_blah[i] = T[i];
-
-
-		Vts = temp_T*ADCgain;
-
-		//test1 = Vts;
-		Rts = (10000*Vts)/(3.3-Vts);
-		//test2 = Rts;
-
+		Vts = (Temperatures_resistance[i]) * 0.00080566;
+		Rts = (33000/Vts) - 10000;
 		Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
-		//  T[i] = T[i] -273;
-
-		if(Temperatures[i]> Tmax || Temperatures[i]<Tmin)
-		{
-			flag = 1;
-		}
 	}
+
+	//cells 5-8
+	for(i = 5; i<9; i++)
+	{
+		Vts = (Temperatures_resistance[i-1]) * 0.00080566;
+		Rts = (33000/Vts) - 10000;
+		Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
+	}
+
+	//cells 10-14
+	for(i = 10; i<15; i++)
+	{
+		Vts = (Temperatures_resistance[i-2]) * 0.00080566;
+		Rts = (33000/Vts) - 10000;
+		Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
+	}
+
+	//cell5,cell10
+	temp_T = I2CA_ReadData(&I2cMsgIn1, 0x2E, 2);
+	Vts = temp_T*ADCgain;
+	Rts = (10000*Vts)/(3.3-Vts);
+	Temperatures[4] = (1/((log(Rts/10000))/4000+0.003356))-273;
+
+	temp_T = I2CA_ReadData(&I2cMsgIn1, 0x30, 2);
+	Vts = temp_T*ADCgain;
+	Rts = (10000*Vts)/(3.3-Vts);
+	Temperatures[9] = (1/((log(Rts/10000))/4000+0.003356))-273;
+
+
+	//Outside
+	Vts = (Temperatures_resistance[13]) * 0.00080566;
+	Rts = (33000/Vts) - 10000;
+	Temperatures[15] = (1/((log(Rts/10000))/4000+0.003356))-273;
+
+	//add later on
+	//	for(i = 0; i<15; i++)
+	//	{
+	temperature_avg = temperature_avg+Temperatures[i];
+
+	if(Temperatures[4]> Tmax || Temperatures[4]<Tmin)
+	{
+		flag = 1;
+	}
+
+	if(Temperatures[9]> Tmax || Temperatures[9]<Tmin)
+	{
+		flag = 1;
+	}
+	//	}
 
 	if(flag == 1)
 		flagTemp = 1;
 	else if(flag == 0)
 		flagTemp = 0;
+
 }
 
 void Balance(int period, float reference)

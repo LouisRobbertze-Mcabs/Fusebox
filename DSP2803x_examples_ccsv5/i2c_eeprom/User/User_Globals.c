@@ -55,7 +55,9 @@ volatile float Voltages[15];
 
 volatile float Voltage_high=0;
 volatile float Voltage_low=10;
-volatile float Temperatures[3];
+volatile float Temperatures[16];
+volatile float Temperature_avg;
+volatile float Temperatures_resistance[14];
 
 volatile float ADCgain;
 volatile float ADCoffset;
@@ -84,11 +86,11 @@ volatile Uint16 Auxilliary_counter = 0;
 
 
 //defines:
-volatile float Vmax = 3.6;
+volatile float Vmax = 3.65;
 volatile float Vmin = 2.9;
 volatile float Vcritical = 2.8;
 volatile float Vcharge = 3.5;
-volatile float Vbalance = 3.47;
+volatile float Vbalance = 3.48;
 
 volatile float Imin = 500;
 volatile float Imax = 3800;

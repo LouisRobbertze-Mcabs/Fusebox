@@ -23,6 +23,7 @@
 #define Aux_Control GpioDataRegs.GPADAT.bit.GPIO15
 #define KeyDrive GpioDataRegs.GPADAT.bit.GPIO19
 #define ContactorOut GpioDataRegs.GPADAT.bit.GPIO20
+#define Fan_Control GpioDataRegs.GPADAT.bit.GPIO19
 #define PreCharge GpioDataRegs.GPADAT.bit.GPIO21
 #define KeySwitch GpioDataRegs.GPADAT.bit.GPIO24
 #define BQOn GpioDataRegs.GPADAT.bit.GPIO26

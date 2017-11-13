@@ -194,7 +194,7 @@ void  Read_Cell_Voltages(void)
 
 void Process_Voltages(void)
 {
-//	static int delay = 0;
+	//	static int delay = 0;
 	if(Voltage_high > Vmax)         //3.6
 	{
 		balance = 1;            //start balancing
@@ -204,8 +204,8 @@ void Process_Voltages(void)
 
 	if(Voltage_low > Vmin && Auxilliary_Voltage < Vauxmin && Auxilliary_Voltage > 8)
 	{
-			Auxilliary_counter = 0;			//turn on aux supply
-			Aux_Control = 1;
+		Auxilliary_counter = 0;			//turn on aux supply
+		Aux_Control = 1;
 	}
 	else if(Auxilliary_counter > AuxChargeTime || Auxilliary_Voltage < 8)
 	{
@@ -266,6 +266,8 @@ void Read_Temperatures(void)
 	float Vts;
 	float Rts;
 	float temperature_avg=0;
+	float temp_Temperature_high = 0;
+	float temp_Temperature_low = 71;
 
 	float temp_T = 0;
 
@@ -310,27 +312,58 @@ void Read_Temperatures(void)
 	Rts = (33000/Vts) - 10000;
 	Temperatures[15] = (1/((log(Rts/10000))/4000+0.003356))-273;
 
-	//add later on
-	//	for(i = 0; i<15; i++)
-	//	{
-	temperature_avg = temperature_avg+Temperatures[i];
-
-	if(Temperatures[4]> Tmax || Temperatures[4]<Tmin)
+	for(i = 0; i<15; i++)
 	{
-		flag = 1;
-	}
+		temperature_avg = temperature_avg+Temperatures[i];
 
-	if(Temperatures[9]> Tmax || Temperatures[9]<Tmin)
-	{
-		flag = 1;
+		if(temp_Temperature_high<Temperatures[i])
+			temp_Temperature_high = Temperatures[i];
+
+		if(temp_Temperature_low>Temperatures[i])
+			temp_Temperature_low = Temperatures[i];
 	}
-	//	}
+	temperature_avg = temperature_avg*0.0667;
+
+
+	if(temp_Temperature_high>70)					//old system filter
+	{
+		Temperature_avg = Temperatures[4];
+		Temperature_high = Temperatures[9];
+		Temperatures[15] = 0;
+
+		if(Temperatures[4]> Tmax || Temperatures[4]<Tmin)
+		{
+			flagTemp = 1;
+		}
+
+		if(Temperatures[9]> Tmax || Temperatures[9]<Tmin)
+		{
+			flagTemp = 1;
+		}
+	}
+	else											//system normal
+	{
+		Temperature_avg = temperature_avg;
+		Temperature_high = temp_Temperature_high;
+		Temperature_low = temp_Temperature_low;
+
+		if(Temperature_high> Tmax || Temperature_low<Tmin)
+		{
+			flagTemp = 1;
+		}
+
+		if((Temperature_avg - Temperatures[15])> 5)
+		{
+			Fan_Control = 1;
+		}
+		else
+			Fan_Control = 0;
+	}
 
 	if(flag == 1)
 		flagTemp = 1;
 	else if(flag == 0)
 		flagTemp = 0;
-
 }
 
 void Balance(int period, float reference)
@@ -391,7 +424,7 @@ void Balance(int period, float reference)
 			}
 
 		}
-		else if(count ==period) // 4 siklusse met ewe selle
+		else if(count == period) // 4 siklusse met ewe selle
 		{
 			//reset all balancing
 			I2CA_WriteData(0x01,0x00);

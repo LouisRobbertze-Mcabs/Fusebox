@@ -58,6 +58,8 @@ volatile float Voltage_low=10;
 volatile float Temperatures[16];
 volatile float Temperature_avg;
 volatile float Temperatures_resistance[14];
+volatile float Temperature_high=0;
+volatile float Temperature_low=50;
 
 volatile float ADCgain;
 volatile float ADCoffset;

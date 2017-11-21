@@ -102,7 +102,7 @@ __interrupt void cpu_timer1_isr(void)
 	counter_50Hz++;
 	static float Aux_Voltage_temp = 0;
 
-	//Sit dit dalk deur 'n laag deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^WcTs
+	//Deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^WcTs
 
 	//adc/4096 *3.3* 10.51/10.51      12.2/2.2
 

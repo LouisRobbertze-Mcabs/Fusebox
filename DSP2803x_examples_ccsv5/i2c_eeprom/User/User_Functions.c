@@ -322,25 +322,25 @@ void Read_Temperatures(void)
 		if(temp_Temperature_low>Temperatures[i])
 			temp_Temperature_low = Temperatures[i];
 	}
-	temperature_avg = temperature_avg*0.0667;
+	Temperature_avg = temperature_avg*0.0667;
 
 
-	if(temp_Temperature_high>70)					//old system filter
+	//	if(temp_Temperature_high>70)					//old system filter
+	//	{
+	//		Temperature_avg = Temperatures[4];
+	//		Temperature_high = Temperatures[9];
+	//		Temperatures[15] = 0;
+
+	if(Temperatures[4]> Tmax || Temperatures[4]<Tmin)
 	{
-		Temperature_avg = Temperatures[4];
-		Temperature_high = Temperatures[9];
-		Temperatures[15] = 0;
-
-		if(Temperatures[4]> Tmax || Temperatures[4]<Tmin)
-		{
-			flagTemp = 1;
-		}
-
-		if(Temperatures[9]> Tmax || Temperatures[9]<Tmin)
-		{
-			flagTemp = 1;
-		}
+		flag = 1;
 	}
+
+	if(Temperatures[9]> Tmax || Temperatures[9]<Tmin)
+	{
+		flag = 1;
+	}
+	/*	}
 	else											//system normal
 	{
 		Temperature_avg = temperature_avg;
@@ -359,7 +359,7 @@ void Read_Temperatures(void)
 		else
 			Fan_Control = 0;
 	}
-
+	 */
 	if(flag == 1)
 		flagTemp = 1;
 	else if(flag == 0)

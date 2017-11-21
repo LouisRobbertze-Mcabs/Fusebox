@@ -110,4 +110,4 @@ volatile float Vdischargedflagreset = 2.7;
 volatile float kp_constant = 3.5;								//charger
 volatile float kp_multiplier = 30;								//charger
 volatile float balancing_upper_level = 3.49;
-volatile float balancing_bottom_level = 3.48;
+volatile float balancing_bottom_level = 3.475;

@@ -31,7 +31,7 @@ __interrupt void  adc_isr(void)
 	{
 		//sit uittree af
 		ContactorOut = 0;       //turn off contactor
-		flagCurrent = 1;
+		//flagCurrent = 1;
 	}                                                               					////////////////////////////////////////////////
 
 	AdcRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;       //Clear ADCINT1 flag reinitialize for next SOC
@@ -116,14 +116,14 @@ __interrupt void cpu_timer1_isr(void)
 		//  led3 = 1;       //turn on red led
 
 		//binne die keydrive if
-		if((flagDischarged == 0) && (flagCurrent == 0)  && (flagTemp == 0) && (Charger_status == 0))
+		if((flagDischarged == 0) && (flagCurrent == 0) /* && (flagTemp == 0) && (Charger_status == 0)*/)
 		{
 
 			ContactorOut = 1;           //turn on contactor
 		}
 
 	}
-	else if((KeySwitch == 0) && (Charger_status == 0)) //keyswitch == 0
+	else if((KeySwitch == 0)/* && (Charger_status == 0)*/) //keyswitch == 0
 	{
 		flagCurrent = 0;
 

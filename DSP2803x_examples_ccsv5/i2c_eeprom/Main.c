@@ -33,6 +33,8 @@ void main(void)
 
 			counter_2Hz = 0;
 			Reset_ADC();
+
+			I2CA_WriteData(0x05,0x03);                                  //turn on outputs (CHG+DSG)
 		}
 	}
 }

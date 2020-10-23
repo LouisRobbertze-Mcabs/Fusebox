@@ -29,7 +29,7 @@ void configADC(void)
 	AdcRegs.ADCSOC0CTL.bit.TRIGSEL  = 0x02;
 	AdcRegs.ADCSOC0CTL.bit.ACQPS    = 20;
 
-	//Fusebox Current
+	//Fusebox Temperature
 	//channel A1 - SOC3
 	AdcRegs.ADCSOC3CTL.bit.CHSEL    = 0x01;
 	AdcRegs.ADCSOC3CTL.bit.TRIGSEL  = 0x02;

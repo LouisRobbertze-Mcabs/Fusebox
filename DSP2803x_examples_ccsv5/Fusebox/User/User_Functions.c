@@ -9,7 +9,7 @@
 
 void Initialise_BMS(void)
 {
-	flagCurrent = 0;
+	//flagCurrent = 0;
 
 	InitSysCtrl();
 	InitI2CGpio();
@@ -67,7 +67,7 @@ void Initialise_BMS(void)
 
 	CAN_Init();
 	configADC();
-	Bq76940_Init();
+	//Bq76940_Init();
 	//  Shut_D_BQ();
 
 	// Reset the watchdog counter

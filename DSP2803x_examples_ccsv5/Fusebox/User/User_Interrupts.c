@@ -46,6 +46,20 @@ __interrupt void cpu_timer0_isr(void)
 
 	counter_2Hz++;
 
+    //SOC5 - Cell14
+    Temperatures[1] = Temperatures_resistance_temp[12] + (0.466*(((AdcResult.ADCRESULT0))-Temperatures_resistance_temp[12]));
+    Temperatures_resistance_temp[12] = Temperatures_resistance[12];
+
+
+  //  Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));                  //maak miskien gebruik van die config leer
+  //  Aux_Voltage_temp = Auxilliary_Voltage;
+
+
+
+
+
+
+
 	//temp meetings
 	//SOC15 - Outside
 	Temperatures_resistance[13] = Temperatures_resistance_temp[13] + (0.466*(((AdcResult.ADCRESULT15))-Temperatures_resistance_temp[13]));
@@ -88,9 +102,9 @@ __interrupt void cpu_timer0_isr(void)
 	//SOC5 - Cell13
 	Temperatures_resistance[11] = Temperatures_resistance_temp[11] + (0.466*(((AdcResult.ADCRESULT3))-Temperatures_resistance_temp[11]));
 	Temperatures_resistance_temp[11] = Temperatures_resistance[11];
-	//SOC5 - Cell14
-	Temperatures_resistance[12] = Temperatures_resistance_temp[12] + (0.466*(((AdcResult.ADCRESULT0))-Temperatures_resistance_temp[12]));
-	Temperatures_resistance_temp[12] = Temperatures_resistance[12];
+
+
+
 
 	CpuTimer0.InterruptCount++;
 	PieCtrlRegs.PIEACK.bit.ACK1 = 1/* PIEACK_GROUP1*/;

@@ -42,66 +42,98 @@ __interrupt void  adc_isr(void)
 
 __interrupt void cpu_timer0_isr(void)
 {
-	static float Temperatures_resistance_temp[14];
+	static float Temp_Values[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	float Fuse_4_Signal;
+    float Fuse_1_Signal;
+	float Forward_Signal;
+	float Brake_Signal;
+	float Key_Sense_Signal;
+	float Horn_Signal;
+	float E_stop_Signal;
+	float Position_Signal;
+
+	float Relay_3_Signal;
+	float Relay_4_Signal;
+
+	float V_Reg_Signal;
+	float Fuse_7_Signal;
+	float Fuse_2_Signal;
+	float Fuse_8_Signal;
 
 	counter_2Hz++;
 
-    //SOC5 - Cell14
-    Temperatures[1] = Temperatures_resistance_temp[12] + (0.466*(((AdcResult.ADCRESULT0))-Temperatures_resistance_temp[12]));
-    Temperatures_resistance_temp[12] = Temperatures_resistance[12];
+    //Fuse box Current
+    //channel A0 - SOC0
+	Fusebox_Current = Temp_Values[0] + (0.466*(((AdcResult.ADCRESULT0))-Temp_Values[0]));                         //add in proper gain
+	Temp_Values[0] = Fusebox_Current;
+
+    //Fuse_Out_1
+    //channel B2 - SOC1
+    Fuse_1_Signal = Temp_Values[1] + (0.466*(((AdcResult.ADCRESULT1))-Temp_Values[1]));                           //add in proper gain
+    Temp_Values[1] = Fuse_1_Signal;
+    //add if to give binary output
+
+    //Fuse_Out_4
+    //channel B4  - SOC2
+	Fuse_4_Signal = Temp_Values[2] + (0.466*(((AdcResult.ADCRESULT2))-Temp_Values[2]));                           //add in proper gain
+    Temp_Values[2] = Fuse_4_Signal;
+    //add if to give binary output
+
+    //Fuse box Temperature
+    //channel A1 - SOC3
+	Fusebox_Temperature = Temp_Values[3] + (0.466*(((AdcResult.ADCRESULT3))-Temp_Values[3]));                     //add in proper gain
+    Temp_Values[3] = Fusebox_Temperature;
+
+    //Forward input
+    //channel A2 - SOC4
+    Forward_Signal = Temp_Values[4] + (0.466*(((AdcResult.ADCRESULT4))-Temp_Values[4]));                           //add in proper gain
+    Temp_Values[4] = Forward_Signal;
+
+    //Brake light output
+    //channel A3 - SOC5
+    Brake_Signal = Temp_Values[5] + (0.466*(((AdcResult.ADCRESULT5))-Temp_Values[5]));                           //add in proper gain
+    Temp_Values[5] = Brake_Signal;
 
 
-  //  Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));                  //maak miskien gebruik van die config leer
-  //  Aux_Voltage_temp = Auxilliary_Voltage;
+    //Key switch input
+    //channel A4 - SOC6
+    Key_Sense_Signal = Temp_Values[6] + (0.466*(((AdcResult.ADCRESULT6))-Temp_Values[6]));                           //add in proper gain
+    Temp_Values[6] = Key_Sense_Signal;
+
+    //Horn output
+    //channel A5 - SOC7
+    Horn_Signal = Temp_Values[7] + (0.466*(((AdcResult.ADCRESULT7))-Temp_Values[7]));                           //add in proper gain
+    Temp_Values[7] = Horn_Signal;
+
+    //E-stop
+    //channel A6 - SOC8
+    E_stop_Signal = Temp_Values[8] + (0.466*(((AdcResult.ADCRESULT8))-Temp_Values[8]));                           //add in proper gain
+    Temp_Values[8] = E_stop_Signal;
+
+    //Position Switch
+    //channel A7 - SOC9
+    Position_Signal = Temp_Values[9] + (0.466*(((AdcResult.ADCRESULT9))-Temp_Values[9]));                           //add in proper gain
+    Temp_Values[9] = Position_Signal;
+
+    //Relay 3                           -- needs to swop with relay 3 output (Heated seats)
+    //channel B0 - SOC10
+    Relay_3_Signal = Temp_Values[10] + (0.466*(((AdcResult.ADCRESULT10))-Temp_Values[10]));                           //add in proper gain
+    Temp_Values[10] = Relay_3_Signal;
+
+    //Relay 4                            -- needs to swop with relay 4 output (Radio out)
+    //channel B1 - SOC11
+    Relay_4_Signal = Temp_Values[11] + (0.466*(((AdcResult.ADCRESULT11))-Temp_Values[11]));                           //add in proper gain
+    Temp_Values[11] = Relay_4_Signal;
+
+    //Fuse_Out_1
+    //channel B2 - SOC12
+
+    //12V Regulator - secondary
+    //channel B3- SOC13
 
 
 
 
-
-
-
-	//temp meetings
-	//SOC15 - Outside
-	Temperatures_resistance[13] = Temperatures_resistance_temp[13] + (0.466*(((AdcResult.ADCRESULT15))-Temperatures_resistance_temp[13]));
-	Temperatures_resistance_temp[13] = Temperatures_resistance[13];
-
-	//Cells:
-	//SOC14 - Cell0
-	Temperatures_resistance[0] = Temperatures_resistance_temp[0] + (0.466*(((AdcResult.ADCRESULT14))-Temperatures_resistance_temp[0]));
-	Temperatures_resistance_temp[0] = Temperatures_resistance[0];
-	//SOC13 - Cell1
-	Temperatures_resistance[1] = Temperatures_resistance_temp[1] + (0.466*(((AdcResult.ADCRESULT13))-Temperatures_resistance_temp[1]));
-	Temperatures_resistance_temp[1] = Temperatures_resistance[1];
-	//SOC12 - Cell2
-	Temperatures_resistance[2] = Temperatures_resistance_temp[2] + (0.466*(((AdcResult.ADCRESULT12))-Temperatures_resistance_temp[2]));
-	Temperatures_resistance_temp[2] = Temperatures_resistance[2];
-	//SOC11 - Cell3
-	Temperatures_resistance[3] = Temperatures_resistance_temp[3] + (0.466*(((AdcResult.ADCRESULT11))-Temperatures_resistance_temp[3]));
-	Temperatures_resistance_temp[3] = Temperatures_resistance[3];
-	//SOC10 - Cell4
-	Temperatures_resistance[4] = Temperatures_resistance_temp[4] + (0.466*(((AdcResult.ADCRESULT10))-Temperatures_resistance_temp[4]));
-	Temperatures_resistance_temp[4] = Temperatures_resistance[4];
-	//SOC9 - Cell6
-	Temperatures_resistance[5] = Temperatures_resistance_temp[5] + (0.466*(((AdcResult.ADCRESULT9))-Temperatures_resistance_temp[5]));
-	Temperatures_resistance_temp[5] = Temperatures_resistance[5];
-	//SOC8 - Cell7
-	Temperatures_resistance[6] = Temperatures_resistance_temp[6] + (0.466*(((AdcResult.ADCRESULT8))-Temperatures_resistance_temp[6]));
-	Temperatures_resistance_temp[6] = Temperatures_resistance[6];
-	//SOC7 - Cell8
-	Temperatures_resistance[7] = Temperatures_resistance_temp[7] + (0.466*(((AdcResult.ADCRESULT7))-Temperatures_resistance_temp[7]));
-	Temperatures_resistance_temp[7] = Temperatures_resistance[7];
-	//SOC6 - Cell9
-	Temperatures_resistance[8] = Temperatures_resistance_temp[8] + (0.466*(((AdcResult.ADCRESULT6))-Temperatures_resistance_temp[8]));
-	Temperatures_resistance_temp[8] = Temperatures_resistance[8];
-	//SOC5 - Cell11
-	Temperatures_resistance[9] = Temperatures_resistance_temp[9] + (0.466*(((AdcResult.ADCRESULT5))-Temperatures_resistance_temp[9]));
-	Temperatures_resistance_temp[9] = Temperatures_resistance[9];
-	//SOC5 - Cell12
-	Temperatures_resistance[10] = Temperatures_resistance_temp[10] + (0.466*(((AdcResult.ADCRESULT4))-Temperatures_resistance_temp[10]));
-	Temperatures_resistance_temp[10] = Temperatures_resistance[10];
-	//SOC5 - Cell13
-	Temperatures_resistance[11] = Temperatures_resistance_temp[11] + (0.466*(((AdcResult.ADCRESULT3))-Temperatures_resistance_temp[11]));
-	Temperatures_resistance_temp[11] = Temperatures_resistance[11];
 
 
 

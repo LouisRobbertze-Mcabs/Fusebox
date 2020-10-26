@@ -107,4 +107,7 @@ extern volatile float kp_multiplier;
 extern volatile float balancing_upper_level;
 extern volatile float balancing_bottom_level;
 
+extern volatile float Fusebox_Current;
+extern volatile float Fusebox_Temperature;
+
 #endif /* USER_GLOBALS_H_ */

@@ -96,24 +96,24 @@ void Init_Gpio(void)
 
 	GpioCtrlRegs.GPAMUX1.bit.GPIO6 = 0;     //BT reset
 	GpioCtrlRegs.GPADIR.bit.GPIO6 = 1;      //BT reset
-	BTReset = 0;                            //keep BT in reset
+//	BTReset = 0;                            //keep BT in reset
 
 	GpioCtrlRegs.GPAMUX1.bit.GPIO15 = 0;    //12 Aux drive
 	GpioCtrlRegs.GPADIR.bit.GPIO15 = 1;     // 12 Aux drive (verander miskien)
-	Aux_Control = 1;
+//	Aux_Control = 1;
 
 	//	GpioCtrlRegs.GPAPUD.bit.GPIO19 = 1;    // Enable pull-up for GPIO19
 	GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;    //KeyDrive
 	GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;     //(Output) key drive (raak nou fan control)
-	Fan_Control = 0; 						//turn off fan for now
+//	Fan_Control = 0; 						//turn off fan for now
 
 	GpioCtrlRegs.GPAMUX2.bit.GPIO20 = 0;    //contactor output
 	GpioCtrlRegs.GPADIR.bit.GPIO20 = 1;     // contactor output
-	ContactorOut = 0;                       //turn off contactor
+//	ContactorOut = 0;                       //turn off contactor
 
 	GpioCtrlRegs.GPAMUX2.bit.GPIO21 = 0;    //precharge resistor
 	GpioCtrlRegs.GPADIR.bit.GPIO21 = 1;     // precharge resistor
-	PreCharge = 1;                          //turn on precharge resistor
+//	PreCharge = 1;                          //turn on precharge resistor
 
 	GpioCtrlRegs.GPAMUX2.bit.GPIO24 = 0;    //key switch
 	GpioCtrlRegs.GPADIR.bit.GPIO24 = 0;     //key switch
@@ -133,9 +133,9 @@ void Init_Gpio(void)
 	EDIS;
 
 	//turn on contactor
-	ContactorOut = 1;
+//	ContactorOut = 1;
 
-	CSControl = 0;  //turn CScontrol on for current measurement
+//	CSControl = 0;  //turn CScontrol on for current measurement
 }
 
 void Toggle_LED(void)
@@ -199,17 +199,17 @@ void Process_Voltages(void)
 	{
 		balance = 1;            //start balancing
 		flagCharged = 1;        //charged flag to to stop charging
-		ContactorOut = 0;
+//		ContactorOut = 0;
 	}
 
 	if(Voltage_low > Vmin && Auxilliary_Voltage < Vauxmin && Auxilliary_Voltage > 8)
 	{
 		Auxilliary_counter = 0;			//turn on aux supply
-		Aux_Control = 1;
+//		Aux_Control = 1;
 	}
 	else if(Auxilliary_counter > AuxChargeTime || Auxilliary_Voltage < 8)
 	{
-		Aux_Control = 0;										//turn off aux supply
+//		Aux_Control = 0;										//turn off aux supply
 	}
 
 	Auxilliary_counter++;
@@ -217,16 +217,16 @@ void Process_Voltages(void)
 
 	if(Voltage_low < Vmin && Voltage_low > Vcritical && Charger_status == 0)
 	{
-		Aux_Control = 0;
+//		Aux_Control = 0;
 		flagDischarged = 1;
-		led3 = 1;               //turn on red led
-		ContactorOut = 0;       //turn off contactor            //turn off output
+//		led3 = 1;               //turn on red led
+//		ContactorOut = 0;       //turn off contactor            //turn off output
 	}
 	else if(Voltage_low < Vcritical && Charger_status == 0)
 	{
-		Aux_Control = 0;
+//		Aux_Control = 0;
 		flagDischarged = 2;
-		led3 = 1;               //turn on red led
+//		led3 = 1;               //turn on red led
 	}
 
 	if(Voltage_high<Vchargedflagreset )
@@ -235,7 +235,7 @@ void Process_Voltages(void)
 	if(Voltage_low>Vdischargedflagreset )
 	{
 		flagDischarged = 0;
-		led3 = 0;               //turn off red led
+//		led3 = 0;               //turn off red led
 	}
 
 }

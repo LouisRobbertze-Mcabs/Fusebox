@@ -199,78 +199,8 @@ void CANChargerReception(void)
 	ChgStatus = RxDataH & 0xFF;
 
 
-	if(ChgStatus == 0)                                                                  //Charger ready to charge. No flags set
-	{
-		Charger_status = 1;//charger connected
-		if(flagCurrent == 0 && flagTemp == 0 && flagCharged == 0 && KeySwitch == 0)     //check flags to ensure charging is allowed   haal flagvoltage uit
-		{
-			if(delay == 0)                                                              //sit miskien check in om met die charger Vbat te meet
-			{
-				ContactorOut = 1;                                                       //turn on contactor
-				delay++;
-			}
-			else if(delay == 1)
-			{
-				Current_max =  Current_max + kp_multiplier*(kp_constant - Voltage_high);								//kp controller constant & kp multiplier
-
-				if(Current_max <0)									//add max as well
-					Current_max = 0;
-				else if(Current_max > 25)
-					Current_max = 25;
-
-				//determine if balancing should start
-				//if cell high > 3.48 balance
-				//if cell low > 3.48: stop balancing , stop charging
 
 
-				if(Voltage_high> balancing_upper_level && Voltage_low < balancing_bottom_level)										//balancing upper level & balancing lower level
-				{
-					balance = 1;
-				}
-				else if(Voltage_high> balancing_upper_level && Voltage_low > balancing_bottom_level)
-				{
-					//balance = 0;
-					flagCharged = 1;
-				}
-
-				CANTransmit(0x618, 0, ChgCalculator(52.5, Current_max), 8);               //charging started
-			}
-		}
-		else																			//BMS flag high. Stop charging and disconnect blah blah
-		{
-			if(delay == 1)                                                              //sit miskien check in om met die charger Vbat te meet
-			{
-				CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                            //disconnect charger
-				delay--;
-			}
-			else if(delay == 0)
-			{
-				ContactorOut = 0;                                                       //turn off contactor
-				CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                            //disconnect charger
-				//Charger_status = 0;												//haal miskien uit
-
-			}
-		}
-	}
-	else                                                                                //Charger flag set. typically power disconnected
-	{
-		if(delay == 1)
-		{
-			CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                                //disconnect charger
-			delay--;
-		}
-		else if(delay == 0)
-		{
-			ContactorOut = 0;                                                           //turn off contactor
-			CANTransmit(0x618,1,ChgCalculator(52.5, 0),8);                                //disconnect charger
-			Charger_status = 0;
-			Current_max = 25;
-		}
-	}
-
-	//    Charger_status = ChgStatus;
-	toets = ChgVoltage;
-	toets2 = ChgCurrent;
 }
 
 void CANSlaveReception(void)

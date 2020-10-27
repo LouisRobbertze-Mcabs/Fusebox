@@ -23,7 +23,7 @@ void  Bq76940_Init(void)
 	int UV;
 	Uint16 Reset;
 
-	BQEnable = 1;                                           //turn on BQ chip
+//	BQEnable = 1;                                           //turn on BQ chip
 	while(counter_2Hz != 1);                                      //toets delay
 
 	Reset = I2CA_ReadData(&I2cMsgIn1,0x00, 1);
@@ -72,7 +72,7 @@ void  Bq76940_Init(void)
 
 	I2CA_WriteData(0x0A,(char)UV);                              //Stel UV_trip op
 
-	BQEnable = 0;                                               //pull low to allow BQ to measure temp
+//	BQEnable = 0;                                               //pull low to allow BQ to measure temp
 
 	EALLOW;
 

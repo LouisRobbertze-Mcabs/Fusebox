@@ -30,14 +30,14 @@ __interrupt void  adc_isr(void)
 	if(Filter_100HZ > Imax || Filter_100HZ < Imin)                       ////////////////////////////////////////////////
 	{
 		//sit uittree af
-		ContactorOut = 0;       //turn off contactor
+//		ContactorOut = 0;       //turn off contactor
 		//flagCurrent = 1;
 	}                                                               					////////////////////////////////////////////////
 
 	AdcRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;       //Clear ADCINT1 flag reinitialize for next SOC
 	PieCtrlRegs.PIEACK.bit.ACK10 = 1;   // Acknowledge interrupt to PIE
 
-	led2 = 0x01^led2;                   //toggle led
+//	led2 = 0x01^led2;                   //toggle led
 }
 
 __interrupt void cpu_timer0_isr(void)
@@ -165,26 +165,7 @@ __interrupt void cpu_timer1_isr(void)
 	//Aux_Voltage_temp = Auxilliary_Voltage;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////// testing
-	if(KeySwitch == 1)  //keyswitch == 1
-	{
-		//  led3 = 1;       //turn on red led
 
-		//binne die keydrive if
-		if((flagDischarged == 0) && (flagCurrent == 0) /* && (flagTemp == 0) && (Charger_status == 0)*/)
-		{
-
-			ContactorOut = 1;           //turn on contactor
-		}
-
-	}
-	else if((KeySwitch == 0)/* && (Charger_status == 0)*/) //keyswitch == 0
-	{
-		flagCurrent = 0;
-
-		ContactorOut = 0;       //turn off contactor
-
-		//  led3 = 0;       //turn off red led
-	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	CpuTimer1.InterruptCount++;
 	EDIS;

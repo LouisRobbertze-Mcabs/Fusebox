@@ -18,11 +18,11 @@ __interrupt void  adc_isr(void)
 	//  int toets_stroom = 0;
 
 
-	test_current = current_p + (0.00314*(AdcResult.ADCRESULT1-current_p));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
+	//test_current = current_p + (0.00314*(AdcResult.ADCRESULT1-current_p));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
 	current_p=test_current;
 
 
-	Filter_100HZ = Filter_100HZ_past + (Ifilter*(AdcResult.ADCRESULT1-Filter_100HZ_past));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
+	//Filter_100HZ = Filter_100HZ_past + (Ifilter*(AdcResult.ADCRESULT1-Filter_100HZ_past));     //   0.00314-1Hz     //  0.01249 - 4 Hz      //0.27-100Hz
 	Filter_100HZ_past=Filter_100HZ;
 
 	//   Filter_100HZ = (test_current-2109)* 0.122;
@@ -42,7 +42,7 @@ __interrupt void  adc_isr(void)
 
 __interrupt void cpu_timer0_isr(void)
 {
-	static float Temp_Values[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static float Temp_Values[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	float Fuse_4_Signal;
     float Fuse_1_Signal;
 	float Forward_Signal;
@@ -125,17 +125,25 @@ __interrupt void cpu_timer0_isr(void)
     Relay_4_Signal = Temp_Values[11] + (0.466*(((AdcResult.ADCRESULT11))-Temp_Values[11]));                           //add in proper gain
     Temp_Values[11] = Relay_4_Signal;
 
-    //Fuse_Out_1
-    //channel B2 - SOC12
-
     //12V Regulator - secondary
-    //channel B3- SOC13
+    //channel B3- SOC12
+    V_Reg_Signal = Temp_Values[12] + (0.466*(((AdcResult.ADCRESULT12))-Temp_Values[12]));                           //add in proper gain
+    Temp_Values[12] = V_Reg_Signal;
 
+    //Fuse_Out_7
+    //channel B5 - SOC13
+    Fuse_7_Signal = Temp_Values[13] + (0.466*(((AdcResult.ADCRESULT13))-Temp_Values[13]));                           //add in proper gain
+    Temp_Values[13] = Fuse_7_Signal;
 
+    //Fuse_Out_2
+    //channel B6 - SOC14
+    Fuse_2_Signal = Temp_Values[14] + (0.466*(((AdcResult.ADCRESULT14))-Temp_Values[14]));                           //add in proper gain
+    Temp_Values[14] = Fuse_2_Signal;
 
-
-
-
+    //Fuse_Out_8
+    //channel B7 - SOC15
+    Fuse_8_Signal = Temp_Values[15] + (0.466*(((AdcResult.ADCRESULT15))-Temp_Values[15]));                           //add in proper gain
+    Temp_Values[15] = Fuse_8_Signal;
 
 
 	CpuTimer0.InterruptCount++;
@@ -153,8 +161,8 @@ __interrupt void cpu_timer1_isr(void)
 	//adc/4096 *3.3* 10.51/10.51      12.2/2.2
 
 
-	Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));					//maak miskien gebruik van die config leer
-	Aux_Voltage_temp = Auxilliary_Voltage;
+	//Auxilliary_Voltage = Aux_Voltage_temp + (0.0609*(((AdcResult.ADCRESULT2)* 0.00442)-Aux_Voltage_temp));					//maak miskien gebruik van die config leer
+	//Aux_Voltage_temp = Auxilliary_Voltage;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////// testing
 	if(KeySwitch == 1)  //keyswitch == 1

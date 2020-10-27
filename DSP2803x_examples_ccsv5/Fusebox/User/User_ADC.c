@@ -97,13 +97,11 @@ void configADC(void)
     AdcRegs.ADCSOC11CTL.bit.TRIGSEL  = 0x02;
     AdcRegs.ADCSOC11CTL.bit.ACQPS    = 20;
 
-
-
     //12V Regulator - secondary
-    //channel B3- SOC13
-    AdcRegs.ADCSOC13CTL.bit.CHSEL    = 0x0B;
-    AdcRegs.ADCSOC13CTL.bit.TRIGSEL  = 0x02;
-    AdcRegs.ADCSOC13CTL.bit.ACQPS    = 20;
+    //channel B3- SOC12
+    AdcRegs.ADCSOC12CTL.bit.CHSEL    = 0x0B;
+    AdcRegs.ADCSOC12CTL.bit.TRIGSEL  = 0x02;
+    AdcRegs.ADCSOC12CTL.bit.ACQPS    = 20;
 
     //Fuse_Out_7
     //channel B5 - SOC13

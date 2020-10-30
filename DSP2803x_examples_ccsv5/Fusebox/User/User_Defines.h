@@ -33,7 +33,7 @@
 
 #define Fuse_Out_Sense_9 GpioDataRegs.GPADAT.bit.GPIO12               //MCU_input
 #define Main_Beam_Out_Sense GpioDataRegs.GPADAT.bit.GPIO13            //MCU_input     -   Relay1 out
-#define Heated_Seats_Out_Sense GpioDataRegs.GPADAT.bit.GPIO14         //MCU_input     -   Relay3 out
+#define Relay_Ctrl_3 GpioDataRegs.GPADAT.bit.GPIO14                   //MCU_input     -   Relay3 out
 #define Wiper_Out_Sense GpioDataRegs.GPADAT.bit.GPIO15                //MCU_input     -   Fuse3 out
 
 #define Mfet_Out_Sense_5 GpioDataRegs.GPADAT.bit.GPIO16               //MCU_input
@@ -58,7 +58,7 @@
 #define Mfet_Out_Sense_7 GpioDataRegs.GPBDAT.bit.GPIO41               //MCU_input
 
 #define Handbrake_In_Sense GpioDataRegs.GPBDAT.bit.GPIO42             //MCU_input
-#define Radio_Out_Sense GpioDataRegs.GPBDAT.bit.GPIO43                //MCU_input           - Relay4
+#define Relay_Ctrl_4 GpioDataRegs.GPBDAT.bit.GPIO43                   //MCU_input           - Relay4
 #define Mfet_Out_Sense_1 GpioDataRegs.GPBDAT.bit.GPIO44               //MCU_input
 
 #endif /* USER_DEFINES_H_ */

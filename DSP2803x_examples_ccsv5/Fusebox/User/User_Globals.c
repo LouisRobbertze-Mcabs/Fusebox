@@ -116,3 +116,18 @@ volatile float balancing_bottom_level = 3.475;
 volatile float Fusebox_Current = 0;
 volatile float Fusebox_Temperature = 0;
 
+volatile Uint16 Fuse_Out_Sense_1 = 0;
+volatile Uint16 Fuse_Out_Sense_4 = 0;
+volatile Uint16 Forward_In_Sense = 0;
+volatile Uint16 Brake_In_Sense = 0;
+volatile Uint16 Key_In_Sense = 0;
+volatile Uint16 Horn_Ctrl_Sense = 0;                            //relay input
+volatile Uint16 E_Stop_In_Sense = 0;                            //define logic
+volatile Uint16 Position_Out_Sense = 0;
+volatile Uint16 Heated_Seats_Out_Sense = 0;                     //Relay 3 needs swopping
+volatile Uint16 Radio_Out_Sense = 0;                            //Relay 4 needs swopping
+volatile Uint16 V_Reg_In_Sense = 0;                             //secondary regulator
+volatile Uint16 Fuse_Out_Sense_7 = 0;
+volatile Uint16 Fuse_Out_Sense_2 = 0;
+volatile Uint16 Fuse_Out_Sense_8 = 0;
+

@@ -12,7 +12,7 @@ void Initialise_BMS(void)
     //flagCurrent = 0;
 
     InitSysCtrl();
-    InitI2CGpio();
+//    InitI2CGpio();
     Init_Gpio();
     InitAdc();
     //	InitSpiaGpio();
@@ -34,7 +34,7 @@ void Initialise_BMS(void)
     PieVectTable.ADCINT1 = &adc_isr;
     EDIS;   // This is needed to disable write to EALLOW protected registers
 
-    I2CA_Init();
+//    I2CA_Init();
     InitCpuTimers();
 
     ConfigCpuTimer(&CpuTimer0, 60, 500000); //2 hz
@@ -67,8 +67,6 @@ void Initialise_BMS(void)
 
     CAN_Init();
     configADC();
-    //Bq76940_Init();
-    //  Shut_D_BQ();
 
     // Reset the watchdog counter
     ServiceDog();
@@ -77,7 +75,7 @@ void Initialise_BMS(void)
     EALLOW;
     SysCtrlRegs.WDCR = 0x002F;
     EDIS;
-    //watchdog timer>>>>>>>>
+
     //DisableDog();
 }
 
@@ -236,8 +234,7 @@ void Init_Gpio(void)
 
 void Toggle_LED(void)
 {
-    GpioDataRegs.GPATOGGLE.bit.GPIO5 = 1;
-    //GpioDataRegs.GPATOGGLE.bit.GPIO19 = 1;
+    GpioDataRegs.GPATOGGLE.bit.GPIO27 = 1;
 }
 
 void  Read_Cell_Voltages(void)

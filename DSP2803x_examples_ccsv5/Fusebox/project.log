@@ -1,0 +1,8 @@
+
+
+!CONFIGURATION: 'Debug' (com.ti.ccstudio.buildDefinitions.C2000.Debug.1498404003) [Thu Nov 26 15:36:00 WAST 2020]
+
+	!TOOL: 'C2000 Compiler' (com.ti.ccstudio.buildDefinitions.C2000_6.1.exe.compilerDebug.1842422246)
+
+		!WARNING: Unresolved target-tool option 'com.ti.ccstudio.buildDefinitions.C2000_6.1.compilerID.ABI'
+

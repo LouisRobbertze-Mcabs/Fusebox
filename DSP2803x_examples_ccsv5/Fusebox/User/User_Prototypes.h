@@ -36,10 +36,12 @@ Uint32 ChgCalculator(float Voltage, float Current);
 void Calculate_Current(void);
 void Read_System_Status(void);
 void Process_System_Status(void);
-
+void GPIO_Error_Check(Uint16 FuseError,Uint16 FuseErrorCount,Uint16 RelayMOSFETStatus,Uint16 RelayMOSFETError,Uint16 RelayMOSFETErrorCounter,Uint16 VehicleStatus);
 void Balance(int period, float reference);
 
 unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key);
+
+
 
 //#pragma CODE_SECTION(DELAY_US, "ramfuncs");
 

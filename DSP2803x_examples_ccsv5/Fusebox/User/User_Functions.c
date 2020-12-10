@@ -89,9 +89,10 @@ void Init_Gpio(void)
     GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 0;     //Mfet_Ctrl_8
     GpioCtrlRegs.GPADIR.bit.GPIO0 = 1;      //Mfet_Ctrl_8
 
-    GpioCtrlRegs.GPAPUD.bit.GPIO1 = 1;      //Disable pull-up
+    /*GpioCtrlRegs.GPAPUD.bit.GPIO1 = 1;      //Disable pull-up
     GpioCtrlRegs.GPAMUX1.bit.GPIO1 = 0;     //Mfet_Ctrl_9
     GpioCtrlRegs.GPADIR.bit.GPIO1 = 1;      //Mfet_Ctrl_9
+    MOSFET 9 REMOVED*/
 
     GpioCtrlRegs.GPAPUD.bit.GPIO2 = 1;      //Disable pull-up
     GpioCtrlRegs.GPAMUX1.bit.GPIO2 = 0;     //Mfet_Ctrl_6
@@ -127,11 +128,11 @@ void Init_Gpio(void)
 
     GpioCtrlRegs.GPAPUD.bit.GPIO10 = 1;      //Disable pull-up
     GpioCtrlRegs.GPAMUX1.bit.GPIO10 = 0;     //Mfet_Ctrl_0
-    GpioCtrlRegs.GPADIR.bit.GPIO10 = 0;      //Mfet_Ctrl_0
+    GpioCtrlRegs.GPADIR.bit.GPIO10 = 1;      //Mfet_Ctrl_0
 
     GpioCtrlRegs.GPAPUD.bit.GPIO11 = 1;      //Disable pull-up
     GpioCtrlRegs.GPAMUX1.bit.GPIO11 = 0;     //Mfet_Ctrl_1
-    GpioCtrlRegs.GPADIR.bit.GPIO11 = 0;      //Mfet_Ctrl_1
+    GpioCtrlRegs.GPADIR.bit.GPIO11 = 1;      //Mfet_Ctrl_1
 
     GpioCtrlRegs.GPAPUD.bit.GPIO12 = 1;      //Disable pull-up
     GpioCtrlRegs.GPAMUX1.bit.GPIO12 = 0;     //Fuse_Out_Sense_9
@@ -372,22 +373,6 @@ void Read_Temperatures(void)
         Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
     }
 
-    //cells 5-8
-    for(i = 5; i<9; i++)
-    {
-        Vts = (Temperatures_resistance[i-1]) * 0.00080566;
-        Rts = (33000/Vts) - 10000;
-        Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
-    }
-
-    //cells 10-14
-    for(i = 10; i<15; i++)
-    {
-        Vts = (Temperatures_resistance[i-2]) * 0.00080566;
-        Rts = (33000/Vts) - 10000;
-        Temperatures[i] = (1/((log(Rts/10000))/4000+0.003356))-273;
-    }
-
     //cell5,cell10
     temp_T = I2CA_ReadData(&I2cMsgIn1, 0x2E, 2);
     Vts = temp_T*ADCgain;
@@ -400,59 +385,6 @@ void Read_Temperatures(void)
     Temperatures[9] = (1/((log(Rts/10000))/4000+0.003356))-273;
 
 
-    //Outside
-    Vts = (Temperatures_resistance[13]) * 0.00080566;
-    Rts = (33000/Vts) - 10000;
-    Temperatures[15] = (1/((log(Rts/10000))/4000+0.003356))-273;
-
-    for(i = 0; i<15; i++)
-    {
-        temperature_avg = temperature_avg+Temperatures[i];
-
-        if(temp_Temperature_high<Temperatures[i])
-            temp_Temperature_high = Temperatures[i];
-
-        if(temp_Temperature_low>Temperatures[i])
-            temp_Temperature_low = Temperatures[i];
-    }
-    Temperature_avg = temperature_avg*0.0667;
-
-
-    //	if(temp_Temperature_high>70)					//old system filter
-    //	{
-    //		Temperature_avg = Temperatures[4];
-    //		Temperature_high = Temperatures[9];
-    //		Temperatures[15] = 0;
-
-    if(Temperatures[4]> Tmax || Temperatures[4]<Tmin)
-    {
-        flag = 1;
-    }
-
-    if(Temperatures[9]> Tmax || Temperatures[9]<Tmin)
-    {
-        flag = 1;
-    }
-    /*	}
-	else											//system normal
-	{
-		Temperature_avg = temperature_avg;
-		Temperature_high = temp_Temperature_high;
-		Temperature_low = temp_Temperature_low;
-
-		if(Temperature_high> Tmax || Temperature_low<Tmin)
-		{
-			flagTemp = 1;
-		}
-
-		if((Temperature_avg - Temperatures[15])> 5)
-		{
-			Fan_Control = 1;
-		}
-		else
-			Fan_Control = 0;
-	}
-     */
     if(flag == 1)
         flagTemp = 1;
     else if(flag == 0)
@@ -656,4 +588,6 @@ Uint32 ChgCalculator(float Voltage, float Current)
 
     return answer;
 }
+
+
 

@@ -17,7 +17,7 @@
 #define I2C_EEPROM_LOW_ADDR   0x91
 
 #define Mfet_Ctrl_8 GpioDataRegs.GPADAT.bit.GPIO0
-#define Mfet_Ctrl_9 GpioDataRegs.GPADAT.bit.GPIO1
+//#define Mfet_Ctrl_9 GpioDataRegs.GPADAT.bit.GPIO1   MOSFET 9 REMOVED
 #define Mfet_Ctrl_6 GpioDataRegs.GPADAT.bit.GPIO2
 #define Mfet_Ctrl_7 GpioDataRegs.GPADAT.bit.GPIO3
 #define Mfet_Ctrl_3 GpioDataRegs.GPADAT.bit.GPIO4
@@ -61,4 +61,4 @@
 #define Relay_Ctrl_4 GpioDataRegs.GPBDAT.bit.GPIO43                   //MCU_input           - Relay4
 #define Mfet_Out_Sense_1 GpioDataRegs.GPBDAT.bit.GPIO44               //MCU_input
 
-#endif /* USER_DEFINES_H_ */
+#endif  /*USER_DEFINES_H_*/

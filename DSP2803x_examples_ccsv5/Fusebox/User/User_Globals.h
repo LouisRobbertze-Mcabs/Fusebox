@@ -107,22 +107,13 @@ extern volatile float kp_multiplier;
 extern volatile float balancing_upper_level;
 extern volatile float balancing_bottom_level;
 
-extern volatile float Fusebox_Current;
-extern volatile float Fusebox_Temperature;
+extern volatile long Fusebox_Current;
+extern volatile long Fusebox_Temperature;
 
-extern volatile Uint16 Fuse_Out_Sense_1;
-extern volatile Uint16 Fuse_Out_Sense_4;
-extern volatile Uint16 Forward_In_Sense;
-extern volatile Uint16 Brake_In_Sense;
-extern volatile Uint16 Key_In_Sense;
-extern volatile Uint16 Horn_Ctrl_Sense;                            //relay input
-extern volatile Uint16 E_Stop_In_Sense;                            //define logic
-extern volatile Uint16 Position_Out_Sense;
-extern volatile Uint16 Heated_Seats_Out_Sense;                     //Relay 3 needs swopping
-extern volatile Uint16 Radio_Out_Sense;                            //Relay 4 needs swopping
-extern volatile Uint16 V_Reg_In_Sense;                             //secondary regulator
-extern volatile Uint16 Fuse_Out_Sense_7;
-extern volatile Uint16 Fuse_Out_Sense_2;
-extern volatile Uint16 Fuse_Out_Sense_8;
+
+
+//extern volatile StateFlag;  //0=Stopped State   1=pre-operational State    2=operational state
+
+
 
 #endif /* USER_GLOBALS_H_ */

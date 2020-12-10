@@ -4,6 +4,7 @@
  *  Created on: 04 May 2017
  *      Author: Sonja
  */
+//******************FUSEBOX
 
 #include "User_CAN.h"
 
@@ -197,45 +198,41 @@ void CANChargerReception(void)
 
 	//Read Charger Status
 	ChgStatus = RxDataH & 0xFF;
-
-
-
-
 }
 
 void CANSlaveReception(void)
 {
-	Uint32 RxData = 0;
+	/*Uint32 RxData = 0;
 	union bits32 TxData;
 
 	RxData = ECanaMboxes.MBOX1.MDH.all;             // Data taken out of direct mailbox
 
 	switch (RxData)
 	{
-	case 1: {TxData.asFloat=Voltages[0]; CANTransmit(0, 1, TxData.asUint,5); break;}
-	case 2: {TxData.asFloat=Voltages[1]; CANTransmit(0, 2, TxData.asUint,5); break;}
-	case 3: {TxData.asFloat=Voltages[2]; CANTransmit(0, 3, TxData.asUint,5); break;}
-	case 4: {TxData.asFloat=Voltages[3]; CANTransmit(0, 4, TxData.asUint,5); break;}
-	case 5: {TxData.asFloat=Voltages[4]; CANTransmit(0, 5, TxData.asUint,5); break;}
-	case 6: {TxData.asFloat=Voltages[5]; CANTransmit(0, 6, TxData.asUint,5); break;}
-	case 7: {TxData.asFloat=Voltages[6]; CANTransmit(0, 7, TxData.asUint,5); break;}
-	case 8: {TxData.asFloat=Voltages[7]; CANTransmit(0, 8, TxData.asUint,5); break;}
-	case 9: {TxData.asFloat=Voltages[8]; CANTransmit(0, 9, TxData.asUint,5); break;}
-	case 10: {TxData.asFloat=Voltages[9]; CANTransmit(0, 10, TxData.asUint,5); break;}
-	case 11: {TxData.asFloat=Voltages[10]; CANTransmit(0, 11, TxData.asUint,5); break;}
-	case 12: {TxData.asFloat=Voltages[11]; CANTransmit(0, 12, TxData.asUint,5); break;}
-	case 13: {TxData.asFloat=Voltages[12]; CANTransmit(0, 13, TxData.asUint,5); break;}
-	case 14: {TxData.asFloat=Voltages[13]; CANTransmit(0, 14, TxData.asUint,5); break;}
-	case 15: {TxData.asFloat=Voltages[14]; CANTransmit(0, 15, TxData.asUint,5); break;}
+    case 1: {TxData.asFloat=Voltages[0]; CANTransmit(0, 1, TxData.asUint,5); break;}
+    case 2: {TxData.asFloat=Voltages[1]; CANTransmit(0, 2, TxData.asUint,5); break;}
+    case 3: {TxData.asFloat=Voltages[2]; CANTransmit(0, 3, TxData.asUint,5); break;}
+    case 4: {TxData.asFloat=Voltages[3]; CANTransmit(0, 4, TxData.asUint,5); break;}
+    case 5: {TxData.asFloat=Voltages[4]; CANTransmit(0, 5, TxData.asUint,5); break;}
+    case 6: {TxData.asFloat=Voltages[5]; CANTransmit(0, 6, TxData.asUint,5); break;}
+    case 7: {TxData.asFloat=Voltages[6]; CANTransmit(0, 7, TxData.asUint,5); break;}
+    case 8: {TxData.asFloat=Voltages[7]; CANTransmit(0, 8, TxData.asUint,5); break;}
+    case 9: {TxData.asFloat=Voltages[8]; CANTransmit(0, 9, TxData.asUint,5); break;}
+    case 10: {TxData.asFloat=Voltages[9]; CANTransmit(0, 10, TxData.asUint,5); break;}
+    case 11: {TxData.asFloat=Voltages[10]; CANTransmit(0, 11, TxData.asUint,5); break;}
+    case 12: {TxData.asFloat=Voltages[11]; CANTransmit(0, 12, TxData.asUint,5); break;}
+    case 13: {TxData.asFloat=Voltages[12]; CANTransmit(0, 13, TxData.asUint,5); break;}
+    case 14: {TxData.asFloat=Voltages[13]; CANTransmit(0, 14, TxData.asUint,5); break;}
+    case 15: {TxData.asFloat=Voltages[14]; CANTransmit(0, 15, TxData.asUint,5); break;}
 
-	case 16: {TxData.asFloat=Current; CANTransmit(0, 16, TxData.asUint,5); break;}
+    case 16: {TxData.asFloat=Current; CANTransmit(0, 16, TxData.asUint,5); break;}
 
-	case 17: {TxData.asFloat=Temperatures[4]; CANTransmit(0, 17, TxData.asUint,5); break;}
-	case 18: {TxData.asFloat=Temperatures[9]; CANTransmit(0, 18, TxData.asUint,5); break;}
-	case 19: {TxData.asFloat=Temperature_avg; CANTransmit(0, 19, TxData.asUint, 5); break;}
+    case 17: {TxData.asFloat=Temperatures[4]; CANTransmit(0, 17, TxData.asUint,5); break;}
+    case 18: {TxData.asFloat=Temperatures[9]; CANTransmit(0, 18, TxData.asUint,5); break;}
+    case 19: {TxData.asFloat=Temperature_avg; CANTransmit(0, 19, TxData.asUint, 5); break;}
 
-	case 20: {TxData.asFloat=Auxilliary_Voltage; CANTransmit(0, 20, TxData.asUint, 5); break;}
-	}
+    case 20: {TxData.asFloat=Auxilliary_Voltage; CANTransmit(0, 20, TxData.asUint, 5); break;}
+	}*/
 }
 
 void CANSlaveConfig(void)
@@ -275,20 +272,71 @@ void CANSlaveConfig(void)
 	}
 }
 
-void CANTransmit(Uint16 Destination, Uint32 TxDataH, Uint32 TxDataL, Uint16 Bytes)      //destination, txdataH, txdataL,  bytes
+void CANTransmit(Uint16 Destination, Uint32 TxDataH, Uint32 TxDataL, Uint16 Bytes, Uint16 Mailbox)      //destination, txdataH, txdataL, bytes, Mailbox
 {
-	ECanaRegs.CANME.all = 0x0000000E;                   // Disable Tx Mailbox
+    switch(Mailbox)
+    {
+    case 0 :
+        if(ECanaRegs.CANTRS.bit.TRS0 == 0)                          // Check to see if previous transmit has completed
+        {
+            ECanaRegs.CANME.bit.ME0 = 0;                            // Disable Tx Mailbox
+            ECanaMboxes.MBOX0.MSGCTRL.all = Bytes;                  // Transmit x bytes of data
+            ECanaMboxes.MBOX0.MSGID.all = 0;                        // Standard ID length, acceptance masks used, no remote frames
+            ECanaMboxes.MBOX0.MSGID.bit.STDMSGID = Destination;     // Load destination address
+            ECanaMboxes.MBOX0.MDL.all = TxDataL;
+            ECanaMboxes.MBOX0.MDH.all = TxDataH;
 
-	ECanaMboxes.MBOX0.MSGCTRL.all = Bytes;              // Transmit x bytes of data
+            ECanaRegs.CANME.bit.ME0 = 1;                            // Enable Tx Mailbox
+            ECanaRegs.CANTRS.bit.TRS0 = 1;                          // Set transmit request
+        }
+        break;
+    case 7 :
+        if(ECanaRegs.CANTRS.bit.TRS7 == 0)                          // Check to see if previous transmit has completed
+        {
+            ECanaRegs.CANME.bit.ME7 = 0;                            // Disable Tx Mailbox
+            ECanaMboxes.MBOX7.MSGCTRL.all = Bytes;                  // Transmit x bytes of data
+            ECanaMboxes.MBOX7.MSGID.all = 0;                        // Standard ID length, acceptance masks used, no remote frames
+            ECanaMboxes.MBOX7.MSGID.bit.STDMSGID = Destination;     // Load destination address
+            ECanaMboxes.MBOX7.MDL.all = TxDataL;
+            ECanaMboxes.MBOX7.MDH.all = TxDataH;
 
-	ECanaMboxes.MBOX0.MSGID.all = 0;                    // Standard ID length, acceptance masks used, no remote frames
-	ECanaMboxes.MBOX0.MSGID.bit.STDMSGID = Destination; // Load destination address
+            ECanaRegs.CANME.bit.ME7 = 1;                            // Enable Tx Mailbox
+            ECanaRegs.CANTRS.bit.TRS7 = 1;                          // Set transmit request
+        }
+        break;
+    case 8 :
+        if(ECanaRegs.CANTRS.bit.TRS8 == 0)                          // Check to see if previous transmit has completed
+        {
+            ECanaRegs.CANME.bit.ME8 = 0;                            // Disable Tx Mailbox
+            ECanaMboxes.MBOX8.MSGCTRL.all = Bytes;                  // Transmit x bytes of data
+            ECanaMboxes.MBOX8.MSGID.all = 0;                        // Standard ID length, acceptance masks used, no remote frames
+            ECanaMboxes.MBOX8.MSGID.bit.STDMSGID = Destination;     // Load destination address
+            ECanaMboxes.MBOX8.MDL.all = TxDataL;
+            ECanaMboxes.MBOX8.MDH.all = TxDataH;
 
-	ECanaMboxes.MBOX0.MDL.all = TxDataL;
-	ECanaMboxes.MBOX0.MDH.all = TxDataH;
+            ECanaRegs.CANME.bit.ME8 = 1;                            // Enable Tx Mailbox
+            ECanaRegs.CANTRS.bit.TRS8 = 1;                          // Set transmit request
+        }
+        break;
+    case 9 :
+        if(ECanaRegs.CANTRS.bit.TRS9 == 0)                          // Check to see if previous transmit has completed
+        {
+            ECanaRegs.CANME.bit.ME9 = 0;                            // Disable Tx Mailbox
+            ECanaMboxes.MBOX9.MSGCTRL.all = Bytes;                  // Transmit x bytes of data
+            ECanaMboxes.MBOX9.MSGID.all = 0;                        // Standard ID length, acceptance masks used, no remote frames
+            ECanaMboxes.MBOX9.MSGID.bit.STDMSGID = Destination;     // Load destination address
+            ECanaMboxes.MBOX9.MDL.all = TxDataL;
+            ECanaMboxes.MBOX9.MDH.all = TxDataH;
 
-	ECanaRegs.CANME.all = 0x0000000F;                   // Enable Tx Mailbox
+            ECanaRegs.CANME.bit.ME9 = 1;                            // Enable Tx Mailbox
+            ECanaRegs.CANTRS.bit.TRS9 = 1;                          // Set transmit request
+        }
+        break;
+    }
 
-	ECanaRegs.CANTRS.all = 0x00000001;                  // Set transmit request
+    if (ECanaRegs.CANES.all != 0 || ECanaRegs.CANES.all != 0x30000 || ECanaRegs.CANES.all != 0x30001)
+    {
+        ECanaRegs.CANES.all = 0xFFF0000;                            //reset flags   //reset fault on CAN bus    0x1BB0000
+    }
 }
 

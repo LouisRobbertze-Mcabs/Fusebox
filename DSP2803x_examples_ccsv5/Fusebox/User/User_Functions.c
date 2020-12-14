@@ -291,6 +291,9 @@ void SetFlags(void)
     //MOSFET/Relay Status ---> 0=Component Offline        1=Component Online
     //Vehicle Status --------> 0=Component Offline        1=Component Online
 
+    //The bits in each SdoMessage member are assigned according to the bit layout given in Annex A of
+    //the fuse box documentation.
+
     if(Fuse_Out_Sense_1) //Fuse Blown
     {
         SdoMessage.FuseErrors |= 0x0001;
@@ -670,7 +673,7 @@ void ADCtoGPIO(void)
 void HeadlightBulbCheck(void)
 {
     static float Current_Prev = 0;
-    Uint16 counter1 = 0;        //timeout counter for head light to switch on after command is received
+    Uint16 counter1 = 0;        //timeout counter for main light to switch on after command is received
     Uint16 counter2 = 0;        //timeout counter for high beam to switch on after command is received
     Uint16 HeadSwitched = 0;
     Uint16 HighSwitched = 0;
@@ -705,9 +708,9 @@ void HeadlightBulbCheck(void)
              * Although it makes the program less efficient,
              * it will allow the program to self detect that a blown bulb has been
              * replaced rather than the technician having to manually reset the flag.
-             * Currently set to (1/50)*3000 = 1 minute
-                CheckAgain1 = 0;
-                counter1 = 0;*/
+             * Currently set to (1/50)*3000 = 1 minute*/
+            CheckAgain1 = 0;
+            counter1 = 0;
         }
         counter1++;
     }
@@ -733,7 +736,12 @@ void HeadlightBulbCheck(void)
             CheckAgain2 = 0;
             HighSwitched = 0;
         }
+        if(counter2 > 3000)
+        {
+            CheckAgain2 = 0;
+            counter2 = 0;
+        }
         counter2++;
-    } //need to add functionality for when high and main beam are switched on in close proximity to one another (temporally)
+    }
     Current_Prev = Fusebox_Current;
 }

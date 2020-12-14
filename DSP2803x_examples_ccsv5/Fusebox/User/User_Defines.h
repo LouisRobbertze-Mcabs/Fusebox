@@ -62,29 +62,6 @@
 #define Mfet_Out_Sense_1 GpioDataRegs.GPBDAT.bit.GPIO44               //MCU_input
 
 //Henry's Defines ******************************************************************************************
-typedef struct Error_Status_Flags{
-    /*For Error Flags: 1 = Error has occurred        0 = No error detected
-     *For Status Flags: 1 = Device is online         0 = Device is Offline
-     *Unused bits written as zero*/
-    Uint16 Flag1:1;                 //e.g. Fuse Error 1
-    Uint16 Flag2:1;                 //e.g. Fuse Error 1
-    Uint16 Flag3:1;
-    Uint16 Flag4:1;
-    Uint16 Flag5:1;
-    Uint16 Flag6:1;
-    Uint16 Flag7:1;
-    Uint16 Flag8:1;
-    Uint16 Flag9:1;
-    Uint16 Flag10:1;
-    Uint16 Flag11:1;
-    Uint16 Flag12:1;
-    Uint16 Flag13:1;
-    Uint16 Flag14:1;
-    Uint16 Flag15:1;
-    Uint16 Flag16:1;
-}Error_Status_Flags;
-
-
 typedef struct Master_Variable_Table{               //As defined in Annex A of the Control Box Documentation
     Uint16 Current;
     Uint16 Temperature;

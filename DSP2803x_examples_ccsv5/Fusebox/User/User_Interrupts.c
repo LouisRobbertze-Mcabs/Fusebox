@@ -80,6 +80,7 @@ __interrupt void can_rx_isr(void)
     Uint32 PDO_Data_High = 0;
     Uint16 NMT_Instruction = 0;
     Uint16 NMT_Location = 0;
+    Uint16 ErrorCounter = 0;
 
     /*if (ECanaRegs.CANRMP.bit.RMP1 == 1)
     {
@@ -133,11 +134,11 @@ __interrupt void can_rx_isr(void)
                 {
                     LowPowerMode = 1;
                 }
-                else if(PDO_Instruction == 0xFF00 && LowPowerMode)   //Low power mode disabled
+                else if(PDO_Instruction == 0xFF00 && LowPowerMode)   //Disable Low power mode
                 {
                     LowPowerMode = 0;
                 }
-                else ; //Invalid instruction ----> must still decide what to do
+                else ; //Code space for Invalid instruction ----> must still decide what to do
 
                 PDO_Data_Low += SdoMessage.RelayErrors; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehcile and Relay/Mosfet status flags
                 PDO_Data_Low = (PDO_Data_Low<<16) + SdoMessage.FuseErrors;
@@ -154,15 +155,18 @@ __interrupt void can_rx_isr(void)
 
             SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
 
-            /*SDO_MISO_Data[0] = Fusebox_Current;             //SDO 0x0900
-            SDO_MISO_Data[1] = Fusebox_Temperature;         //SDO 0x0902
-            SDO_MISO_Data[2] = FuseError;                   //SDO 0x0904
-            SDO_MISO_Data[3] = RelayMOSFETStatus;           //SDO 0x0906
-            SDO_MISO_Data[4] = RelayMOSFETError;            //SDO 0x0908
-            SDO_MISO_Data[5] = VehicleStatus;               //SDO 0x090A
-            SDO_MISO_Data[6] = ErrorCounter;                //SDO 0x090C
-            SDO_MISO_Data[7] = IgnitionCounter;             //SDO 0x0912
-            SDO_MISO_Data[8] = OperationalCounter;   */       //SDO 0x0914
+            ErrorCounter += SdoMessage.RelayErrorCounter;
+            ErrorCounter = (ErrorCounter << 8) + SdoMessage.FuseErrorCounter;
+
+            SDO_MISO_Data[0] = SdoMessage.Current;             //SDO 0x0900
+            SDO_MISO_Data[1] = SdoMessage.Temperature;         //SDO 0x0902
+            SDO_MISO_Data[2] = SdoMessage.FuseErrors;          //SDO 0x0904
+            SDO_MISO_Data[3] = SdoMessage.RelayStatus;         //SDO 0x0906
+            SDO_MISO_Data[4] = SdoMessage.RelayErrors;         //SDO 0x0908
+            SDO_MISO_Data[5] = SdoMessage.VehicleStatus;       //SDO 0x090A
+            SDO_MISO_Data[6] = ErrorCounter;                   //SDO 0x090C
+            SDO_MISO_Data[7] = IgnitionCounter;                //SDO 0x0912
+            SDO_MISO_Data[8] = OperationalCounter;             //SDO 0x0914
 
             SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2;
             if(SDO_ArrayIndex >= 0 && SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], SDO_MISO_Ctrl, 8, 9);

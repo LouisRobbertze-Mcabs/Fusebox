@@ -251,47 +251,15 @@ void ClearErrorFlags(Uint16 Flag_Selection)
     //Fuse Errors ----------------------
     if(!Flag_Selection || Flag_Selection == 1)
     {
-        SdoMessage.FuseErrors.Flag1 = 0;
-        SdoMessage.FuseErrors.Flag2 = 0;
-        SdoMessage.FuseErrors.Flag3 = 0;
-        SdoMessage.FuseErrors.Flag4 = 0;
-        SdoMessage.FuseErrors.Flag5 = 0;
-        SdoMessage.FuseErrors.Flag6 = 0;
-        SdoMessage.FuseErrors.Flag7 = 0;
-        SdoMessage.FuseErrors.Flag8 = 0;
-        SdoMessage.FuseErrors.Flag9 = 0;
-        SdoMessage.FuseErrors.Flag10 = 0;
-        SdoMessage.FuseErrors.Flag11 = 0;
-        SdoMessage.FuseErrors.Flag12 = 0;
-        SdoMessage.FuseErrors.Flag13 = 0;
-        SdoMessage.FuseErrors.Flag14 = 0;
-        SdoMessage.FuseErrors.Flag15 = 0;
-        SdoMessage.FuseErrors.Flag16 = 0;
-
-        SdoMessage.ErrorCounter.FuseCounter = 0;
+        SdoMessage.FuseErrors = 0;
+        SdoMessage.FuseErrorCounter = 0;
     }
 
     if(!Flag_Selection || Flag_Selection == 2)
     {
         //Relay and Mosfet Errors -----------
-        SdoMessage.RelayErrors.Flag1 = 0;
-        SdoMessage.RelayErrors.Flag2 = 0;
-        SdoMessage.RelayErrors.Flag3 = 0;
-        SdoMessage.RelayErrors.Flag4 = 0;
-        SdoMessage.RelayErrors.Flag5 = 0;
-        SdoMessage.RelayErrors.Flag6 = 0;
-        SdoMessage.RelayErrors.Flag7 = 0;
-        SdoMessage.RelayErrors.Flag8 = 0;
-        SdoMessage.RelayErrors.Flag9 = 0;
-        SdoMessage.RelayErrors.Flag10 = 0;
-        SdoMessage.RelayErrors.Flag11 = 0;
-        SdoMessage.RelayErrors.Flag12 = 0;
-        SdoMessage.RelayErrors.Flag13 = 0;
-        SdoMessage.RelayErrors.Flag14 = 0;
-        SdoMessage.RelayErrors.Flag15 = 0;
-        SdoMessage.RelayErrors.Flag16 = 0;
-
-        SdoMessage.ErrorCounter.RelayCounter = 0;
+        SdoMessage.RelayErrors = 0;
+        SdoMessage.RelayErrorCounter = 0;
     }
 }
 
@@ -325,212 +293,216 @@ void SetFlags(void)
 
     if(Fuse_Out_Sense_1) //Fuse Blown
     {
-        SdoMessage.FuseErrors.Flag1 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0001;
+        SdoMessage.FuseErrorCounter++;
     }
     else //Fuse Functional
     {
-        if(Main_Beam_Out_Sense) SdoMessage.RelayStatus.Flag1 = 1;
+        if(Main_Beam_Out_Sense) SdoMessage.RelayStatus |= 0x0001;
 
         if(Main_Beam_Out_Sense != Main_Beam_Ctrl_Sense)
         {
-            SdoMessage.RelayErrors.Flag1 = 1; //Active High
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0001;
+            SdoMessage.RelayErrorCounter++;
         }
     }
     if(Fuse_Out_Sense_2)
     {
-        SdoMessage.FuseErrors.Flag2 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0002;
+        SdoMessage.FuseErrorCounter++;
     }
     else
     {
-        if(High_Beam_Out_Sense) SdoMessage.RelayStatus.Flag2 = 1;
+        if(High_Beam_Out_Sense) SdoMessage.RelayStatus |= 0x0002;
 
         if(High_Beam_Out_Sense != High_Beam_Ctrl_Sense)
         {
-            SdoMessage.RelayErrors.Flag2 = 1; //Active High
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0002;
+            SdoMessage.RelayErrorCounter++;
         }
     }
 
     if(!Fuse_Out_Sense_3)
     {
-        SdoMessage.FuseErrors.Flag3 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0004;
+        SdoMessage.FuseErrorCounter++;
     }
     else
     {
-        if(Mfet_Out_Sense_0) SdoMessage.RelayStatus.Flag6 = 1;    //Flag 6 (Not flag 3) - see User_Defines.h > struct Error_Status_Flags for Relay flag definitions
-        if(Mfet_Out_Sense_4) SdoMessage.RelayStatus.Flag10 = 1;
+        if(Mfet_Out_Sense_0) SdoMessage.RelayStatus |= 0x0020;
+        if(Mfet_Out_Sense_4) SdoMessage.RelayStatus |= 0x0200;
 
         if(Mfet_Out_Sense_0 != Mfet_Ctrl_0)
         {
-            SdoMessage.RelayErrors.Flag6 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0020;
+            SdoMessage.RelayErrorCounter++;
         }
 
         if(Mfet_Out_Sense_4 != Mfet_Ctrl_4)
         {
-            SdoMessage.RelayErrors.Flag10 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0200;
+            SdoMessage.RelayErrorCounter++;
         }
     }
 
     if(Fuse_Out_Sense_4)
     {
-        SdoMessage.FuseErrors.Flag4 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0008;
+        SdoMessage.FuseErrorCounter +=1;
     }
     else
     {
-
+        //Fuse 4 doesnt output to any device at the moment
     }
 
     if(!Fuse_Out_Sense_5)
     {
-        SdoMessage.FuseErrors.Flag5 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0010;
+        SdoMessage.FuseErrorCounter++;
     }
     else
     {
-        if(Mfet_Out_Sense_1) SdoMessage.RelayStatus.Flag7 = 1;
-        if(Mfet_Out_Sense_2) SdoMessage.RelayStatus.Flag8 = 1;
-        if(Mfet_Out_Sense_3) SdoMessage.RelayStatus.Flag9 = 1;
+        if(Mfet_Out_Sense_1) SdoMessage.RelayStatus |= 0x0040;
+        if(Mfet_Out_Sense_2) SdoMessage.RelayStatus |= 0x0080;
+        if(Mfet_Out_Sense_3) SdoMessage.RelayStatus |= 0x0100;
 
         if(Mfet_Out_Sense_1 != Mfet_Ctrl_1)
         {
-            SdoMessage.RelayErrors.Flag7 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0040;
+            SdoMessage.RelayErrorCounter++;
         }
 
         if(Mfet_Out_Sense_2 != Mfet_Ctrl_2)
         {
-            SdoMessage.RelayErrors.Flag8 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0080;
+            SdoMessage.RelayErrorCounter++;
         }
 
         if(Mfet_Out_Sense_3 != Mfet_Ctrl_3)
         {
-            SdoMessage.RelayErrors.Flag9 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0100;
+            SdoMessage.RelayErrorCounter++;
         }
     }
 
     if(!Fuse_Out_Sense_6)
     {
-        SdoMessage.FuseErrors.Flag6 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0020;
+        SdoMessage.FuseErrorCounter++;
     }
     else
     {
-        if(Horn_Out_Sense) SdoMessage.RelayStatus.Flag5 = 1;//Relay 5 ----->>> Bartho said this might change
+        if(Horn_Out_Sense) SdoMessage.RelayStatus |= 0x0010;
 
         if(Horn_Out_Sense != Relay_Ctrl_3)
         {
-            SdoMessage.RelayErrors.Flag5 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0010;
+            SdoMessage.RelayErrorCounter++;
         }
     }
 
-    if(Fuse_Out_Sense_7)
+    if(!Fuse_Out_Sense_7)
     {
-        SdoMessage.FuseErrors.Flag7 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.RelayErrors |= 0x0040;
+        SdoMessage.RelayErrorCounter++;
     }
     else
     {
-        if(Heated_Seats_Out_Sense) SdoMessage.RelayStatus.Flag3 = 1; //Relay 3 ----->>> Requires fixing
+        if(Heated_Seats_Out_Sense) SdoMessage.RelayStatus |= 0x0004;
 
         if(Heated_Seats_Out_Sense != Relay_Ctrl_3)
         {
-            SdoMessage.RelayErrors.Flag3 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0004;
+            SdoMessage.RelayErrorCounter++;
         }
     }
 
     if(Fuse_Out_Sense_8)
     {
-        SdoMessage.FuseErrors.Flag8 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0080;
+        SdoMessage.FuseErrorCounter++;
     }
     else
     {
-        if(Radio_Out_Sense) SdoMessage.RelayStatus.Flag4 = 1; //Relay 4 ----->>> Requires Fixing
+        if(Radio_Out_Sense) SdoMessage.RelayStatus |= 0x0008;
 
         if(Radio_Out_Sense != Relay_Ctrl_4)
         {
-            SdoMessage.RelayErrors.Flag4 = 1; //Active High ----->>> Requires Fixing
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0008;
+            SdoMessage.RelayErrorCounter++;
         }
     }
+
     if(!Fuse_Out_Sense_9)
     {
-        SdoMessage.FuseErrors.Flag9 = 1;
-        SdoMessage.ErrorCounter.FuseCounter++;
+        SdoMessage.FuseErrors |= 0x0100;
+        SdoMessage.FuseErrorCounter++;
     }
     else
     {
-        if(Mfet_Out_Sense_5) SdoMessage.RelayStatus.Flag11 = 1;
-        if(Mfet_Out_Sense_6) SdoMessage.RelayStatus.Flag12 = 1;
-        if(Mfet_Out_Sense_7) SdoMessage.RelayStatus.Flag13 = 1;
-        if(Mfet_Out_Sense_8) SdoMessage.RelayStatus.Flag14 = 1;
+        if(Mfet_Out_Sense_5) SdoMessage.RelayStatus |= 0x0400;
+        if(Mfet_Out_Sense_6) SdoMessage.RelayStatus |= 0x0800;
+        if(Mfet_Out_Sense_7) SdoMessage.RelayStatus |= 0x1000;
+        if(Mfet_Out_Sense_8) SdoMessage.RelayStatus |= 0x2000;
 
         if(Mfet_Out_Sense_5 != Mfet_Ctrl_5)
         {
-            SdoMessage.RelayErrors.Flag11 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0400;
+            SdoMessage.RelayErrorCounter++;
         }
 
         if(Mfet_Out_Sense_6 != Mfet_Ctrl_6)
         {
-            SdoMessage.RelayErrors.Flag12 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x0800;
+            SdoMessage.RelayErrorCounter++;
         }
 
         if(Mfet_Out_Sense_7 != Mfet_Ctrl_7)
         {
-            SdoMessage.RelayErrors.Flag13 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x1000;
+            SdoMessage.RelayErrorCounter++;
         }
 
         if(Mfet_Out_Sense_8 != Mfet_Ctrl_8)
         {
-            SdoMessage.RelayErrors.Flag14 = 1;
-            SdoMessage.ErrorCounter.RelayCounter++;
+            SdoMessage.RelayErrors |= 0x2000;
+            SdoMessage.RelayErrorCounter++;
         }
     }
-    if(SdoMessage.ErrorCounter.FuseCounter == 9)
+
+    if(SdoMessage.FuseErrorCounter == 9)
     {
         //If all the fuses have registered as blown then it is assumed that the master fuse has blown and that all slave fuses are in fact operational
         ClearErrorFlags(1); //Clear only fuse flags and counter --->see function definition in User_Functions.c for argument definitions
-        SdoMessage.FuseErrors.Flag10 = 1;
-        SdoMessage.ErrorCounter.FuseCounter = 1;
+        SdoMessage.FuseErrors |= 0x0200;
+        SdoMessage.FuseErrorCounter = 1;
     }
 
     //VEHICLE STATUS FLAGS ***********************************************************************************************************************************************************************
-    if(Brake_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(Brake_In_Sense) SdoMessage.VehicleStatus |= 0x0001;
 
-    if(!Handbrake_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(!Handbrake_In_Sense) SdoMessage.VehicleStatus |= 0x0002;
 
-    if(Key_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(Key_In_Sense) SdoMessage.VehicleStatus |= 0x0004;
 
-    if(E_Stop_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(E_Stop_In_Sense) SdoMessage.VehicleStatus |= 0x0008;
 
-    if(Forward_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(Forward_In_Sense) SdoMessage.VehicleStatus |= 0x0010;
 
-    if(Reverse_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(Reverse_In_Sense) SdoMessage.VehicleStatus |= 0x0020;
 
-    if(Flasher_L_Out_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(Flasher_L_Out_Sense) SdoMessage.VehicleStatus |= 0x0040;
 
-    if(Flasher_R_Out_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(Flasher_R_Out_Sense) SdoMessage.VehicleStatus |= 0x0080;
 
-    if(V_Reg_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+    if(V_Reg_In_Sense) SdoMessage.VehicleStatus |= 0x0100;
+
 }
 
 void ADCtoGPIO(void)
 {
-    static long Temp_Values[16];
+    static float Temp_Floats[2];
+    static long Temp_Values[14];
     long Fuse_1_Signal;
     long Fuse_4_Signal;
     long Vts;
@@ -548,8 +520,6 @@ void ADCtoGPIO(void)
     long Fuse_2_Signal;
     long Fuse_8_Signal;
 
-    //maybe run in a function that is triggered by this counter?
-    //also, make more efficent by using Uint16 instead of floats
     //ADC result multiplied by 1e12 to avoid gorra round off errors when using int instead of float
     //ServiceDog();
 
@@ -560,13 +530,13 @@ void ADCtoGPIO(void)
     //channel A0 - SOC0
 
 
-    Fusebox_Current = Temp_Values[0] + (0.72*((0.02*(AdcResult.ADCRESULT0))-Temp_Values[0]));                  //Test gain (3.3/4096 *1/39.6mV)
-    Temp_Values[0] = Fusebox_Current;
+    Fusebox_Current = Temp_Floats[0] + (0.72*((0.02*(AdcResult.ADCRESULT0))-Temp_Floats[0]));                  //Test gain (3.3/4096 *1/39.6mV)
+    Temp_Floats[0] = Fusebox_Current;
 
     //Fuse_Out_1
     //channel B2 - SOC1
-    Fuse_1_Signal = (Temp_Values[1] + (0.72*(((1E6*AdcResult.ADCRESULT1))-Temp_Values[1])));                          //add in proper gain
-    Temp_Values[1] = Fuse_1_Signal;
+    Fuse_1_Signal = (Temp_Values[0] + (72*((1E6*AdcResult.ADCRESULT1))-Temp_Values[0]))/100;                          //add in proper gain
+    Temp_Values[0] = Fuse_1_Signal;
     if(Fuse_1_Signal>1E6*2048)
         Fuse_Out_Sense_1 = 0;   //active when voltage is low
     else
@@ -574,8 +544,8 @@ void ADCtoGPIO(void)
 
     //Fuse_Out_4
     //channel B4  - SOC2
-    Fuse_4_Signal = (Temp_Values[2] + (0.72*(((1E6*AdcResult.ADCRESULT2))-Temp_Values[2])));                          //add in proper gain
-    Temp_Values[2] = Fuse_4_Signal;
+    Fuse_4_Signal = (Temp_Values[1] + (72*((1E6*AdcResult.ADCRESULT2))-Temp_Values[1]))/100;                          //add in proper gain
+    Temp_Values[1] = Fuse_4_Signal;
     if(Fuse_4_Signal>1E6*2048)
         Fuse_Out_Sense_4 = 0;                           //active when voltage is low
     else
@@ -583,23 +553,23 @@ void ADCtoGPIO(void)
 
     //Fuse box Temperature
     //channel A1 - SOC3
-    Vts = Temp_Values[3] + (0.72*((0.00080566*(AdcResult.ADCRESULT3))-Temp_Values[3]));                     //add in proper gain
-    Temp_Values[3] = Vts;
+    Vts = Temp_Floats[1] + (0.72*((0.00080566*(AdcResult.ADCRESULT3))-Temp_Floats[1]));                     //add in proper gain
+    Temp_Floats[1] = Vts;
     Rts = (33000/Vts) - 10000;
     Fusebox_Temperature = (1/((log(Rts/10000))/4000+0.003356))-273;
 
     //Forward input
     //channel A2 - SOC4
-    Forward_Signal = (Temp_Values[4] + (0.72*(((1E6*AdcResult.ADCRESULT4))-Temp_Values[4])));                           //add in proper gain
-    Temp_Values[4] = Forward_Signal;
+    Forward_Signal = (Temp_Values[2] + (72*((1E6*AdcResult.ADCRESULT4))-Temp_Values[2]))/100;                           //add in proper gain
+    Temp_Values[2] = Forward_Signal;
     if(Forward_Signal>1E6*2048)
         Forward_In_Sense = 1;                           //active high
     else
         Forward_In_Sense = 0;
     //Brake light output
     //channel A3 - SOC5
-    Brake_Signal = (Temp_Values[5] + (0.72*(((1E6*AdcResult.ADCRESULT5))-Temp_Values[5])));                           //add in proper gain
-    Temp_Values[5] = Brake_Signal;
+    Brake_Signal = (Temp_Values[3] + (72*((1E6*AdcResult.ADCRESULT5))-Temp_Values[3]))/100;                           //add in proper gain
+    Temp_Values[3] = Brake_Signal;
     if(Brake_Signal>1E6*2048)
         Brake_In_Sense = 1;                           //active high
     else
@@ -607,8 +577,8 @@ void ADCtoGPIO(void)
 
     //Key switch input
     //channel A4 - SOC6
-    Key_Sense_Signal = (Temp_Values[6] + (0.72*(((1E6*AdcResult.ADCRESULT6))-Temp_Values[6])));                           //add in proper gain
-    Temp_Values[6] = Key_Sense_Signal;
+    Key_Sense_Signal = (Temp_Values[4] + (72*((1E6*AdcResult.ADCRESULT6))-Temp_Values[4]))/100;                           //add in proper gain
+    Temp_Values[4] = Key_Sense_Signal;
     if(Key_Sense_Signal>1E6*2048)
         Key_In_Sense = 1;                           //active high
     else
@@ -616,8 +586,8 @@ void ADCtoGPIO(void)
 
     //Horn output
     //channel A5 - SOC7
-    Horn_Signal = (Temp_Values[7] + (0.72*(((1E6*AdcResult.ADCRESULT7))-Temp_Values[7])));                           //add in proper gain
-    Temp_Values[7] = Horn_Signal;
+    Horn_Signal = (Temp_Values[5] + (72*((1E6*AdcResult.ADCRESULT7))-Temp_Values[5]))/100;                           //add in proper gain
+    Temp_Values[5] = Horn_Signal;
     if(Horn_Signal>1E6*2048)
         Horn_Ctrl_Sense = 0;                           //active high ------>>> LOW
     else
@@ -625,8 +595,8 @@ void ADCtoGPIO(void)
 
     //E-stop
     //channel A6 - SOC8
-    E_stop_Signal = (Temp_Values[8] + (0.72*(((1E6*AdcResult.ADCRESULT8))-Temp_Values[8])));                           //add in proper gain
-    Temp_Values[8] = E_stop_Signal;
+    E_stop_Signal = (Temp_Values[6] + (72*((1E6*AdcResult.ADCRESULT8))-Temp_Values[6]))/100;                           //add in proper gain
+    Temp_Values[6] = E_stop_Signal;
     if(E_stop_Signal>1E6*2048)
         E_Stop_In_Sense = 1;                           //active high
     else
@@ -634,8 +604,8 @@ void ADCtoGPIO(void)
 
     //Position Switch
     //channel A7 - SOC9
-    Position_Signal = (Temp_Values[9] + (0.72*(((1E6*AdcResult.ADCRESULT9))-Temp_Values[9])));                           //add in proper gain
-    Temp_Values[9] = Position_Signal;
+    Position_Signal = (Temp_Values[7] + (72*((1E6*AdcResult.ADCRESULT9))-Temp_Values[7]))/100;                           //add in proper gain
+    Temp_Values[7] = Position_Signal;
     if(Position_Signal>1E6*2048)
         Position_Out_Sense = 1;                           //active high
     else
@@ -643,8 +613,8 @@ void ADCtoGPIO(void)
 
     //Relay 3                           -- needs to swop with relay 3 output (Heated seats)
     //channel B0 - SOC10
-    Relay_3_Signal = (Temp_Values[10] + (0.72*(((1E6*AdcResult.ADCRESULT10))-Temp_Values[10])));                           //add in proper gain
-    Temp_Values[10] = Relay_3_Signal;
+    Relay_3_Signal = (Temp_Values[8] + (72*((1E6*AdcResult.ADCRESULT10))-Temp_Values[8]))/100;                           //add in proper gain
+    Temp_Values[8] = Relay_3_Signal;
     if(Relay_3_Signal>1E6*2048)
         Heated_Seats_Out_Sense = 1;                           //active high
     else
@@ -652,8 +622,8 @@ void ADCtoGPIO(void)
 
     //Relay 4                            -- needs to swop to relay 4 output (Radio out)
     //channel B1 - SOC11
-    Relay_4_Signal = (Temp_Values[11] + (0.72*(((1E6*AdcResult.ADCRESULT11))-Temp_Values[11])));                           //add in proper gain
-    Temp_Values[11] = Relay_4_Signal;
+    Relay_4_Signal = (Temp_Values[9] + (72*((1E6*AdcResult.ADCRESULT11))-Temp_Values[9]))/100;                           //add in proper gain
+    Temp_Values[9] = Relay_4_Signal;
     if(Relay_4_Signal>1E6*2048)
         Radio_Out_Sense = 1;                           //active high
     else
@@ -661,8 +631,8 @@ void ADCtoGPIO(void)
 
     //12V Regulator - secondary
     //channel B3- SOC12
-    V_Reg_Signal = (Temp_Values[12] + (0.72*(((1E6*AdcResult.ADCRESULT12))-Temp_Values[12])));                           //add in proper gain
-    Temp_Values[12] = V_Reg_Signal;
+    V_Reg_Signal = (Temp_Values[10] + (72*((1E6*AdcResult.ADCRESULT12))-Temp_Values[10]))/100;                           //add in proper gain
+    Temp_Values[10] = V_Reg_Signal;
     if(V_Reg_Signal>1E6*2048)
         V_Reg_In_Sense = 1;                           //active high
     else
@@ -670,8 +640,8 @@ void ADCtoGPIO(void)
 
     //Fuse_Out_7
     //channel B5 - SOC13
-    Fuse_7_Signal = (Temp_Values[13] + (0.72*(((1E6*AdcResult.ADCRESULT13))-Temp_Values[13])));                           //add in proper gain
-    Temp_Values[13] = Fuse_7_Signal;
+    Fuse_7_Signal = (Temp_Values[11] + (72*((1E6*AdcResult.ADCRESULT13))-Temp_Values[11]))/100;                           //add in proper gain
+    Temp_Values[11] = Fuse_7_Signal;
     if(Fuse_7_Signal>1E6*2048)
         Fuse_Out_Sense_7 = 0;                           //active low
     else
@@ -679,8 +649,8 @@ void ADCtoGPIO(void)
 
     //Fuse_Out_2
     //channel B6 - SOC14
-    Fuse_2_Signal = (Temp_Values[14] + (0.72*(((1E6*AdcResult.ADCRESULT14))-Temp_Values[14])));                           //add in proper gain
-    Temp_Values[14] = Fuse_2_Signal;
+    Fuse_2_Signal = (Temp_Values[12] + (72*((1E6*AdcResult.ADCRESULT14))-Temp_Values[12]))/100;                           //add in proper gain
+    Temp_Values[12] = Fuse_2_Signal;
     if(Fuse_2_Signal>1E6*2048)
         Fuse_Out_Sense_2 = 0;                           //active low
     else
@@ -688,8 +658,8 @@ void ADCtoGPIO(void)
 
     //Fuse_Out_8
     //channel B7 - SOC15
-    Fuse_8_Signal = (Temp_Values[15] + (0.72*(((1E6*AdcResult.ADCRESULT15))-Temp_Values[15])));                           //add in proper gain
-    Temp_Values[15] = Fuse_8_Signal;
+    Fuse_8_Signal = (Temp_Values[13] + (72*((1E6*AdcResult.ADCRESULT15))-Temp_Values[13]))/100;                           //add in proper gain
+    Temp_Values[13] = Fuse_8_Signal;
     if(Fuse_8_Signal>1E6*2048)
         Fuse_Out_Sense_8 = 0;                           //active low
     else
@@ -707,7 +677,7 @@ void HeadlightBulbCheck(void)
     Uint16 CheckAgain1 = 1;
     Uint16 CheckAgain2 = 1;
 
-    if(Main_Beam_Ctrl_Sense && !(SdoMessage.FuseErrors.Flag1)) //checks that fuse is not blown
+    if(Main_Beam_Ctrl_Sense && !(SdoMessage.FuseErrors && 0x0001)) //checks that fuse is not blown
     {
         if(counter1 < 10 && !HeadSwitched) //timeout (currently set to (1/50)*10 = 200ms) to allow for fuses to switch and head light to respond to command before registering an error
         {
@@ -741,7 +711,7 @@ void HeadlightBulbCheck(void)
         }
         counter1++;
     }
-    if(High_Beam_Ctrl_Sense && !(SdoMessage.FuseErrors.Flag2))
+    if(High_Beam_Ctrl_Sense && !(SdoMessage.FuseErrors && 0x0002))
     {
         if(counter2 < 10 && !HighSwitched) //the HighSwitched Variable prevents this 'if' block from running again if a successful switch was detected
         {

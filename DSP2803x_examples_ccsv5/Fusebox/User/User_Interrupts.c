@@ -139,11 +139,11 @@ __interrupt void can_rx_isr(void)
                 }
                 else ; //Invalid instruction ----> must still decide what to do
 
-                //PDO_Data_Low += RelayMOSFETError; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehcile and Relay/Mosfet status flags
-                //PDO_Data_Low = (PDO_Data_Low<<16) + FuseError;
-                //PDO_Data_High += VehicleStatus;
-                // PDO_Data_High = (PDO_Data_High<<16) + RelayMOSFETStatus;
-                //CANTransmit(0x1BC, PDO_Data_High, PDO_Data_Low, 8, 7); //PDO_MISO
+                PDO_Data_Low += SdoMessage.RelayErrors; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehcile and Relay/Mosfet status flags
+                PDO_Data_Low = (PDO_Data_Low<<16) + SdoMessage.FuseErrors;
+                PDO_Data_High += SdoMessage.VehicleStatus;
+                PDO_Data_High = (PDO_Data_High<<16) + SdoMessage.RelayStatus;
+                CANTransmit(0x1BC, PDO_Data_High, PDO_Data_Low, 8, 7); //PDO_MISO
             }
         }
 

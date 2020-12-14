@@ -61,7 +61,7 @@
 #define Relay_Ctrl_4 GpioDataRegs.GPBDAT.bit.GPIO43                   //MCU_input           - Relay4
 #define Mfet_Out_Sense_1 GpioDataRegs.GPBDAT.bit.GPIO44               //MCU_input
 
-//Henry's Defines
+//Henry's Defines ******************************************************************************************
 typedef struct Error_Status_Flags{
     /*For Error Flags: 1 = Error has occurred        0 = No error detected
      *For Status Flags: 1 = Device is online         0 = Device is Offline
@@ -84,19 +84,16 @@ typedef struct Error_Status_Flags{
     Uint16 Flag16:1;
 }Error_Status_Flags;
 
-typedef struct Error_Counter{
-    Uint16 FuseCounter:8;
-    Uint16 RelayCounter:8;
-}Error_Counter;
 
 typedef struct Master_Variable_Table{               //As defined in Annex A of the Control Box Documentation
     Uint16 Current;
     Uint16 Temperature;
-    Error_Status_Flags FuseErrors;
-    Error_Status_Flags RelayErrors;           //includes relay and mosfet errors
-    Error_Status_Flags RelayStatus;           //includes relay and mosfet statuses
-    Error_Status_Flags VehicleStatus;
-    Error_Counter ErrorCounter;
+    Uint16 FuseErrors;
+    Uint16 RelayErrors;           //includes relay and mosfet errors
+    Uint16 RelayStatus;           //includes relay and mosfet statuses
+    Uint16 VehicleStatus;
+    Uint8  FuseErrorCounter;
+    Uint8  RelayErrorCounter;
 }MasterVariableTable;
 
 #endif  /*USER_DEFINES_H_*/

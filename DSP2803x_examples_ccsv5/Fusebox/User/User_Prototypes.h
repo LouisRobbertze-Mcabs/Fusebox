@@ -23,14 +23,16 @@ union bits32
     float32 asFloat;
 };
 
-void Initialise_BMS(void);
+void Initialise_FuseBox(void);
 void Init_Gpio(void);
-
 void Toggle_LED(void);
-//void GPIO_Error_Check(Uint16 FuseError,Uint16 FuseErrorCount,Uint16 RelayMOSFETStatus,Uint16 RelayMOSFETError,Uint16 RelayMOSFETErrorCounter,Uint16 VehicleStatus);
-unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key);
 
+ //Henry's Prototypes**************************************************************
 void ClearErrorFlags(Uint16 Flag_Selection);
+void EnableLowPower(void);
+void SetFlags(void);
+void ADCtoGPIO(void);
+void HeadlightBulbCheck(void);
 
 
 //#pragma CODE_SECTION(DELAY_US, "ramfuncs");

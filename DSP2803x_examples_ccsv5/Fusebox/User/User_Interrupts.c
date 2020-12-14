@@ -66,21 +66,21 @@ extern volatile Uint16 CheckAgain2;
 extern volatile Uint16 Operational_State;       //as demanded by NMT
 extern volatile Uint16 LowPowerMode;
 
+MasterVariableTable SdoMessage;
 __interrupt void adc_isr(void)
 {
-	//gee aandag hieraan. doen 'n stroom meting conversion teen 1 Hz soos spanning
-	//Sit dit dalk deur 'n laag deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^-WcTs
+    //gee aandag hieraan. doen 'n stroom meting conversion teen 1 Hz soos spanning
+    //Sit dit dalk deur 'n laag deurlaat filter y(k) = y(k - 1) + a[x(k) - y(k - 1)] met a = 1 - e^-WcTs
 
-	AdcRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;       //Clear ADCINT1 flag reinitialize for next SOC
-	PieCtrlRegs.PIEACK.bit.ACK10 = 1;           // Acknowledge interrupt to PIE
+    AdcRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;       //Clear ADCINT1 flag reinitialize for next SOC
+    PieCtrlRegs.PIEACK.bit.ACK10 = 1;           // Acknowledge interrupt to PIE
 }
 
 __interrupt void cpu_timer0_isr(void)
 {
     counter_2Hz++;
-    ServiceDog();
-	CpuTimer0.InterruptCount++;
-	PieCtrlRegs.PIEACK.bit.ACK1 = 1/* PIEACK_GROUP1*/;
+    CpuTimer0.InterruptCount++;
+    PieCtrlRegs.PIEACK.bit.ACK1 = 1/* PIEACK_GROUP1*/;
 }
 
 __interrupt void cpu_timer1_isr(void)                           //50Hz loop
@@ -88,7 +88,7 @@ __interrupt void cpu_timer1_isr(void)                           //50Hz loop
     //maybe run in a function that is triggered by this counter?
     //also, make more efficent by using Uint16 instead of floats
     //ADC result multiplied by 1e12 to avoid gorra round off errors when using int instead of float
-//ServiceDog();
+    //ServiceDog();
 
     /*float Fc = 10;     //clock frequency [Hz]
     float Ts = 1/50;   //sample period [s]*/
@@ -233,359 +233,361 @@ __interrupt void cpu_timer1_isr(void)                           //50Hz loop
     //A given fuse is checked to make sure that it is functional (IF). If it is functional, the devices supplied by it are then checked for error (ELSE).
     //If a fuse is blown, then the slaved devices are assumed to be functional.
 
-        //Fuse Error ------------> 0=Fuse Operational         1=Fuse Blown
-        //MOSFET/Relay Error ----> 0=Component Operational    1=Component Inoperable
-        //MOSFET/Relay Status ---> 0=Component Offline        1=Component Online
-        //Vehicle Status --------> 0=Component Offline        1=Component Online
-        FuseErrorCount = 0;
-        RelayMOSFETErrorCounter = 0;
+    //Fuse Error ------------> 0=Fuse Operational         1=Fuse Blown
+    //MOSFET/Relay Error ----> 0=Component Operational    1=Component Inoperable
+    //MOSFET/Relay Status ---> 0=Component Offline        1=Component Online
+    //Vehicle Status --------> 0=Component Offline        1=Component Online
+    FuseErrorCount = 0;
+    RelayMOSFETErrorCounter = 0;
 
-       if(Fuse_Out_Sense_1) //Fuse Blown
+    if(Fuse_Out_Sense_1) //Fuse Blown
+    {
+        SdoMessage.FuseErrors.Flag1 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else //Fuse Functional
+    {
+        if(Main_Beam_Out_Sense) SdoMessage.RelayStatus.Flag1 = 1;
+
+        if(Main_Beam_Out_Sense != Main_Beam_Ctrl_Sense)
         {
-            FuseError = FuseError | 0x0001;
-            FuseErrorCount++;
+            SdoMessage.RelayErrors.Flag1 = 1; //Active High
+            SdoMessage.ErrorCounter.RelayCounter++;
         }
-        else //Fuse Functional
-        {
-            if(Main_Beam_Out_Sense) RelayMOSFETStatus = RelayMOSFETStatus | 0x0001;
+    }
+    if(Fuse_Out_Sense_2)
+    {
+        SdoMessage.FuseErrors.Flag2 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+        if(High_Beam_Out_Sense) SdoMessage.RelayStatus.Flag2 = 1;
 
-            if(Main_Beam_Out_Sense != Main_Beam_Ctrl_Sense)
+        if(High_Beam_Out_Sense != High_Beam_Ctrl_Sense)
+        {
+            SdoMessage.RelayErrors.Flag2 = 1; //Active High
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+    }
+
+    if(!Fuse_Out_Sense_3)
+    {
+        SdoMessage.FuseErrors.Flag3 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+        if(Mfet_Out_Sense_0) SdoMessage.RelayStatus.Flag6 = 1;    //Flag 6 (Not flag 3) - see User_Defines.h > struct Error_Status_Flags for Relay flag definitions
+        if(Mfet_Out_Sense_4) SdoMessage.RelayStatus.Flag10 = 1;
+
+        if(Mfet_Out_Sense_0 != Mfet_Ctrl_0)
+        {
+            SdoMessage.RelayErrors.Flag6 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+
+        if(Mfet_Out_Sense_4 != Mfet_Ctrl_4)
+        {
+            SdoMessage.RelayErrors.Flag10 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+    }
+
+    if(Fuse_Out_Sense_4)
+    {
+        SdoMessage.FuseErrors.Flag4 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+
+    }
+
+    if(!Fuse_Out_Sense_5)
+    {
+        SdoMessage.FuseErrors.Flag5 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+        if(Mfet_Out_Sense_1) SdoMessage.RelayStatus.Flag7 = 1;
+        if(Mfet_Out_Sense_2) SdoMessage.RelayStatus.Flag8 = 1;
+        if(Mfet_Out_Sense_3) SdoMessage.RelayStatus.Flag9 = 1;
+
+        if(Mfet_Out_Sense_1 != Mfet_Ctrl_1)
+        {
+            SdoMessage.RelayErrors.Flag7 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+
+        if(Mfet_Out_Sense_2 != Mfet_Ctrl_2)
+        {
+            SdoMessage.RelayErrors.Flag8 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+
+        if(Mfet_Out_Sense_3 != Mfet_Ctrl_3)
+        {
+            SdoMessage.RelayErrors.Flag9 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+    }
+
+    if(!Fuse_Out_Sense_6)
+    {
+        SdoMessage.FuseErrors.Flag6 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+        if(Horn_Out_Sense) SdoMessage.RelayStatus.Flag5 = 1;//Relay 5 ----->>> Bartho said this might change
+
+        if(Horn_Out_Sense != Relay_Ctrl_3)
+        {
+            SdoMessage.RelayErrors.Flag5 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+    }
+
+    if(Fuse_Out_Sense_7)
+    {
+        SdoMessage.FuseErrors.Flag7 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+        if(Heated_Seats_Out_Sense) SdoMessage.RelayStatus.Flag3 = 1; //Relay 3 ----->>> Requires fixing
+
+        if(Heated_Seats_Out_Sense != Relay_Ctrl_3)
+        {
+            SdoMessage.RelayErrors.Flag3 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+    }
+
+    if(Fuse_Out_Sense_8)
+    {
+        SdoMessage.FuseErrors.Flag8 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+        if(Radio_Out_Sense) SdoMessage.RelayStatus.Flag4 = 1; //Relay 4 ----->>> Requires Fixing
+
+        if(Radio_Out_Sense != Relay_Ctrl_4)
+        {
+            SdoMessage.RelayErrors.Flag4 = 1; //Active High ----->>> Requires Fixing
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+    }
+    if(!Fuse_Out_Sense_9)
+    {
+        SdoMessage.FuseErrors.Flag9 = 1;
+        SdoMessage.ErrorCounter.FuseCounter++;
+    }
+    else
+    {
+        if(Mfet_Out_Sense_5) SdoMessage.RelayStatus.Flag11 = 1;
+        if(Mfet_Out_Sense_6) SdoMessage.RelayStatus.Flag12 = 1;
+        if(Mfet_Out_Sense_7) SdoMessage.RelayStatus.Flag13 = 1;
+        if(Mfet_Out_Sense_8) SdoMessage.RelayStatus.Flag14 = 1;
+
+        if(Mfet_Out_Sense_5 != Mfet_Ctrl_5)
+        {
+            SdoMessage.RelayErrors.Flag11 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+
+        if(Mfet_Out_Sense_6 != Mfet_Ctrl_6)
+        {
+            SdoMessage.RelayErrors.Flag12 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+
+        if(Mfet_Out_Sense_7 != Mfet_Ctrl_7)
+        {
+            SdoMessage.RelayErrors.Flag13 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+
+        if(Mfet_Out_Sense_8 != Mfet_Ctrl_8)
+        {
+            SdoMessage.RelayErrors.Flag14 = 1;
+            SdoMessage.ErrorCounter.RelayCounter++;
+        }
+    }
+    if(SdoMessage.ErrorCounter.FuseCounter == 9)
+    {
+        //If all the fuses have registered as blown then it is assumed that the master fuse has blown and that all slave fuses are in fact operational
+        ClearErrorFlags(1); //Clear only fuse flags and counter --->see function definition in User_Functions.c for argument definitions
+        SdoMessage.FuseErrors.Flag10 = 1;
+        SdoMessage.ErrorCounter.FuseCounter = 1;
+    }
+
+    //VEHICLE STATUS FLAGS ***********************************************************************************************************************************************************************
+    if(Brake_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(!Handbrake_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(Key_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(E_Stop_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(Forward_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(Reverse_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(Flasher_L_Out_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(Flasher_R_Out_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+    if(V_Reg_In_Sense) SdoMessage.VehicleStatus.Flag1 = 1;
+
+
+    if(Main_Beam_Ctrl_Sense && !(SdoMessage.FuseErrors.Flag1)) //checks that fuse is not blown
+    {
+        if(counter1 < 10 && !HeadSwitched) //timeout (currently set to (1/50)*10 = 200ms) to allow for fuses to switch and head light to respond to command before registering an error
+        {
+            if(Fusebox_Current - Current_Prev >= 10000) //checks if the head light switches on after commanded to do so (current steps up as expected)
             {
-                RelayMOSFETError = RelayMOSFETError | 0x0001; //Active High
-                RelayMOSFETErrorCounter++;
+                HeadLightBlown = 0; //Sets to 'not blown' in the event that the bulb is fixed after a breakage (prevents need to reset value manually after repairs)
+                HeadSwitched = 1; //code skips this block if a successful on state was reached
             }
         }
-        if(Fuse_Out_Sense_2)
+        else if(CheckAgain1)//bulb has blown
         {
-            FuseError = FuseError | 0x0002;
-            FuseErrorCount++;
-        }
-        else
-        {
-            if(High_Beam_Out_Sense) RelayMOSFETStatus = RelayMOSFETStatus | 0x0002;
-
-            if(High_Beam_Out_Sense != High_Beam_Ctrl_Sense)
-            {
-                RelayMOSFETError = RelayMOSFETError | 0x0002; //Active High
-                RelayMOSFETErrorCounter++;
-            }
+            HeadLightBlown = 1; //Expected current step has not occurred, head light assumed blown
+            CheckAgain1 = 0; //if bulb is blown don't bother checking
         }
 
-        if(!Fuse_Out_Sense_3)
+        if(HeadSwitched && (Current_Prev - Fusebox_Current >= 0)) //head light switched correctly initially but then blew during operation (unexpected current drop without a switch off command)
         {
-            FuseError =  FuseError | 0x0004;
-            FuseErrorCount++;
+            HeadLightBlown = 1;
+            CheckAgain1 = 0;
+            HeadSwitched = 0;
         }
-        else
+        if(counter1 > 3000)
         {
-            if(Mfet_Out_Sense_0) RelayMOSFETStatus = RelayMOSFETStatus | 0x0020;
-            if(Mfet_Out_Sense_4) RelayMOSFETStatus = RelayMOSFETStatus | 0x0200;
-
-            if(Mfet_Out_Sense_0 != Mfet_Ctrl_0)
-            {
-                RelayMOSFETError = RelayMOSFETError | 0x0020;
-                RelayMOSFETErrorCounter++;
-            }
-
-            if(Mfet_Out_Sense_4 != Mfet_Ctrl_4)
-            {
-                RelayMOSFETError = RelayMOSFETError | 0x0200;
-                RelayMOSFETErrorCounter++;
-            }
-        }
-
-        if(Fuse_Out_Sense_4)
-        {
-            FuseError = FuseError | 0x0008;
-            FuseErrorCount++;
-        }
-        else
-        {
-
-        }
-
-        if(!Fuse_Out_Sense_5)
-        {
-            FuseError = FuseError | 0x0010;
-            FuseErrorCount++;
-        }
-        else
-        {
-            if(Mfet_Out_Sense_1) RelayMOSFETStatus = RelayMOSFETStatus | 0x0040;
-            if(Mfet_Out_Sense_2) RelayMOSFETStatus = RelayMOSFETStatus | 0x0080;
-            if(Mfet_Out_Sense_3) RelayMOSFETStatus = RelayMOSFETStatus | 0x0100;
-
-            if(Mfet_Out_Sense_1 != Mfet_Ctrl_1)
-                {
-                    RelayMOSFETError = RelayMOSFETError | 0x0040;
-                    RelayMOSFETErrorCounter++;
-                }
-
-                if(Mfet_Out_Sense_2 != Mfet_Ctrl_2)
-                {
-                    RelayMOSFETError = RelayMOSFETError | 0x0080;
-                    RelayMOSFETErrorCounter++;
-                }
-
-                if(Mfet_Out_Sense_3 != Mfet_Ctrl_3)
-                {
-                    RelayMOSFETError = RelayMOSFETError | 0x0100;
-                    RelayMOSFETErrorCounter++;
-                }
-        }
-
-        if(!Fuse_Out_Sense_6)
-        {
-            FuseError = FuseError | 0x0020;
-            FuseErrorCount++;
-        }
-        else
-        {
-            if(Horn_Out_Sense) RelayMOSFETStatus = RelayMOSFETStatus | 0x0010; //Relay 5 ----->>> Requires Fixing
-
-            if(Horn_Out_Sense != Relay_Ctrl_3)
-            {
-                RelayMOSFETError = RelayMOSFETError | 0x0010; //Active Low ----->>> Requires Fixing
-                RelayMOSFETErrorCounter++;
-            }
-        }
-
-        if(Fuse_Out_Sense_7)
-        {
-            FuseError = FuseError | 0x0040;
-            FuseErrorCount++;
-        }
-        else
-        {
-            if(Heated_Seats_Out_Sense) RelayMOSFETStatus = RelayMOSFETStatus | 0x0004; //Relay 3 ----->>> Requires fixing
-
-            if(Heated_Seats_Out_Sense != Relay_Ctrl_3)
-            {
-                RelayMOSFETError = RelayMOSFETError | 0x0004; //Active High ----->>> Requires fixing
-                RelayMOSFETErrorCounter++;
-            }
-        }
-
-        if(Fuse_Out_Sense_8)
-        {
-            FuseError = FuseError | 0x0080;
-            FuseErrorCount++;
-        }
-        else
-        {
-            if(Radio_Out_Sense) RelayMOSFETStatus = RelayMOSFETStatus | 0x0008; //Relay 4 ----->>> Requires Fixing
-
-            if(Radio_Out_Sense != Relay_Ctrl_4)
-            {
-                RelayMOSFETError = RelayMOSFETError | 0x0008; //Active High ----->>> Requires Fixing
-                RelayMOSFETErrorCounter++;
-            }
-        }
-
-
-        if(!Fuse_Out_Sense_9)
-        {
-            FuseError = FuseError | 0x0100;
-            FuseErrorCount++;
-        }
-        else
-        {
-            if(Mfet_Out_Sense_5) RelayMOSFETStatus = RelayMOSFETStatus | 0x0400;
-            if(Mfet_Out_Sense_6) RelayMOSFETStatus = RelayMOSFETStatus | 0x0800;
-            if(Mfet_Out_Sense_7) RelayMOSFETStatus = RelayMOSFETStatus | 0x1000;
-            if(Mfet_Out_Sense_8) RelayMOSFETStatus = RelayMOSFETStatus | 0x2000;
-
-            if(Mfet_Out_Sense_5 != Mfet_Ctrl_5)
-                {
-                    RelayMOSFETError = RelayMOSFETError | 0x0400;
-                    RelayMOSFETErrorCounter++;
-                }
-
-                if(Mfet_Out_Sense_6 != Mfet_Ctrl_6)
-                {
-                    RelayMOSFETError = RelayMOSFETError | 0x0800;
-                    RelayMOSFETErrorCounter++;
-                }
-
-                if(Mfet_Out_Sense_7 != Mfet_Ctrl_7)
-                {
-                    RelayMOSFETError = RelayMOSFETError | 0x1000;
-                    RelayMOSFETErrorCounter++;
-                }
-
-                if(Mfet_Out_Sense_8 != Mfet_Ctrl_8)
-                {
-                    RelayMOSFETError = RelayMOSFETError | 0x2000;
-                    RelayMOSFETErrorCounter++;
-                }
-        }
-        //ServiceDog();
-        if(FuseError & 0x0FFF == 0) FuseError = 0x1000; //If all the fuses have registered as blown then it is assumed that the master fuse has blown and that all slave fuses are in fact operational
-
-        ErrorCounter = FuseErrorCount + (RelayMOSFETErrorCounter<<8);
-        //VEHICLE STATUS FLAGS ***********************************************************************************************************************************************************************
-        if(Brake_In_Sense) VehicleStatus = VehicleStatus | 0x0001;
-
-        if(!Handbrake_In_Sense) VehicleStatus = VehicleStatus | 0x0002;
-
-        if(Key_In_Sense) VehicleStatus = VehicleStatus | 0x0004;
-
-        if(E_Stop_In_Sense) VehicleStatus = VehicleStatus | 0x0008;
-
-        if(Forward_In_Sense) VehicleStatus = VehicleStatus | 0x0010;
-
-        if(Reverse_In_Sense) VehicleStatus = VehicleStatus | 0x0020;
-
-        if(Flasher_L_Out_Sense) VehicleStatus = VehicleStatus | 0x0040;
-
-        if(Flasher_R_Out_Sense) VehicleStatus = VehicleStatus | 0x0080;
-
-        if(V_Reg_In_Sense) VehicleStatus = VehicleStatus | 0x0100;
-
-
-        if(Main_Beam_Ctrl_Sense && !(FuseError & 0x0001)) //checks that fuse is not blown
-        {
-            if(counter1 < 10 && !HeadSwitched) //timeout (currently set to (1/50)*10 = 200ms) to allow for fuses to switch and head light to respond to command before registering an error
-            {
-                if(Fusebox_Current - Current_Prev >= 10000) //checks if the head light switches on after commanded to do so (current steps up as expected)
-                {
-                    HeadLightBlown = 0; //Sets to 'not blown' in the event that the bulb is fixed after a breakage (prevents need to reset value manually after repairs)
-                    HeadSwitched = 1; //code skips this block if a successful on state was reached
-                }
-            }
-            else if(CheckAgain1)//bulb has blown
-            {
-                HeadLightBlown = 1; //Expected current step has not occurred, head light assumed blown
-                CheckAgain1 = 0; //if bulb is blown don't bother checking
-            }
-
-            if(HeadSwitched && (Current_Prev - Fusebox_Current >= 0)) //head light switched correctly initially but then blew during operation (unexpected current drop without a switch off command)
-            {
-                HeadLightBlown = 1;
-                CheckAgain1 = 0;
-                HeadSwitched = 0;
-            }
-            if(counter1 > 3000)
-            {
-                /*This 'if' periodically resets the CheckAgain flag to force a re-check on the bulb (even if it is blown).
-                 * Although it makes the program less efficient,
-                 * it will allow the program to self detect that a blown bulb has been
-                 * replaced rather than the technician having to manually reset the flag.
-                 * Currently set to (1/50)*3000 = 1 minute
+            /*This 'if' periodically resets the CheckAgain flag to force a re-check on the bulb (even if it is blown).
+             * Although it makes the program less efficient,
+             * it will allow the program to self detect that a blown bulb has been
+             * replaced rather than the technician having to manually reset the flag.
+             * Currently set to (1/50)*3000 = 1 minute
                 CheckAgain1 = 0;
                 counter1 = 0;*/
-            }
-            counter1++;
         }
-        if(High_Beam_Ctrl_Sense && (FuseError & 0x0002 == 0x0000))
+        counter1++;
+    }
+    if(High_Beam_Ctrl_Sense && !(SdoMessage.FuseErrors.Flag2))
+    {
+        if(counter2 < 10 && !HighSwitched) //the HighSwitched Variable prevents this 'if' block from running again if a successful switch was detected
         {
-            if(counter2 < 10 && !HighSwitched) //the HighSwitched Variable prevents this 'if' block from running again if a successful switch was detected
-            {
-                if(Fusebox_Current - Current_Prev > 5) // the value must still be ascertained
-                {
-                    HighBeamBlown = 0;
-                    HighSwitched = 1;
-                }
-            }
-            else if(CheckAgain2)
+            if(Fusebox_Current - Current_Prev > 5) // the value must still be ascertained
             {
                 HighBeamBlown = 0;
-                CheckAgain2 = 0; //if bulb is blown dont bother checking again
+                HighSwitched = 1;
             }
+        }
+        else if(CheckAgain2)
+        {
+            HighBeamBlown = 0;
+            CheckAgain2 = 0; //if bulb is blown dont bother checking again
+        }
 
-            if(HighSwitched && (Current_Prev - Fusebox_Current >= 0))
-            {
-                HighBeamBlown = 1;
-                CheckAgain2 = 0;
-                HighSwitched = 0;
-            }
-            counter2++;
-        } //need to add functionality for when high and main beam are switched on in close proximity to one another (temporally)
-        Current_Prev = Fusebox_Current;
+        if(HighSwitched && (Current_Prev - Fusebox_Current >= 0))
+        {
+            HighBeamBlown = 1;
+            CheckAgain2 = 0;
+            HighSwitched = 0;
+        }
+        counter2++;
+    } //need to add functionality for when high and main beam are switched on in close proximity to one another (temporally)
+    Current_Prev = Fusebox_Current;
 
     //OPERATING TIME *********************************************
-    //defined as the amount of time spent in the NMT Operational State (0x01) will increment counter after an operational hour has elapsed
-        if(Operational_State != 4)    //ensures system is not in the halt state
+    //defined as the amount of time spent in the NMT Operational State (0x01). Will increment counter after an operational hour has elapsed
+    if(Operational_State != 4)    //ensures system is not in the halt state
+    {
+        HourTimer++;
+        if(HourTimer >= 180000)         //60*60*50=180000    Based on a timer of 50Hz
         {
-            HourTimer++;
-            if(HourTimer >= 3000)         //60*60*50=180000    Based on a timer of 50Hz
-            {
-               OperationalCounter++;
-               HourTimer = 0;
-            }
+            OperationalCounter++;  //VALUE NEEDS TO BE MOVED TO EEPROM before CPU shuts down and value is lost
+            HourTimer = 0;
         }
+    }
     //IGNITION CYCLE COUNTER *************************************
     //counter increments every time the vehicle is started
-        if(Key_In_Sense && !ResetIgnitionFlag) //if key is on and the counter has not yet been incremented
-        {
-            IgnitionCounter++;
-            ResetIgnitionFlag = 1; //prevents counter from counting more than once per ignition
-        }
-        else if(!Key_In_Sense) ResetIgnitionFlag = 0; //resets flag when vehicle is switched off
+    if(Key_In_Sense && !ResetIgnitionFlag) //if key is on and the counter has not yet been incremented
+    {
+        IgnitionCounter++;
+        ResetIgnitionFlag = 1; //prevents counter from counting more than once per ignition
+    }
+    else if(!Key_In_Sense) ResetIgnitionFlag = 0; //resets flag when vehicle is switched off
 
-	CpuTimer1.InterruptCount++;
-	EDIS;
+    CpuTimer1.InterruptCount++;
+    EDIS;
 }
 
 __interrupt void cpu_timer2_isr(void)
 {
-	EALLOW;
+    EALLOW;
 
-	CpuTimer2.InterruptCount++;
-	EDIS;
+    CpuTimer2.InterruptCount++;
+    EDIS;
 }
 
 __interrupt void i2c_int1a_isr(void)     // I2C-A
 {
-	Uint16 IntSource;
+   /* Uint16 IntSource;
 
-	// Read interrupt source
-	IntSource = I2caRegs.I2CISRC.all;
+    // Read interrupt source
+    IntSource = I2caRegs.I2CISRC.all;
 
-	// Interrupt source = stop condition detected
-	if(IntSource == I2C_SCD_ISRC)
-	{
-		// If completed message was writing data, reset msg to inactive state
-		if (CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_WRITE_BUSY)
-		{
-			CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
-			//I2cMsgIn1.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
-		}
-		else
-		{
-			// If a message receives a NACK during the address setup portion of the
-			// EEPROM read, the code further below included in the register access ready
-			// interrupt source code will generate a stop condition. After the stop
-			// condition is received (here), set the message status to try again.
-			// User may want to limit the number of retries before generating an error.
-			if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY)
-			{
-				CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_RESTART;
-			}
-			// If completed message was reading EEPROM data, reset msg to inactive state
-			// and read data from FIFO.
-			else if (CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY)
-			{
-				CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
+    // Interrupt source = stop condition detected
+    if(IntSource == I2C_SCD_ISRC)
+    {
+        // If completed message was writing data, reset msg to inactive state
+        if (CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_WRITE_BUSY)
+        {
+            CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
+            //I2cMsgIn1.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+        }
+        else
+        {
+            // If a message receives a NACK during the address setup portion of the
+            // EEPROM read, the code further below included in the register access ready
+            // interrupt source code will generate a stop condition. After the stop
+            // condition is received (here), set the message status to try again.
+            // User may want to limit the number of retries before generating an error.
+            if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY)
+            {
+                CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_RESTART;
+            }
+            // If completed message was reading EEPROM data, reset msg to inactive state
+            // and read data from FIFO.
+            else if (CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY)
+            {
+                CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
 
-				DataOut = I2caRegs.I2CDRR;
-				DataOut2 = I2caRegs.I2CDRR;
-			}
-		}
-	}  // end of stop condition detected
-	else if(IntSource == 2)												//no acknowledge condition
-	{
-		// Generate some error due to invalid interrupt source
-		CurrentMsgPtr->MsgStatus = 0xFF;
-	}
-	else
-	{
-		// Generate some error due to invalid interrupt source
-		//__asm("   ESTOP0");
-		CurrentMsgPtr->MsgStatus = 0xFF;
-	}
-	// Enable future I2C (PIE Group 8) interrupts
-	PieCtrlRegs.PIEACK.bit.ACK8 = 1;
+                DataOut = I2caRegs.I2CDRR;
+                DataOut2 = I2caRegs.I2CDRR;
+            }
+        }
+    }  // end of stop condition detected
+    else if(IntSource == 2)												//no acknowledge condition
+    {
+        // Generate some error due to invalid interrupt source
+        CurrentMsgPtr->MsgStatus = 0xFF;
+    }
+    else
+    {
+        // Generate some error due to invalid interrupt source
+        //__asm("   ESTOP0");
+        CurrentMsgPtr->MsgStatus = 0xFF;
+    }*/
+    // Enable future I2C (PIE Group 8) interrupts
+    PieCtrlRegs.PIEACK.bit.ACK8 = 1;
 }
 
 __interrupt void can_rx_isr(void)
@@ -595,34 +597,34 @@ __interrupt void can_rx_isr(void)
     //RMP4 = NMT_MOSI
     //RMP5 = PDO_MOSI
     //RMP6 = SDO_MOSI
-	Uint16 SDO_MISO_Data[9] = {0};
-	Uint32 SDO_MISO_Ctrl = 0;
-	Uint16 SDO_MOSI_Request = 0;
-	Uint16 SDO_MOSI_Ctrl = 0;
-	Uint16 SDO_ArrayIndex = 0;
-	Uint16 PDO_Instruction = 0;
-	Uint32 PDO_Data_Low = 0;
-	Uint32 PDO_Data_High = 0;
+    Uint16 SDO_MISO_Data[9] = {0};
+    Uint32 SDO_MISO_Ctrl = 0;
+    Uint16 SDO_MOSI_Request = 0;
+    Uint16 SDO_MOSI_Ctrl = 0;
+    Uint16 SDO_ArrayIndex = 0;
+    Uint16 PDO_Instruction = 0;
+    Uint32 PDO_Data_Low = 0;
+    Uint32 PDO_Data_High = 0;
     Uint16 NMT_Instruction = 0;
     Uint16 NMT_Location = 0;
 
-	if (ECanaRegs.CANRMP.bit.RMP1 == 1)
-	{
-	    //CANSlaveReception();                //handle the receive message
-	    ECanaRegs.CANRMP.bit.RMP1 = 1;
-	}
-	else if (ECanaRegs.CANRMP.bit.RMP2 == 1)
-	{
-	    //CANChargerReception();
-	}
-	else if(ECanaRegs.CANRMP.bit.RMP3 == 1)
-	{
-	    CANSlaveConfig();
-	}
-	else if (ECanaRegs.CANRMP.bit.RMP4 == 1) //State set from NMT (MOSI)
-	{
-	    NMT_Instruction = ECanaMboxes.MBOX4.MDL.all & 0xFF;
-	    NMT_Location = ECanaMboxes.MBOX4.MDL.all & 0xFF00;
+    /*if (ECanaRegs.CANRMP.bit.RMP1 == 1)
+    {
+        //CANSlaveReception();                //handle the receive message
+        ECanaRegs.CANRMP.bit.RMP1 = 1;
+    }
+    else if (ECanaRegs.CANRMP.bit.RMP2 == 1)
+    {
+        //CANChargerReception();
+    }
+    else if(ECanaRegs.CANRMP.bit.RMP3 == 1)
+    {
+        CANSlaveConfig();
+    }*/
+    if (ECanaRegs.CANRMP.bit.RMP4 == 1) //State set from NMT (MOSI)
+    {
+        NMT_Instruction = ECanaMboxes.MBOX4.MDL.all & 0xFF;
+        NMT_Location = ECanaMboxes.MBOX4.MDL.all & 0xFF00;
 
         if(NMT_Location == 0x1D00 || NMT_Location == 0)
         {
@@ -672,43 +674,43 @@ __interrupt void can_rx_isr(void)
             }
         }
 
-    if(SDO_MOSI_Ctrl == 0x42)
-    {
-        SDO_MOSI_Ctrl = ECanaMboxes.MBOX6.MDL.all & 0xFF;
-        SDO_MOSI_Request = (ECanaMboxes.MBOX6.MDL.all>>8) & 0xFFFF;
+        if(SDO_MOSI_Ctrl == 0x42)
+        {
+            SDO_MOSI_Ctrl = ECanaMboxes.MBOX6.MDL.all & 0xFF;
+            SDO_MOSI_Request = (ECanaMboxes.MBOX6.MDL.all>>8) & 0xFFFF;
 
-        SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
+            SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
 
-        SDO_MISO_Data[0] = Fusebox_Current;             //SDO 0x0900
-        SDO_MISO_Data[1] = Fusebox_Temperature;         //SDO 0x0902
-        SDO_MISO_Data[2] = FuseError;                   //SDO 0x0904
-        SDO_MISO_Data[3] = RelayMOSFETStatus;           //SDO 0x0906
-        SDO_MISO_Data[4] = RelayMOSFETError;            //SDO 0x0908
-        SDO_MISO_Data[5] = VehicleStatus;               //SDO 0x090A
-        SDO_MISO_Data[6] = ErrorCounter;                //SDO 0x090C
-        SDO_MISO_Data[7] = IgnitionCounter;             //SDO 0x0912
-        SDO_MISO_Data[8] = OperationalCounter;          //SDO 0x0914
+            SDO_MISO_Data[0] = Fusebox_Current;             //SDO 0x0900
+            SDO_MISO_Data[1] = Fusebox_Temperature;         //SDO 0x0902
+            SDO_MISO_Data[2] = FuseError;                   //SDO 0x0904
+            SDO_MISO_Data[3] = RelayMOSFETStatus;           //SDO 0x0906
+            SDO_MISO_Data[4] = RelayMOSFETError;            //SDO 0x0908
+            SDO_MISO_Data[5] = VehicleStatus;               //SDO 0x090A
+            SDO_MISO_Data[6] = ErrorCounter;                //SDO 0x090C
+            SDO_MISO_Data[7] = IgnitionCounter;             //SDO 0x0912
+            SDO_MISO_Data[8] = OperationalCounter;          //SDO 0x0914
 
-        SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2;
-        if(SDO_ArrayIndex >= 0 && SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], SDO_MISO_Ctrl, 8, 9);
-        else CANTransmit(0xE, 0x06020000, SDO_MISO_Ctrl, 8, 9); //Invalid object reference-object does not exist
+            SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2;
+            if(SDO_ArrayIndex >= 0 && SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], SDO_MISO_Ctrl, 8, 9);
+            else CANTransmit(0xE, 0x06020000, SDO_MISO_Ctrl, 8, 9); //Invalid object reference-object does not exist
+        }
+
+        ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
+        PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
     }
-
-	    ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
-	    PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
-	}
 }
 __interrupt void can_tx_isr(void)
 {
-	/*if (ECanaRegs.CANTA.all == 0x00000001)
+    /*if (ECanaRegs.CANTA.all == 0x00000001)
     {
         ECanaRegs.CANTA.all = 0xFFFFFFFF;           // Reset tranmission flags
     }*/
 
 
-	ECanaRegs.CANTA.all = 0xFFFFFFFF;
+    ECanaRegs.CANTA.all = 0xFFFFFFFF;
 
-	// Reset tranmission flags
-	PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
+    // Reset tranmission flags
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
 }
 

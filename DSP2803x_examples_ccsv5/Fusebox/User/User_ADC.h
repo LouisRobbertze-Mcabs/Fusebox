@@ -11,6 +11,5 @@
 #include "User_Defines.h"
 
 void configADC(void);
-void Reset_ADC(void);
 
 #endif /* USER_USER_ADC_H_ */

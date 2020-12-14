@@ -121,7 +121,7 @@ void CANMailboxConfig(void)
 
 	// Rx Mailbox (0x00000002)
 	ECanaMboxes.MBOX1.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-	ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = NodeID;  // Current address loaded
+	ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = 1;       // Current address loaded -----> NodeID = 1
 	ECanaLAMRegs.LAM1.all = 0x00000000;             // Accept standard IDs with matching address
 
 	ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005; // Receive 4 bytes of data
@@ -164,7 +164,7 @@ void CANInterruptConfig(void)
 	EINT;                                           // Global interrupt enable
 }
 
-void CANChargerReception(void)
+/*void CANChargerReception(void)
 {
 	Uint32 RxDataL = 0;
 	Uint32 RxDataH = 0;
@@ -198,11 +198,11 @@ void CANChargerReception(void)
 
 	//Read Charger Status
 	ChgStatus = RxDataH & 0xFF;
-}
+}*/
 
-void CANSlaveReception(void)
+/*void CANSlaveReception(void)
 {
-	/*Uint32 RxData = 0;
+	Uint32 RxData = 0;
 	union bits32 TxData;
 
 	RxData = ECanaMboxes.MBOX1.MDH.all;             // Data taken out of direct mailbox
@@ -232,10 +232,10 @@ void CANSlaveReception(void)
     case 19: {TxData.asFloat=Temperature_avg; CANTransmit(0, 19, TxData.asUint, 5); break;}
 
     case 20: {TxData.asFloat=Auxilliary_Voltage; CANTransmit(0, 20, TxData.asUint, 5); break;}
-	}*/
-}
+	}
+}*/
 
-void CANSlaveConfig(void)
+/*void CANSlaveConfig(void)
 {
 	Uint32 RxDataNumber = 0;
 	float RxDataValue = 0;
@@ -270,7 +270,7 @@ void CANSlaveConfig(void)
 	//stroom meting offset waarde
 	//stroom meting multiplier/skaal
 	}
-}
+}*/
 
 void CANTransmit(Uint16 Destination, Uint32 TxDataH, Uint32 TxDataL, Uint16 Bytes, Uint16 Mailbox)      //destination, txdataH, txdataL, bytes, Mailbox
 {

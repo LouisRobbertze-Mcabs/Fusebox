@@ -15,8 +15,6 @@
 #include <string.h>
 #include "User_CAN.h"
 #include "User_ADC.h"
-#include "User_I2C.h"
-#include "User_BQ.h"
 #include "User_Interrupts.h"
 
 union bits32
@@ -29,18 +27,10 @@ void Initialise_BMS(void);
 void Init_Gpio(void);
 
 void Toggle_LED(void);
-void Read_Cell_Voltages(void);
-void Process_Voltages(void);
-void Read_Temperatures(void);
-Uint32 ChgCalculator(float Voltage, float Current);
-void Calculate_Current(void);
-void Read_System_Status(void);
-void Process_System_Status(void);
-void GPIO_Error_Check(Uint16 FuseError,Uint16 FuseErrorCount,Uint16 RelayMOSFETStatus,Uint16 RelayMOSFETError,Uint16 RelayMOSFETErrorCounter,Uint16 VehicleStatus);
-void Balance(int period, float reference);
-
+//void GPIO_Error_Check(Uint16 FuseError,Uint16 FuseErrorCount,Uint16 RelayMOSFETStatus,Uint16 RelayMOSFETError,Uint16 RelayMOSFETErrorCounter,Uint16 VehicleStatus);
 unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key);
 
+void ClearErrorFlags(Uint16 Flag_Selection);
 
 
 //#pragma CODE_SECTION(DELAY_US, "ramfuncs");

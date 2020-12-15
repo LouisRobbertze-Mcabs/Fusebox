@@ -34,12 +34,17 @@ __interrupt void cpu_timer1_isr(void)                           //50Hz loop
     if(Operational_State != 4)    //ensures system is not in the halt state
     {
         HourTimer++;
-        if(HourTimer >= 180000)         //60*60*50=180000    Based on a timer of 50Hz
+        if(HourTimer >= 180000)         //60*60*50=180000    Based on a timer of 50Hz for a period of 1 hour
         {
             OperationalCounter++;  //VALUE NEEDS TO BE MOVED TO EEPROM before CPU shuts down and value is lost
             HourTimer = 0;
+            /*currently, this feature will suffer a time 'loss' when the vehicle is powered down: if the counter reaches a value of, say, 52 minutes
+             *and the vehicle is switched off, the counter will be reset to zero (it is initialised to zero in globals.c) and the 52 minutes
+             *will be lost.
+             */
         }
     }
+
     //IGNITION CYCLE COUNTER *************************************
     //counter increments every time the vehicle is started
     if(Key_In_Sense && !ResetIgnitionFlag) //if key is on and the counter has not yet been incremented
@@ -113,11 +118,11 @@ __interrupt void can_rx_isr(void)
             case 0x80 :
                 Operational_State = 0x7F;          //Pre-Op state
                 break;
-            case 0x81 :                    //Device Reset
+            case 0x81 :                            //Device Reset
                 Operational_State = 0x0;
                 while(Operational_State<0x100){;}  //Reset governed by Watchdog timer
                 break;
-            case 0x82 :                    //CAN Bus reset
+            case 0x82 :                            //CAN Bus reset
                 Operational_State = 0x0;
                 //add reset function
                 break;
@@ -128,7 +133,7 @@ __interrupt void can_rx_isr(void)
         {
             PDO_Instruction = ECanaMboxes.MBOX5.MDL.all & 0xFF;
 
-            if(Operational_State == 5)
+            if(Operational_State == 5) //PDO only used when NMT state = Operatioanl
             {
                 if(PDO_Instruction == 0xFF01 && !LowPowerMode)   //Enter Low power mode
                 {
@@ -140,7 +145,8 @@ __interrupt void can_rx_isr(void)
                 }
                 else ; //Code space for Invalid instruction ----> must still decide what to do
 
-                PDO_Data_Low += SdoMessage.RelayErrors; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehcile and Relay/Mosfet status flags
+                //sets up the PDO message bytes using the data in the SdoMessage struct
+                PDO_Data_Low += SdoMessage.RelayErrors; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehicle and Relay/Mosfet status flags
                 PDO_Data_Low = (PDO_Data_Low<<16) + SdoMessage.FuseErrors;
                 PDO_Data_High += SdoMessage.VehicleStatus;
                 PDO_Data_High = (PDO_Data_High<<16) + SdoMessage.RelayStatus;
@@ -155,9 +161,12 @@ __interrupt void can_rx_isr(void)
 
             SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
 
+            //sets up the error counter word for CAN transmission
             ErrorCounter += SdoMessage.RelayErrorCounter;
             ErrorCounter = (ErrorCounter << 8) + SdoMessage.FuseErrorCounter;
 
+            //This array acts a holder for all the potential SDO requests.
+            //Note only the requested array element is transmitted - not the entire array
             SDO_MISO_Data[0] = SdoMessage.Current;             //SDO 0x0900
             SDO_MISO_Data[1] = SdoMessage.Temperature;         //SDO 0x0902
             SDO_MISO_Data[2] = SdoMessage.FuseErrors;          //SDO 0x0904
@@ -168,8 +177,8 @@ __interrupt void can_rx_isr(void)
             SDO_MISO_Data[7] = IgnitionCounter;                //SDO 0x0912
             SDO_MISO_Data[8] = OperationalCounter;             //SDO 0x0914
 
-            SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2;
-            if(SDO_ArrayIndex >= 0 && SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], SDO_MISO_Ctrl, 8, 9);
+            SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2; //converts the SDO request into a value which is used to make a selection from the array above
+            if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], SDO_MISO_Ctrl, 8, 9); //Transmits the requested information via CAN
             else CANTransmit(0xE, 0x06020000, SDO_MISO_Ctrl, 8, 9); //Invalid object reference-object does not exist
         }
 

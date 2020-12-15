@@ -242,7 +242,7 @@ void ClearErrorFlags(Uint16 Flag_Selection)
 {
     /*Sets selected error flags and counters that appear in Annex A and B of the fusebox documentation
      * to the default state (0x0)
-     * Flag_Selection:
+     * Uint16 Flag_Selection:
      * 0 - Reset all
      * 1 - Reset Fuse Errors and counter only
      * 2 - Reset Relay errors and counter only
@@ -268,7 +268,7 @@ void EnableLowPower(void)
     /*If the master PDO asserts low power mode, all nonessential features will be shut down
      * Currently classified as nonessential:
      * All MOSFETS
-     * Relays*/
+     * */
 
     Mfet_Ctrl_0 = 0;
     Mfet_Ctrl_1 = 0;
@@ -294,9 +294,11 @@ void SetFlags(void)
     //The bits in each SdoMessage member are assigned according to the bit layout given in Annex A of
     //the fuse box documentation.
 
+    //The mapping which indicates what MOSFETs and Relays are connected to each fuse is taken from the KiCAD schematic (UpperBoard) of the PCB
+
     if(Fuse_Out_Sense_1) //Fuse Blown
     {
-        SdoMessage.FuseErrors |= 0x0001;
+        SdoMessage.FuseErrors |= 0x0001; //sets the correct bit to acknowledge error
         SdoMessage.FuseErrorCounter++;
     }
     else //Fuse Functional
@@ -355,7 +357,7 @@ void SetFlags(void)
     }
     else
     {
-        //Fuse 4 doesnt output to any device at the moment
+        //Fuse 4 doesn't output to any device at the moment as far as I can tell
     }
 
     if(!Fuse_Out_Sense_5)
@@ -531,8 +533,6 @@ void ADCtoGPIO(void)
 
     //Fuse box Current
     //channel A0 - SOC0
-
-
     Fusebox_Current = Temp_Floats[0] + (0.72*((0.02*(AdcResult.ADCRESULT0))-Temp_Floats[0]));                  //Test gain (3.3/4096 *1/39.6mV)
     Temp_Floats[0] = Fusebox_Current;
 
@@ -693,7 +693,7 @@ void HeadlightBulbCheck(void)
         else if(CheckAgain1)//bulb has blown
         {
             HeadLightBlown = 1; //Expected current step has not occurred, head light assumed blown
-            CheckAgain1 = 0; //if bulb is blown don't bother checking
+            CheckAgain1 = 0; //if bulb is blown don't bother checking again
         }
 
         if(HeadSwitched && (Current_Prev - Fusebox_Current >= 0)) //head light switched correctly initially but then blew during operation (unexpected current drop without a switch off command)
@@ -708,7 +708,7 @@ void HeadlightBulbCheck(void)
              * Although it makes the program less efficient,
              * it will allow the program to self detect that a blown bulb has been
              * replaced rather than the technician having to manually reset the flag.
-             * Currently set to (1/50)*3000 = 1 minute*/
+             * Currently set to (1/50)*3000 = 1 minute - Based on 50 Hz timer*/
             CheckAgain1 = 0;
             counter1 = 0;
         }
@@ -743,5 +743,5 @@ void HeadlightBulbCheck(void)
         }
         counter2++;
     }
-    Current_Prev = Fusebox_Current;
+    Current_Prev = Fusebox_Current; //sets a static value for historic reference
 }

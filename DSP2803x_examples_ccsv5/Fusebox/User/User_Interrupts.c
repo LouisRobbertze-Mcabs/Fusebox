@@ -100,6 +100,7 @@ __interrupt void can_rx_isr(void)
     {
         CANSlaveConfig();
     }*/
+    CanInterruptTriggered++;
     if (ECanaRegs.CANRMP.bit.RMP4 == 1) //State set from NMT (MOSI)
     {
         NMT_Instruction = ECanaMboxes.MBOX4.MDL.all & 0xFF;

@@ -41,7 +41,8 @@ void CANSetup(void)
 	// Configure Master Control register
 	ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
 	ECanaShadow.CANMC.bit.SCB = 0;                  //  Martin Rademeyer //
-	ECanaShadow.CANMC.bit.DBO = 1;                  //  Martin Rademeyer //     1 bartho
+	ECanaShadow.CANMC.bit.DBO = 1;                  //  Martin Rademeyer // 1 bartho
+	ECanaShadow.CANMC.bit.ABO = 1;
 	ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
 
 	// Initialise Message Control registers
@@ -121,7 +122,7 @@ void CANMailboxConfig(void)
 
 	// Rx Mailbox (0x00000002)
 	ECanaMboxes.MBOX1.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-	ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = 1;       // Current address loaded -----> NodeID = 1
+	ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = NodeID;       // Current address loaded -----> NodeID = 1
 	ECanaLAMRegs.LAM1.all = 0x00000000;             // Accept standard IDs with matching address
 
 	ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005; // Receive 4 bytes of data
@@ -150,7 +151,7 @@ void CANInterruptConfig(void)
 
 	EALLOW;
 	ECanaRegs.CANGIM.all = 0x00000003;              // Enable ECAN0INT and ECAN0INT interrupt lines
-	ECanaRegs.CANMIM.all = 0x0000000F;              // Allow interrupts for Mailbox 0 and 1 , 2,3
+	ECanaRegs.CANMIM.all = 0x000003FF;              // Allow interrupts for Mailbox 1-10
 	ECanaRegs.CANMIL.all = 0x00000001;              // Mailbox 0 triggers ECAN1INT line, Mailbox 1 triggers ECAN0INT line       //1 bartho
 	PieVectTable.ECAN0INTA = &can_rx_isr;           // Link Rx ISR function
 	PieVectTable.ECAN1INTA = &can_tx_isr;           // Link Tx ISR function

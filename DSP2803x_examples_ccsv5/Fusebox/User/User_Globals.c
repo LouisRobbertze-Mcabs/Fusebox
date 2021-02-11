@@ -9,7 +9,7 @@
 //volatile int CANcounter = 0;
 volatile long Fusebox_Current = 0;
 volatile long Fusebox_Temperature = 0;
-volatile Uint16 counter_2Hz;
+volatile Uint16 counter_2Hz = 0;
 
 volatile Uint16 Fuse_Out_Sense_1 = 0;
 volatile Uint16 Fuse_Out_Sense_4 = 0;

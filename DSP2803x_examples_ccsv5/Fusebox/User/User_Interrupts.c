@@ -25,7 +25,7 @@ __interrupt void cpu_timer0_isr(void)
 
 __interrupt void cpu_timer1_isr(void)                           //50Hz loop
 {
-    ADCtoGPIO();  //Use ADCs as an ad hoc GPIO
+    ADCtoGPIO();  //Use ADCs as a defacto GPIO
     SetFlags();   //sets error and status flags for use in PDO/SDO MISOs
     HeadlightBulbCheck(); //experimental check to determine whether the head/high light has blown
 
@@ -60,7 +60,19 @@ __interrupt void cpu_timer1_isr(void)                           //50Hz loop
 
 __interrupt void cpu_timer2_isr(void)
 {
+    // This CPU timer interrupt is typically reserved for DSP/BIOS use
+    // It is currently being used to time the Heartbeat_2 message for the CANopen network
+
+
     EALLOW;
+    Uint32 PDO_Data_Low = 0;
+    Uint32 PDO_Data_High = 0;
+
+    PDO_Data_Low += SdoMessage.RelayErrors; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehicle and Relay/Mosfet status flags
+    PDO_Data_Low = (PDO_Data_Low<<16) + SdoMessage.FuseErrors;
+    PDO_Data_High += SdoMessage.VehicleStatus;
+    PDO_Data_High = (PDO_Data_High<<16) + SdoMessage.RelayStatus;
+    CANTransmit(0x63D, PDO_Data_High, PDO_Data_Low, 8, 7); //PDO_MISO
 
     CpuTimer2.InterruptCount++;
     EDIS;
@@ -73,16 +85,12 @@ __interrupt void can_rx_isr(void)
     //Mailbox 7 - Master: VCU
     //Mailbox 9 - Slave: Control Box
     //RMP4 = NMT_MOSI
-    //RMP5 = PDO_MOSI
     //RMP6 = SDO_MOSI
     Uint16 SDO_MISO_Data[9] = {0};
     Uint32 SDO_MISO_Ctrl = 0;
     Uint16 SDO_MOSI_Request = 0;
     Uint16 SDO_MOSI_Ctrl = 0;
     Uint16 SDO_ArrayIndex = 0;
-    Uint16 PDO_Instruction = 0;
-    Uint32 PDO_Data_Low = 0;
-    Uint32 PDO_Data_High = 0;
     Uint16 NMT_Instruction = 0;
     Uint16 NMT_Location = 0;
     Uint16 ErrorCounter = 0;
@@ -98,7 +106,7 @@ __interrupt void can_rx_isr(void)
     }
     else if(ECanaRegs.CANRMP.bit.RMP3 == 1)
     {
-        CANSlaveConfig();
+        //CANSlaveConfig();
     }*/
     CanInterruptTriggered++;
     if (ECanaRegs.CANRMP.bit.RMP4 == 1) //State set from NMT (MOSI)
@@ -112,12 +120,17 @@ __interrupt void can_rx_isr(void)
             {
             case 1:
                 Operational_State = 0x5;           //Operational State
+                LowPowerMode = 0;
                 break;
             case 2:
                 Operational_State = 0x4;           //Halt state
+                LowPowerMode = 0;
                 break;
+            case 3:
+                LowPowerMode = 1;                  //Operational State in low power mode
             case 0x80 :
                 Operational_State = 0x7F;          //Pre-Op state
+                LowPowerMode = 0;
                 break;
             case 0x81 :                            //Device Reset
                 Operational_State = 0x0;
@@ -128,41 +141,20 @@ __interrupt void can_rx_isr(void)
                 //add reset function
                 break;
             }
-            CANTransmit(0x73C, 0, Operational_State, 8, 7); //heart beat response    Double check mailbox
+            CANTransmit(0x5BD, 0, Operational_State, 8, 7); //heartbeat_1 response    Double check mailbox
         }
-        else if (ECanaRegs.CANRMP.bit.RMP5 == 1)    //PDO_MOSI
+    }
+
+    else if(ECanaRegs.CANRMP.bit.RMP6 == 1)
+    {
+        SDO_MOSI_Ctrl = ECanaMboxes.MBOX6.MDL.all & 0xFF;
+        SDO_MOSI_Request = (ECanaMboxes.MBOX6.MDL.all>>8) & 0xFFFF;
+
+        SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
+
+        //sets up the error counter word for CAN transmission
+        if(Operational_State != 4 && SDO_MOSI_Ctrl == 0x42)
         {
-            PDO_Instruction = ECanaMboxes.MBOX5.MDL.all & 0xFF;
-
-            if(Operational_State == 5) //PDO only used when NMT state = Operatioanl
-            {
-                if(PDO_Instruction == 0xFF01 && !LowPowerMode)   //Enter Low power mode
-                {
-                    LowPowerMode = 1;
-                }
-                else if(PDO_Instruction == 0xFF00 && LowPowerMode)   //Disable Low power mode
-                {
-                    LowPowerMode = 0;
-                }
-                else ; //Code space for Invalid instruction ----> must still decide what to do
-
-                //sets up the PDO message bytes using the data in the SdoMessage struct
-                PDO_Data_Low += SdoMessage.RelayErrors; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehicle and Relay/Mosfet status flags
-                PDO_Data_Low = (PDO_Data_Low<<16) + SdoMessage.FuseErrors;
-                PDO_Data_High += SdoMessage.VehicleStatus;
-                PDO_Data_High = (PDO_Data_High<<16) + SdoMessage.RelayStatus;
-                CANTransmit(0x1BC, PDO_Data_High, PDO_Data_Low, 8, 7); //PDO_MISO
-            }
-        }
-
-        if(SDO_MOSI_Ctrl == 0x42)
-        {
-            SDO_MOSI_Ctrl = ECanaMboxes.MBOX6.MDL.all & 0xFF;
-            SDO_MOSI_Request = (ECanaMboxes.MBOX6.MDL.all>>8) & 0xFFFF;
-
-            SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
-
-            //sets up the error counter word for CAN transmission
             ErrorCounter += SdoMessage.RelayErrorCounter;
             ErrorCounter = (ErrorCounter << 8) + SdoMessage.FuseErrorCounter;
 
@@ -180,13 +172,14 @@ __interrupt void can_rx_isr(void)
 
             SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2; //converts the SDO request into a value which is used to make a selection from the array above
             if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], SDO_MISO_Ctrl, 8, 9); //Transmits the requested information via CAN
-            else CANTransmit(0xE, 0x06020000, SDO_MISO_Ctrl, 8, 9); //Invalid object reference-object does not exist
+            else CANTransmit(0x1BD, 0x06020000, SDO_MISO_Ctrl, 8, 9); //Invalid object reference-object does not exist
         }
-
-        ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
-        PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
     }
+
+    ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
 }
+
 __interrupt void can_tx_isr(void)
 {
     /*if (ECanaRegs.CANTA.all == 0x00000001)

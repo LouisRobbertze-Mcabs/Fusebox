@@ -38,7 +38,7 @@ void Initialise_FuseBox(void)
 
     ConfigCpuTimer(&CpuTimer0, 60, 500000); //2 hz
     ConfigCpuTimer(&CpuTimer1, 60, 20000);  //50 hz
-    ConfigCpuTimer(&CpuTimer2, 60, 500);    //2 Khz         //500
+    ConfigCpuTimer(&CpuTimer2, 60, 1e6);    //1 hz         //500
 
     CpuTimer0Regs.TCR.all = 0x4000; // Use write-only instruction to set TSS bit = 0
     CpuTimer1Regs.TCR.all = 0x4000; // Use write-only instruction to set TSS bit = 0

@@ -10,159 +10,189 @@
 
 void CAN_Init(void)
 {
-	CANSetup();
-	CANMailboxConfig();
-	CANInterruptConfig();
+    CANSetup();
+    CANMailboxConfig();
+    CANInterruptConfig();
 }
 
 void CANSetup(void)
 {
-	EALLOW;
+    EALLOW;
 
-	// Configure CAN GPIO pins
-	GpioCtrlRegs.GPAPUD.bit.GPIO30 = 0;             // Enable pull-up for GPIO30 (CANRXA)
-	GpioCtrlRegs.GPAPUD.bit.GPIO31 = 0;             // Enable pull-up for GPIO31 (CANTXA)
-	GpioCtrlRegs.GPAQSEL2.bit.GPIO30 = 3;           // Asynch qual for GPIO30 (CANRXA)
-	GpioCtrlRegs.GPAMUX2.bit.GPIO30 = 1;            // Configure GPIO30 for CANRXA operation
-	GpioCtrlRegs.GPAMUX2.bit.GPIO31 = 1;            // Configure GPIO31 for CANTXA operation
-	GpioCtrlRegs.GPAMUX2.bit.GPIO27 = 0;            // Set the enable signal to the CAN transciever as GPIO
-	GpioCtrlRegs.GPADIR.bit.GPIO27 = 1;             // Set the enable signal to the CAN transciever as output
-	GpioDataRegs.GPADAT.bit.GPIO27 = 1;             // Set the enable signal to the CAN transciever high
+    // Configure CAN GPIO pins
+    GpioCtrlRegs.GPAPUD.bit.GPIO30 = 0;             // Enable pull-up for GPIO30 (CANRXA)
+    GpioCtrlRegs.GPAPUD.bit.GPIO31 = 0;             // Enable pull-up for GPIO31 (CANTXA)
+    GpioCtrlRegs.GPAQSEL2.bit.GPIO30 = 3;           // Asynch qual for GPIO30 (CANRXA)
+    GpioCtrlRegs.GPAMUX2.bit.GPIO30 = 1;            // Configure GPIO30 for CANRXA operation
+    GpioCtrlRegs.GPAMUX2.bit.GPIO31 = 1;            // Configure GPIO31 for CANTXA operation
+    GpioCtrlRegs.GPAMUX2.bit.GPIO27 = 0;            // Set the enable signal to the CAN transciever as GPIO
+    GpioCtrlRegs.GPADIR.bit.GPIO27 = 1;             // Set the enable signal to the CAN transciever as output
+    GpioDataRegs.GPADAT.bit.GPIO27 = 1;             // Set the enable signal to the CAN transciever high
 
-	// Configure eCAN RX and TX pins
-	struct ECAN_REGS ECanaShadow;
-	ECanaShadow.CANTIOC.all = ECanaRegs.CANTIOC.all;
-	ECanaShadow.CANTIOC.bit.TXFUNC = 1;
-	ECanaRegs.CANTIOC.all = ECanaShadow.CANTIOC.all;
-	ECanaShadow.CANRIOC.all = ECanaRegs.CANRIOC.all;
-	ECanaShadow.CANRIOC.bit.RXFUNC = 1;
-	ECanaRegs.CANRIOC.all = ECanaShadow.CANRIOC.all;
+    // Configure eCAN RX and TX pins
+    struct ECAN_REGS ECanaShadow;
+    ECanaShadow.CANTIOC.all = ECanaRegs.CANTIOC.all;
+    ECanaShadow.CANTIOC.bit.TXFUNC = 1;
+    ECanaRegs.CANTIOC.all = ECanaShadow.CANTIOC.all;
+    ECanaShadow.CANRIOC.all = ECanaRegs.CANRIOC.all;
+    ECanaShadow.CANRIOC.bit.RXFUNC = 1;
+    ECanaRegs.CANRIOC.all = ECanaShadow.CANRIOC.all;
 
-	// Configure Master Control register
-	ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
-	ECanaShadow.CANMC.bit.SCB = 0;                  //  Martin Rademeyer //
-	ECanaShadow.CANMC.bit.DBO = 1;                  //  Martin Rademeyer // 1 bartho
-	ECanaShadow.CANMC.bit.ABO = 1;
-	ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
+    // Configure Master Control register
+    ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
+    ECanaShadow.CANMC.bit.SCB = 0;                  //  Martin Rademeyer //
+    ECanaShadow.CANMC.bit.DBO = 1;                  //  Martin Rademeyer //     1 bartho
+    ECanaShadow.CANMC.bit.ABO = 1;                  //Bartho testing Wake up on bus activity..
+    ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
 
-	// Initialise Message Control registers
-	ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX4.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX5.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX6.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX7.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX8.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX9.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX10.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX11.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX12.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX13.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX14.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX15.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX16.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX17.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX18.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX19.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX20.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX21.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX22.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX23.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX24.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX25.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX26.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX27.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX28.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX29.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX30.MSGCTRL.all = 0x00000000;
-	ECanaMboxes.MBOX31.MSGCTRL.all = 0x00000000;
+    // Initialise Message Control registers
+    ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX4.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX5.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX6.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX7.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX8.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX9.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX10.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX11.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX12.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX13.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX14.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX15.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX16.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX17.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX18.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX19.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX20.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX21.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX22.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX23.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX24.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX25.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX26.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX27.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX28.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX29.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX30.MSGCTRL.all = 0x00000000;
+    ECanaMboxes.MBOX31.MSGCTRL.all = 0x00000000;
 
-	// Clear flag registers
-	ECanaRegs.CANTA.all = 0xFFFFFFFF;
-	ECanaRegs.CANRMP.all = 0xFFFFFFFF;
-	ECanaRegs.CANGIF0.all = 0xFFFFFFFF;
-	ECanaRegs.CANGIF1.all = 0xFFFFFFFF;
+    // Clear flag registers
+    ECanaRegs.CANTA.all = 0xFFFFFFFF;
+    ECanaRegs.CANRMP.all = 0xFFFFFFFF;
+    ECanaRegs.CANGIF0.all = 0xFFFFFFFF;
+    ECanaRegs.CANGIF1.all = 0xFFFFFFFF;
 
-	// Configure bit-timing
-	ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
-	ECanaShadow.CANMC.bit.CCR = 1 ;
-	ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
-	do {ECanaShadow.CANES.all = ECanaRegs.CANES.all;}   // Wait until the CPU has been granted permission to change the configuration registers
-	while (ECanaShadow.CANES.bit.CCE != 1 );            // Wait for CCE bit to be set..
-	ECanaShadow.CANBTC.all = 0;
-	ECanaShadow.CANBTC.bit.BRPREG = 3;
-	//  ECanaShadow.CANBTC.bit.BRPREG = 15;                 //  Martin Rademeyer //
-	//  ECanaShadow.CANBTC.bit.BRPREG = 1;                  //  Martin Rademeyer //
-	ECanaShadow.CANBTC.bit.TSEG2REG = 2;                //  Martin Rademeyer //
-	ECanaShadow.CANBTC.bit.TSEG1REG = 10;               //  Martin Rademeyer //
-	ECanaShadow.CANBTC.bit.SAM = 0;                     //1
-	ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
+    // Configure bit-timing
+    ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
+    ECanaShadow.CANMC.bit.CCR = 1 ;
+    ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
+    do {ECanaShadow.CANES.all = ECanaRegs.CANES.all;}   // Wait until the CPU has been granted permission to change the configuration registers
+    while (ECanaShadow.CANES.bit.CCE != 1 );            // Wait for CCE bit to be set..
+    ECanaShadow.CANBTC.all = 0;
+    ECanaShadow.CANBTC.bit.BRPREG = 3;
+    //  ECanaShadow.CANBTC.bit.BRPREG = 15;                 //  Martin Rademeyer //
+    //  ECanaShadow.CANBTC.bit.BRPREG = 1;                  //  Martin Rademeyer //
+    ECanaShadow.CANBTC.bit.TSEG2REG = 2;                //  Martin Rademeyer //
+    ECanaShadow.CANBTC.bit.TSEG1REG = 10;               //  Martin Rademeyer //
+    ECanaShadow.CANBTC.bit.SAM = 0;                     //1
+    ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
 
-	// Finalise CAN configuration
-	ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
-	ECanaShadow.CANMC.bit.CCR = 0 ;
-	ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
-	do {ECanaShadow.CANES.all = ECanaRegs.CANES.all;}   // Wait until the CPU no longer has permission to change the configuration registers
-	while(ECanaShadow.CANES.bit.CCE != 0 );             // Wait for CCE bit to be  cleared..
-	ECanaRegs.CANME.all = 0;                            // Disable all Mailboxes - Required before writing the MSGIDs
+    // Finalise CAN configuration
+    ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
+    ECanaShadow.CANMC.bit.CCR = 0 ;
+    ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
+    do {ECanaShadow.CANES.all = ECanaRegs.CANES.all;}   // Wait until the CPU no longer has permission to change the configuration registers
+    while(ECanaShadow.CANES.bit.CCE != 0 );             // Wait for CCE bit to be  cleared..
+    ECanaRegs.CANME.all = 0;                            // Disable all Mailboxes - Required before writing the MSGIDs
 
-	EDIS;
+    EDIS;
 }
 
 void CANMailboxConfig(void)
 {
-	ECanaRegs.CANGAM.all = 0x00000000;              // Global All-Pass Mask (Don't care: 1, Match: 0)
+    ECanaRegs.CANGAM.all = 0x00000000;              // Global All-Pass Mask (Don't care: 1, Match: 0)
 
-	ECanaRegs.CANMD.all = 0x0000000E;               // Message Direction (Rx: 1, Tx: 0)                                 //bartho    0x00000006
+    ECanaRegs.CANMD.all = 0x0000007E;               // Message Direction (Rx: 1, Tx: 0)         //bartho    0x00000006
 
-	// Tx Mailbox (0x00000001)
-	ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000004; // Transmit 4 bytes of data
+    // Tx Mailbox (0x00000001)
+    ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000004; // Transmit 4 bytes of data
 
-	// Rx Mailbox (0x00000002)
-	ECanaMboxes.MBOX1.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-	ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = NodeID;       // Current address loaded -----> NodeID = 1
-	ECanaLAMRegs.LAM1.all = 0x00000000;             // Accept standard IDs with matching address
+    // Rx Mailbox (0x00000002)
+    ECanaMboxes.MBOX1.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
+    ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = NodeID;  // Current address loaded
+    ECanaLAMRegs.LAM1.all = 0x00000000;             // Accept standard IDs with matching address
+    ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005; // Receive 4 bytes of data
 
-	ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005; // Receive 4 bytes of data
-
-	// Rx Mailbox (0x00000003)
-	ECanaMboxes.MBOX2.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
-	ECanaMboxes.MBOX2.MSGID.bit.STDMSGID = 0x0611;  // Current address loaded                                           //bartho
-	ECanaLAMRegs.LAM2.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
-	ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000008; // Receive 8 bytes of data                                              //bartho
+    // Rx Mailbox (0x00000003)
+    ECanaMboxes.MBOX2.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
+    ECanaMboxes.MBOX2.MSGID.bit.STDMSGID = 0x0611;  // Current address loaded                                           //bartho
+    ECanaLAMRegs.LAM2.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
+    ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data                                              //bartho
 
 
-	// Rx Mailbox (0x00000004)
-	ECanaMboxes.MBOX3.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
-	ECanaMboxes.MBOX3.MSGID.bit.STDMSGID = 0x011;  // Current address loaded                                           //bartho
-	ECanaLAMRegs.LAM3.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
-	ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000005; // Receive 5 bytes of data                                              //bartho
+    // Rx Mailbox (0x00000004)
+    ECanaMboxes.MBOX3.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
+    ECanaMboxes.MBOX3.MSGID.bit.STDMSGID = 0x011;   // Current address loaded                                           //bartho
+    ECanaLAMRegs.LAM3.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
+    ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000005;     // Receive 5 bytes of data                                              //bartho
 
-	ECanaRegs.CANME.all = 0x0000000E;               // Enable Rx Mailbox                                                //bartho    0x00000006
 
-	// The Tx Mailbox MSGID has to be set as required and then enabled
+    // Bartho Edit to ADD CANopen receive and transmit mailboxes
+
+    // Rx Mailbox (0x00000005)                      // NMT_MOSI
+    ECanaMboxes.MBOX4.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
+    ECanaMboxes.MBOX4.MSGID.bit.STDMSGID = 0x00;    // Current address loaded
+    ECanaLAMRegs.LAM4.all = 0x00000000;             // Accept standard IDs with matching address
+    ECanaMboxes.MBOX4.MSGCTRL.all = 0x00000002;     // Receive 2 bytes of data
+
+    // Rx Mailbox (0x00000006)                      // PDO1_MOSI
+    ECanaMboxes.MBOX5.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
+    ECanaMboxes.MBOX5.MSGID.bit.STDMSGID = 0x21D;   // Current address loaded
+    ECanaLAMRegs.LAM5.all = 0x00000000;             // Accept standard IDs with matching address
+    ECanaMboxes.MBOX5.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data
+
+    // Rx Mailbox (0x00000007)                      // SDO_MOSI
+    ECanaMboxes.MBOX6.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
+    ECanaMboxes.MBOX6.MSGID.bit.STDMSGID = 0x61D;   // Current address loaded
+    ECanaLAMRegs.LAM6.all = 0x00000000;             // Accept standard IDs with matching address
+    ECanaMboxes.MBOX6.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data
+
+    // Tx Mailbox (0x00000008)                      // Heartbeat_MISO
+    ECanaMboxes.MBOX7.MSGCTRL.all = 0x00000001;     // Transmit 1 bytes of data
+
+    // Tx Mailbox (0x00000009)                      // PDO1_MISO
+    ECanaMboxes.MBOX8.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
+
+    // Tx Mailbox (0x000000010)                     // SDO_MISO
+    ECanaMboxes.MBOX9.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
+
+
+    ECanaRegs.CANME.all = 0x0000007E;               // Enable Rx Mailbox    //bartho    0x00000006
+
+    // The Tx Mailbox MSGID has to be set as required and then enabled
 }
 
 void CANInterruptConfig(void)
 {
-	DINT;                                           // Global interrupt disable
+    DINT;                                           // Global interrupt disable
 
-	EALLOW;
-	ECanaRegs.CANGIM.all = 0x00000003;              // Enable ECAN0INT and ECAN0INT interrupt lines
-	ECanaRegs.CANMIM.all = 0x000003FF;              // Allow interrupts for Mailbox 1-10
-	ECanaRegs.CANMIL.all = 0x00000001;              // Mailbox 0 triggers ECAN1INT line, Mailbox 1 triggers ECAN0INT line       //1 bartho
-	PieVectTable.ECAN0INTA = &can_rx_isr;           // Link Rx ISR function
-	PieVectTable.ECAN1INTA = &can_tx_isr;           // Link Tx ISR function
-	EDIS;
+    EALLOW;
+    ECanaRegs.CANGIM.all = 0x00000003;              // Enable ECAN0INT and ECAN0INT interrupt lines
+    ECanaRegs.CANMIM.all = 0x000003FF;              // Allow interrupts for Mailbox 0 ~ 10
+    ECanaRegs.CANMIL.all = 0x00000381;              // Mailbox 0 triggers ECAN1INT line, Mailbox 1 triggers ECAN0INT line
+    PieVectTable.ECAN0INTA = &can_rx_isr;           // Link Rx ISR function
+    PieVectTable.ECAN1INTA = &can_tx_isr;           // Link Tx ISR function
+    EDIS;
 
-	PieCtrlRegs.PIEIER9.bit.INTx5 = 1;              // Enable Rx interrupt in PIE group 9
-	PieCtrlRegs.PIEIER9.bit.INTx6 = 1;              // Enable Tx interrupt in PIE group 9
+    PieCtrlRegs.PIEIER9.bit.INTx5 = 1;              // Enable Rx interrupt in PIE group 9
+    PieCtrlRegs.PIEIER9.bit.INTx6 = 1;              // Enable Tx interrupt in PIE group 9
 
-	IER |= M_INT9;                                  // Enable group 9 interrupts
+    IER |= M_INT9;                                  // Enable group 9 interrupts
 
-	EINT;                                           // Global interrupt enable
+    EINT;                                           // Global interrupt enable
 }
 
 /*void CANChargerReception(void)

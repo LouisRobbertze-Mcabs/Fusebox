@@ -485,22 +485,31 @@ void SetFlags(void)
 
     //VEHICLE STATUS FLAGS ***********************************************************************************************************************************************************************
     if(Brake_In_Sense) SdoMessage.VehicleStatus |= 0x0001;
+    else if(!Brake_In_Sense) SdoMessage.VehicleStatus &= 0xFFFE;
 
     if(!Handbrake_In_Sense) SdoMessage.VehicleStatus |= 0x0002;
+    else if(!Handbrake_In_Sense) SdoMessage.VehicleStatus &= 0xFFFD;
 
     if(Key_In_Sense) SdoMessage.VehicleStatus |= 0x0004;
+    else if(!Key_In_Sense) SdoMessage.VehicleStatus &= 0xFFFB;
 
     if(E_Stop_In_Sense) SdoMessage.VehicleStatus |= 0x0008;
+    else if(!E_Stop_In_Sense) SdoMessage.VehicleStatus &= 0xFFF7;
 
     if(Forward_In_Sense) SdoMessage.VehicleStatus |= 0x0010;
+    else if(!Forward_In_Sense) SdoMessage.VehicleStatus &= 0xFFEF;
 
     if(Reverse_In_Sense) SdoMessage.VehicleStatus |= 0x0020;
+    else if(!Reverse_In_Sense) SdoMessage.VehicleStatus &= 0xFFDF;
 
     if(Flasher_L_Out_Sense) SdoMessage.VehicleStatus |= 0x0040;
+    else if(!Flasher_L_Out_Sense) SdoMessage.VehicleStatus &= 0xFFBF;
 
     if(Flasher_R_Out_Sense) SdoMessage.VehicleStatus |= 0x0080;
+    else if(!Flasher_R_Out_Sense) SdoMessage.VehicleStatus &= 0xFF7F;
 
     if(V_Reg_In_Sense) SdoMessage.VehicleStatus |= 0x0100;
+    else if(!V_Reg_In_Sense) SdoMessage.VehicleStatus &= 0xFEFF;
 
 }
 

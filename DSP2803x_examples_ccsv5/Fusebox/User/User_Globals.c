@@ -6,11 +6,7 @@
  */
 #include "User_Globals.h"
 /////////////////////////////////////////////
-//volatile int CANcounter = 0;
-volatile long Fusebox_Current = 0;
-volatile long Fusebox_Temperature = 0;
 volatile Uint16 counter_2Hz = 0;
-volatile Uint16 CanInterruptTriggered = 0;
 
 volatile Uint16 Fuse_Out_Sense_1 = 0;
 volatile Uint16 Fuse_Out_Sense_4 = 0;
@@ -40,6 +36,9 @@ volatile Uint16 HighBeamBlown = 0;
 
 volatile Uint16 Operational_State = 0;     //as demanded by NMT
 volatile Uint16 LowPowerMode = 0;          //as set by master NMT message
-Uint16 NodeID = 1;
+volatile Uint32 ErrorCounter = 0;
+Uint16 CAN_Initialised = 0;
+
+
 
 

@@ -25,18 +25,19 @@ __interrupt void cpu_timer0_isr(void)
 
 __interrupt void cpu_timer1_isr(void)                           //50Hz loop
 {
-    ADCtoGPIO();  //Use ADCs as a defacto GPIO
-    SetFlags();   //sets error and status flags for use in PDO/SDO MISOs
-    HeadlightBulbCheck(); //experimental check to determine whether the head/high light has blown
-
-    //OPERATING TIME *********************************************
-    //defined as the amount of time spent in the NMT Operational State (0x01). Will increment counter after an operational hour has elapsed
     if(Operational_State != 4)    //ensures system is not in the halt state
     {
+
+        ADCtoGPIO();  //Use ADCs as a defacto GPIO
+        SetFlags();   //sets error and status flags for use in PDO/SDO MISOs
+        HeadlightBulbCheck(); //experimental check to determine whether the head/high light has blown
+
+        //OPERATING TIME *********************************************
+        //defined as the amount of time spent in the NMT Operational State (0x01) and Low Power Mode (0x03). Will increment counter after an operational hour has elapsed
         HourTimer++;
         if(HourTimer >= 180000)         //60*60*50=180000    Based on a timer of 50Hz for a period of 1 hour
         {
-            OperationalCounter++;  //VALUE NEEDS TO BE MOVED TO EEPROM before CPU shuts down and value is lost
+            OperationalCounter++;  //VALUE NEEDS TO BE MOVED TO EEPROM before CPU shuts down and value is lost     !!!!!!!!!!!!!!!!!!!!
             HourTimer = 0;
             /*currently, this feature will suffer a time 'loss' when the vehicle is powered down: if the counter reaches a value of, say, 52 minutes
              *and the vehicle is switched off, the counter will be reset to zero (it is initialised to zero in globals.c) and the 52 minutes
@@ -53,6 +54,8 @@ __interrupt void cpu_timer1_isr(void)                           //50Hz loop
         ResetIgnitionFlag = 1; //prevents counter from counting more than once per ignition
     }
     else if(!Key_In_Sense) ResetIgnitionFlag = 0; //resets flag when vehicle is switched off
+
+
 
     CpuTimer1.InterruptCount++;
     EDIS;
@@ -79,21 +82,21 @@ __interrupt void cpu_timer2_isr(void)
 }
 
 
-
 __interrupt void can_rx_isr(void)
 {
     //Mailbox 7 - Master: VCU
     //Mailbox 9 - Slave: Control Box
     //RMP4 = NMT_MOSI
     //RMP6 = SDO_MOSI
-    Uint16 SDO_MISO_Data[9] = {0};
-    Uint32 SDO_MISO_Ctrl = 0;
-    Uint16 SDO_MOSI_Request = 0;
+    Uint32 SDO_MISO_Data[9] = {0};
+    //Uint32 SDO_MISO_Ctrl = 0;
+
     Uint16 SDO_MOSI_Ctrl = 0;
     Uint16 SDO_ArrayIndex = 0;
     Uint16 NMT_Instruction = 0;
     Uint16 NMT_Location = 0;
-    Uint16 ErrorCounter = 0;
+    Uint16 SDO_MOSI_Request = 0;
+
 
     /*if (ECanaRegs.CANRMP.bit.RMP1 == 1)
     {
@@ -108,7 +111,6 @@ __interrupt void can_rx_isr(void)
     {
         //CANSlaveConfig();
     }*/
-    CanInterruptTriggered++;
     if (ECanaRegs.CANRMP.bit.RMP4 == 1) //State set from NMT (MOSI)
     {
         NMT_Instruction = ECanaMboxes.MBOX4.MDL.all & 0xFF;
@@ -119,26 +121,33 @@ __interrupt void can_rx_isr(void)
             switch(NMT_Instruction)
             {
             case 1:
-                Operational_State = 0x5;           //Operational State
+                Operational_State = 5;           //Operational State
                 LowPowerMode = 0;
                 break;
             case 2:
-                Operational_State = 0x4;           //Halt state
+                Operational_State = 4;           //Halt state
                 LowPowerMode = 0;
                 break;
             case 3:
-                LowPowerMode = 1;                  //Operational State in low power mode
+                Operational_State = 6;            //Operational State in low power mode
+                LowPowerMode = 1;
+                break;
             case 0x80 :
                 Operational_State = 0x7F;          //Pre-Op state
                 LowPowerMode = 0;
                 break;
-            case 0x81 :                            //Device Reset
+            case 0x81 :                             //Device Reset
                 Operational_State = 0x0;
-                while(Operational_State<0x100){;}  //Reset governed by Watchdog timer
+                while(Operational_State != 100){;}  //Reset governed by Watchdog timer
                 break;
-            case 0x82 :                            //CAN Bus reset
+            case 0x82 :                             //CAN Bus reset
                 Operational_State = 0x0;
-                //add reset function
+                CAN_Initialised = 0;
+                CAN_Init();
+                if(!CAN_Initialised) // if CAN_Initialised is still zero then CAN_Init failed and entire device must reset
+                {
+                    while(Operational_State != 100){;}  //Reset governed by Watchdog timer
+                }
                 break;
             }
             CANTransmit(0x5BD, 0, Operational_State, 8, 7); //heartbeat_1 response    Double check mailbox
@@ -150,13 +159,11 @@ __interrupt void can_rx_isr(void)
         SDO_MOSI_Ctrl = ECanaMboxes.MBOX6.MDL.all & 0xFF;
         SDO_MOSI_Request = (ECanaMboxes.MBOX6.MDL.all>>8) & 0xFFFF;
 
-        SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
+        //SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
 
         //sets up the error counter word for CAN transmission
         if(Operational_State != 4 && SDO_MOSI_Ctrl == 0x42)
         {
-            ErrorCounter += SdoMessage.RelayErrorCounter;
-            ErrorCounter = (ErrorCounter << 8) + SdoMessage.FuseErrorCounter;
 
             //This array acts a holder for all the potential SDO requests.
             //Note only the requested array element is transmitted - not the entire array
@@ -170,9 +177,15 @@ __interrupt void can_rx_isr(void)
             SDO_MISO_Data[7] = IgnitionCounter;                //SDO 0x0912
             SDO_MISO_Data[8] = OperationalCounter;             //SDO 0x0914
 
+            if(SDO_MOSI_Request == 0x0912) SDO_MOSI_Request = 0x090E;
+            if(SDO_MOSI_Request == 0x0914) SDO_MOSI_Request = 0x0910;
+            //Refering to annex A of the control box doc, the SDO Location index went up in 2s but these two indices
+            //break that pattern which will cause issues with the array indexing below. These two ifs simply adjust the SDO indices
+            //to follow the 2s pattern
+
             SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2; //converts the SDO request into a value which is used to make a selection from the array above
-            if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], SDO_MISO_Ctrl, 8, 9); //Transmits the requested information via CAN
-            else CANTransmit(0x1BD, 0x06020000, SDO_MISO_Ctrl, 8, 9); //Invalid object reference-object does not exist
+            if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], 0x40, 8, 9); //Transmits the requested information via CAN
+            else CANTransmit(0x1BD, 0x06020000, 0x40, 8, 9); //Invalid object reference-object does not exist
         }
     }
 

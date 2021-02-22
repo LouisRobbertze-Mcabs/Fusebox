@@ -10,6 +10,7 @@ void main(void)
     //set all error/status flags and counters to zero
     ClearErrorFlags(0);     //Clear all error flags and counters --->see function definition in User_Functions.c for argument definitions
 	Initialise_FuseBox();
+	Operational_State = 5;
 	while(1)
 	{
 		if(counter_2Hz == 1)

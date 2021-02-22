@@ -13,6 +13,7 @@ void CAN_Init(void)
     CANSetup();
     CANMailboxConfig();
     CANInterruptConfig();
+    CAN_Initialised = 1;  //used to ensure that the CAN bus was successfully reset after NMT CAN Bus reset command (0x82)
 }
 
 void CANSetup(void)
@@ -122,7 +123,7 @@ void CANMailboxConfig(void)
 
     // Rx Mailbox (0x00000002)
     ECanaMboxes.MBOX1.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = NodeID;  // Current address loaded
+    ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = 1;  // Current address loaded
     ECanaLAMRegs.LAM1.all = 0x00000000;             // Accept standard IDs with matching address
     ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005; // Receive 4 bytes of data
 

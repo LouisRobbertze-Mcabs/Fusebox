@@ -69,8 +69,8 @@ typedef struct Master_Variable_Table{               //As defined in Annex A of t
     Uint16 RelayErrors;           //includes relay and mosfet errors
     Uint16 RelayStatus;           //includes relay and mosfet statuses
     Uint16 VehicleStatus;
-    Uint8  FuseErrorCounter;
-    Uint8  RelayErrorCounter;
+    Uint16 FuseErrorCounter;
+    Uint16  RelayErrorCounter;
 }MasterVariableTable;
 
 #endif  /*USER_DEFINES_H_*/

@@ -296,6 +296,7 @@ void SetFlags(void)
 
     //The mapping which indicates what MOSFETs and Relays are connected to each fuse is taken from the KiCAD schematic (UpperBoard) of the PCB
 
+    ClearErrorFlags(0); //reset all flags to default state
     if(Fuse_Out_Sense_1) //Fuse Blown
     {
         SdoMessage.FuseErrors |= 0x0001; //sets the correct bit to acknowledge error
@@ -485,32 +486,35 @@ void SetFlags(void)
 
     //VEHICLE STATUS FLAGS ***********************************************************************************************************************************************************************
     if(Brake_In_Sense) SdoMessage.VehicleStatus |= 0x0001;
-    else if(!Brake_In_Sense) SdoMessage.VehicleStatus &= 0xFFFE;
+    else if(!Brake_In_Sense) SdoMessage.VehicleStatus &= 0xFFE;
 
     if(!Handbrake_In_Sense) SdoMessage.VehicleStatus |= 0x0002;
-    else if(!Handbrake_In_Sense) SdoMessage.VehicleStatus &= 0xFFFD;
+    else if(!Handbrake_In_Sense) SdoMessage.VehicleStatus &= 0xFFD;
 
     if(Key_In_Sense) SdoMessage.VehicleStatus |= 0x0004;
-    else if(!Key_In_Sense) SdoMessage.VehicleStatus &= 0xFFFB;
+    else if(!Key_In_Sense) SdoMessage.VehicleStatus &= 0xFFB;
 
     if(E_Stop_In_Sense) SdoMessage.VehicleStatus |= 0x0008;
-    else if(!E_Stop_In_Sense) SdoMessage.VehicleStatus &= 0xFFF7;
+    else if(!E_Stop_In_Sense) SdoMessage.VehicleStatus &= 0xFF7;
 
     if(Forward_In_Sense) SdoMessage.VehicleStatus |= 0x0010;
-    else if(!Forward_In_Sense) SdoMessage.VehicleStatus &= 0xFFEF;
+    else if(!Forward_In_Sense) SdoMessage.VehicleStatus &= 0xFEF;
 
     if(Reverse_In_Sense) SdoMessage.VehicleStatus |= 0x0020;
-    else if(!Reverse_In_Sense) SdoMessage.VehicleStatus &= 0xFFDF;
+    else if(!Reverse_In_Sense) SdoMessage.VehicleStatus &= 0xFDF;
 
     if(Flasher_L_Out_Sense) SdoMessage.VehicleStatus |= 0x0040;
-    else if(!Flasher_L_Out_Sense) SdoMessage.VehicleStatus &= 0xFFBF;
+    else if(!Flasher_L_Out_Sense) SdoMessage.VehicleStatus &= 0xFBF;
 
     if(Flasher_R_Out_Sense) SdoMessage.VehicleStatus |= 0x0080;
-    else if(!Flasher_R_Out_Sense) SdoMessage.VehicleStatus &= 0xFF7F;
+    else if(!Flasher_R_Out_Sense) SdoMessage.VehicleStatus &= 0xF7F;
 
     if(V_Reg_In_Sense) SdoMessage.VehicleStatus |= 0x0100;
-    else if(!V_Reg_In_Sense) SdoMessage.VehicleStatus &= 0xFEFF;
+    else if(!V_Reg_In_Sense) SdoMessage.VehicleStatus &= 0xEFF;
 
+    //Setting ErrorCounter
+    ErrorCounter += SdoMessage.RelayErrorCounter;
+    ErrorCounter = (ErrorCounter << 16) + SdoMessage.FuseErrorCounter;
 }
 
 void ADCtoGPIO(void)
@@ -542,8 +546,8 @@ void ADCtoGPIO(void)
 
     //Fuse box Current
     //channel A0 - SOC0
-    Fusebox_Current = Temp_Floats[0] + (0.72*((0.02*(AdcResult.ADCRESULT0))-Temp_Floats[0]));                  //Test gain (3.3/4096 *1/39.6mV)
-    Temp_Floats[0] = Fusebox_Current;
+    SdoMessage.Current = Temp_Floats[0] + (0.72*((0.02*(AdcResult.ADCRESULT0))-Temp_Floats[0]));                  //Test gain (3.3/4096 *1/39.6mV)
+    Temp_Floats[0] = SdoMessage.Current;
 
     //Fuse_Out_1
     //channel B2 - SOC1
@@ -568,7 +572,7 @@ void ADCtoGPIO(void)
     Vts = Temp_Floats[1] + (0.72*((0.00080566*(AdcResult.ADCRESULT3))-Temp_Floats[1]));                     //add in proper gain
     Temp_Floats[1] = Vts;
     Rts = (33000/Vts) - 10000;
-    Fusebox_Temperature = (1/((log(Rts/10000))/4000+0.003356))-273;
+    SdoMessage.Temperature = (1/((log(Rts/10000))/4000+0.003356))-273;    //setting relevant SdoMessage member for CAN transmission
 
     //Forward input
     //channel A2 - SOC4
@@ -693,7 +697,7 @@ void HeadlightBulbCheck(void)
     {
         if(counter1 < 10 && !HeadSwitched) //timeout (currently set to (1/50)*10 = 200ms) to allow for fuses to switch and head light to respond to command before registering an error
         {
-            if(Fusebox_Current - Current_Prev >= 10000) //checks if the head light switches on after commanded to do so (current steps up as expected)
+            if(SdoMessage.Current - Current_Prev >= 10000) //checks if the head light switches on after commanded to do so (current steps up as expected)
             {
                 HeadLightBlown = 0; //Sets to 'not blown' in the event that the bulb is fixed after a breakage (prevents need to reset value manually after repairs)
                 HeadSwitched = 1; //code skips this block if a successful on state was reached
@@ -705,7 +709,7 @@ void HeadlightBulbCheck(void)
             CheckAgain1 = 0; //if bulb is blown don't bother checking again
         }
 
-        if(HeadSwitched && (Current_Prev - Fusebox_Current >= 0)) //head light switched correctly initially but then blew during operation (unexpected current drop without a switch off command)
+        if(HeadSwitched && (Current_Prev - SdoMessage.Current >= 0)) //head light switched correctly initially but then blew during operation (unexpected current drop without a switch off command)
         {
             HeadLightBlown = 1;
             CheckAgain1 = 0;
@@ -727,7 +731,7 @@ void HeadlightBulbCheck(void)
     {
         if(counter2 < 10 && !HighSwitched) //the HighSwitched Variable prevents this 'if' block from running again if a successful switch was detected
         {
-            if(Fusebox_Current - Current_Prev > 5) // the value must still be ascertained
+            if(SdoMessage.Current - Current_Prev > 5) // the value must still be ascertained
             {
                 HighBeamBlown = 0;
                 HighSwitched = 1;
@@ -739,7 +743,7 @@ void HeadlightBulbCheck(void)
             CheckAgain2 = 0; //if bulb is blown dont bother checking again
         }
 
-        if(HighSwitched && (Current_Prev - Fusebox_Current >= 0))
+        if(HighSwitched && (Current_Prev - SdoMessage.Current >= 0))
         {
             HighBeamBlown = 1;
             CheckAgain2 = 0;
@@ -752,5 +756,5 @@ void HeadlightBulbCheck(void)
         }
         counter2++;
     }
-    Current_Prev = Fusebox_Current; //sets a static value for historic reference
+    Current_Prev = SdoMessage.Current; //sets a static value for historic reference
 }

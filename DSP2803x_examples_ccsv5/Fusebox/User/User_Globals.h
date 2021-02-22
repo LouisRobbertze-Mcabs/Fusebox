@@ -14,10 +14,8 @@
 #include <float.h>
 #include <string.h>
 #include "User_Defines.h"
-extern volatile long Fusebox_Current;
-extern volatile long Fusebox_Temperature;
+
 extern volatile Uint16 counter_2Hz;
-extern volatile Uint16 CanInterruptTriggered;
 
 extern volatile Uint16 Fuse_Out_Sense_1;
 extern volatile Uint16 Fuse_Out_Sense_4;
@@ -47,8 +45,12 @@ extern volatile Uint16 HeadLightBlown;
 extern volatile Uint16 HighBeamBlown;
 
 extern volatile Uint16 Operational_State;       //as demanded by NMT
-extern volatile Uint16 LowPowerMode;            //as set by PDO
-extern Uint16 NodeID;
+extern volatile Uint16 LowPowerMode;            //as set by NMT
+extern volatile Uint32 ErrorCounter;
+extern Uint16 CAN_Initialised;
+
+
+
 
 
 #endif /* USER_GLOBALS_H_ */

@@ -260,25 +260,24 @@ void ClearErrorFlags(Uint16 Flag_Selection)
         //Relay and Mosfet Errors -----------
         SdoMessage.RelayErrors = 0;
         SdoMessage.RelayErrorCounter = 0;
+        SdoMessage.RelayStatus = 0;
     }
+
+    SdoMessage.VehicleStatus = 0;
 }
 
 void EnableLowPower(void)
 {
     /*If the master PDO asserts low power mode, all nonessential features will be shut down
      * Currently classified as nonessential:
-     * All MOSFETS
+     * MOSFET_7 --> USB charger
      * */
+    DisableUSBcharger(); //disable MOSFET_7
+}
 
-    Mfet_Ctrl_0 = 0;
-    Mfet_Ctrl_1 = 0;
-    Mfet_Ctrl_2 = 0;
-    Mfet_Ctrl_3 = 0;
-    Mfet_Ctrl_4 = 0;
-    Mfet_Ctrl_5 = 0;
-    Mfet_Ctrl_6 = 0;
-    Mfet_Ctrl_7 = 0;
-    Mfet_Ctrl_8 = 0;
+void DisableLowPower(void)
+{
+    EnableUSBcharger();
 }
 
 void SetFlags(void)
@@ -486,31 +485,31 @@ void SetFlags(void)
 
     //VEHICLE STATUS FLAGS ***********************************************************************************************************************************************************************
     if(Brake_In_Sense) SdoMessage.VehicleStatus |= 0x0001;
-    else if(!Brake_In_Sense) SdoMessage.VehicleStatus &= 0xFFE;
+    //else if(!Brake_In_Sense) SdoMessage.VehicleStatus &= 0xFFE;
 
     if(!Handbrake_In_Sense) SdoMessage.VehicleStatus |= 0x0002;
-    else if(!Handbrake_In_Sense) SdoMessage.VehicleStatus &= 0xFFD;
+    //else if(!Handbrake_In_Sense) SdoMessage.VehicleStatus &= 0xFFD;
 
     if(Key_In_Sense) SdoMessage.VehicleStatus |= 0x0004;
-    else if(!Key_In_Sense) SdoMessage.VehicleStatus &= 0xFFB;
+    //else if(!Key_In_Sense) SdoMessage.VehicleStatus &= 0xFFB;
 
     if(E_Stop_In_Sense) SdoMessage.VehicleStatus |= 0x0008;
-    else if(!E_Stop_In_Sense) SdoMessage.VehicleStatus &= 0xFF7;
+    //else if(!E_Stop_In_Sense) SdoMessage.VehicleStatus &= 0xFF7;
 
     if(Forward_In_Sense) SdoMessage.VehicleStatus |= 0x0010;
-    else if(!Forward_In_Sense) SdoMessage.VehicleStatus &= 0xFEF;
+    //else if(!Forward_In_Sense) SdoMessage.VehicleStatus &= 0xFEF;
 
     if(Reverse_In_Sense) SdoMessage.VehicleStatus |= 0x0020;
-    else if(!Reverse_In_Sense) SdoMessage.VehicleStatus &= 0xFDF;
+    //else if(!Reverse_In_Sense) SdoMessage.VehicleStatus &= 0xFDF;
 
     if(Flasher_L_Out_Sense) SdoMessage.VehicleStatus |= 0x0040;
-    else if(!Flasher_L_Out_Sense) SdoMessage.VehicleStatus &= 0xFBF;
+    //else if(!Flasher_L_Out_Sense) SdoMessage.VehicleStatus &= 0xFBF;
 
     if(Flasher_R_Out_Sense) SdoMessage.VehicleStatus |= 0x0080;
-    else if(!Flasher_R_Out_Sense) SdoMessage.VehicleStatus &= 0xF7F;
+    //else if(!Flasher_R_Out_Sense) SdoMessage.VehicleStatus &= 0xF7F;
 
     if(V_Reg_In_Sense) SdoMessage.VehicleStatus |= 0x0100;
-    else if(!V_Reg_In_Sense) SdoMessage.VehicleStatus &= 0xEFF;
+    //else if(!V_Reg_In_Sense) SdoMessage.VehicleStatus &= 0xEFF;
 
     //Setting ErrorCounter
     ErrorCounter += SdoMessage.RelayErrorCounter;
@@ -757,4 +756,25 @@ void HeadlightBulbCheck(void)
         counter2++;
     }
     Current_Prev = SdoMessage.Current; //sets a static value for historic reference
+}
+
+void HeadlightControl(void)
+{
+    //Euro regulations require main beam to be required at all times
+    //if high beam is switched on, main beam must switch off
+    //main beam controlled by MOSFET_5
+
+    if(!High_Beam_Ctrl_Sense) GpioDataRegs.GPBSET.bit.GPIO40 = 1;
+
+    else if(High_Beam_Ctrl_Sense) GpioDataRegs.GPBCLEAR.bit.GPIO40 = 1;
+}
+
+void DisableUSBcharger(void)
+{
+    //USB Charger connected to MOSFET_7
+    GpioDataRegs.GPACLEAR.bit.GPIO3 = 1;
+}
+void EnableUSBcharger(void)
+{
+    GpioDataRegs.GPASET.bit.GPIO3 = 1;
 }

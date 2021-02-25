@@ -34,7 +34,7 @@ volatile Uint32 IgnitionCounter = 0;
 volatile Uint16 HeadLightBlown = 0;
 volatile Uint16 HighBeamBlown = 0;
 
-volatile Uint16 Operational_State = 0;     //as demanded by NMT
+volatile Uint16 Operational_State = 127;     //set to pre-op at start up by default --->requires NMT message to go to Op state
 volatile Uint16 LowPowerMode = 0;          //as set by master NMT message
 volatile Uint32 ErrorCounter = 0;
 Uint16 CAN_Initialised = 0;

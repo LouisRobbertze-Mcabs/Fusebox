@@ -7,10 +7,11 @@
 
 void main(void)
 {
-    //set all error/status flags and counters to zero
+    Operational_State = 127; //pre op state
     ClearErrorFlags(0);     //Clear all error flags and counters --->see function definition in User_Functions.c for argument definitions
 	Initialise_FuseBox();
-	Operational_State = 5;
+	Operational_State = 5; //operational state
+	EnableUSBcharger(); //switches on USB charger
 	while(1)
 	{
 		if(counter_2Hz == 1)
@@ -21,6 +22,7 @@ void main(void)
 		{
 			Toggle_LED();
             if(LowPowerMode) EnableLowPower();
+            else if(!LowPowerMode) DisableLowPower();
 			ServiceDog();
 			counter_2Hz = 0;
 		}

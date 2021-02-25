@@ -25,11 +25,12 @@ __interrupt void cpu_timer0_isr(void)
 
 __interrupt void cpu_timer1_isr(void)                           //50Hz loop
 {
-    if(Operational_State != 4)    //ensures system is not in the halt state
+    if(Operational_State == 5)    //ensures system is not in the halt state
     {
 
         ADCtoGPIO();  //Use ADCs as a defacto GPIO
         SetFlags();   //sets error and status flags for use in PDO/SDO MISOs
+        HeadlightControl();
         HeadlightBulbCheck(); //experimental check to determine whether the head/high light has blown
 
         //OPERATING TIME *********************************************
@@ -68,14 +69,14 @@ __interrupt void cpu_timer2_isr(void)
 
 
     EALLOW;
-    Uint32 PDO_Data_Low = 0;
-    Uint32 PDO_Data_High = 0;
+    Uint32 Heartbeat_2_Low = 0;
+    Uint32 Heartbeat_2_High = 0;
 
-    PDO_Data_Low += SdoMessage.RelayErrors; //PDO response includes Fuse and Relay/Mosfet error flags as well as Vehicle and Relay/Mosfet status flags
-    PDO_Data_Low = (PDO_Data_Low<<16) + SdoMessage.FuseErrors;
-    PDO_Data_High += SdoMessage.VehicleStatus;
-    PDO_Data_High = (PDO_Data_High<<16) + SdoMessage.RelayStatus;
-    CANTransmit(0x63D, PDO_Data_High, PDO_Data_Low, 8, 7); //PDO_MISO
+    Heartbeat_2_Low += SdoMessage.RelayErrors; //Heartbeat_2 response includes Fuse and Relay/Mosfet error flags as well as Vehicle and Relay/Mosfet status flags
+    Heartbeat_2_Low = (Heartbeat_2_Low<<16) + SdoMessage.FuseErrors;
+    Heartbeat_2_High += SdoMessage.VehicleStatus;
+    Heartbeat_2_High = (Heartbeat_2_High<<16) + SdoMessage.RelayStatus;
+    CANTransmit(0x63D, Heartbeat_2_High, Heartbeat_2_Low, 8, 7); //Heartbeat_2 Message
 
     CpuTimer2.InterruptCount++;
     EDIS;

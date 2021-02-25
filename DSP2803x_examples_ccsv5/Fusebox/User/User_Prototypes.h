@@ -30,9 +30,13 @@ void Toggle_LED(void);
  //Henry's Prototypes**************************************************************
 void ClearErrorFlags(Uint16 Flag_Selection);
 void EnableLowPower(void);
+void DisableLowPower(void);
 void SetFlags(void);
 void ADCtoGPIO(void);
 void HeadlightBulbCheck(void);
+void HeadlightControl(void);
+void DisableUSBcharger(void);
+void EnableUSBcharger(void);
 
 
 //#pragma CODE_SECTION(DELAY_US, "ramfuncs");

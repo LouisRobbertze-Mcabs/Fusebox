@@ -782,14 +782,14 @@ void EnableUSBcharger(void)
 
 void SwitchReverseSensor(void)
 {
-    if(Acewell_Drive_Ready && 1)
+    if(Acewell_Drive_Ready && Reverse_In_Sense)
     {
-        GpioDataRegs.GPASET.bit.GPIO11 = 1;
+        GpioDataRegs.GPASET.bit.GPIO11 = 1; //set MOSFET_Ctrl_1
         dummy_response = 1;
     }
-    else if(!Acewell_Drive_Ready || 0 || LowPowerMode)
+    else if(!Acewell_Drive_Ready || !Reverse_In_Sense || LowPowerMode)
     {
-        GpioDataRegs.GPACLEAR.bit.GPIO11 = 1;
+        GpioDataRegs.GPACLEAR.bit.GPIO11 = 1; //clear MOSFET_Ctrl_1
         dummy_response = 0;
     }
     CANTransmit(0x1BD, 0, dummy_response, 1, 7);

@@ -194,7 +194,7 @@ __interrupt void can_rx_isr(void)
     else if(ECanaRegs.CANRMP.bit.RMP10 == 1) //Acewell Speedometer
     {
         count++;
-        if(ECanaMboxes.MBOX10.MDL.all & 0xFF00000000 == 0x8800000000) //Acewell LED indicator
+        if(ECanaMboxes.MBOX10.MDH.all == 0x88) //Acewell LED indicator
         {
             count++;
             if(ECanaMboxes.MBOX10.MDL.all & 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator

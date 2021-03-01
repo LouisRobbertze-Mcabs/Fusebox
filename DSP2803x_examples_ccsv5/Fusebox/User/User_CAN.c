@@ -116,7 +116,7 @@ void CANMailboxConfig(void)
 {
     ECanaRegs.CANGAM.all = 0x00000000;              // Global All-Pass Mask (Don't care: 1, Match: 0)
 
-    ECanaRegs.CANMD.all = 0x0000007E;               // Message Direction (Rx: 1, Tx: 0)         //bartho    0x00000006
+    ECanaRegs.CANMD.all = 0x0000047E;               // Message Direction (Rx: 1, Tx: 0)         //bartho    0x00000006
 
     // Tx Mailbox (0x00000001)
     ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000004; // Transmit 4 bytes of data
@@ -170,8 +170,14 @@ void CANMailboxConfig(void)
     // Tx Mailbox (0x000000010)                     // SDO_MISO
     ECanaMboxes.MBOX9.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
 
+    // Rx Mailbox (0x000000011)                      //Speedometer CAN receive
+    ECanaMboxes.MBOX10.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
+    ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x718;   // Current address loaded
+    ECanaLAMRegs.LAM10.all = 0x00000000;              // Accept standard IDs with matching address
+    ECanaMboxes.MBOX10.MSGCTRL.all = 0x00000008;     // Receive 5 bytes of data
 
-    ECanaRegs.CANME.all = 0x0000007E;               // Enable Rx Mailbox    //bartho    0x00000006
+
+    ECanaRegs.CANME.all = 0x0000047E;               // Enable Rx Mailbox    //bartho    0x00000006
 
     // The Tx Mailbox MSGID has to be set as required and then enabled
 }
@@ -182,7 +188,7 @@ void CANInterruptConfig(void)
 
     EALLOW;
     ECanaRegs.CANGIM.all = 0x00000003;              // Enable ECAN0INT and ECAN0INT interrupt lines
-    ECanaRegs.CANMIM.all = 0x000003FF;              // Allow interrupts for Mailbox 0 ~ 10
+    ECanaRegs.CANMIM.all = 0x000007FF;              // Allow interrupts for Mailbox 0 ~ 10
     ECanaRegs.CANMIL.all = 0x00000381;              // Mailbox 0 triggers ECAN1INT line, Mailbox 1 triggers ECAN0INT line
     PieVectTable.ECAN0INTA = &can_rx_isr;           // Link Rx ISR function
     PieVectTable.ECAN1INTA = &can_tx_isr;           // Link Tx ISR function

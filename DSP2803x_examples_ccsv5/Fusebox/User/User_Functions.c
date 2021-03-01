@@ -271,6 +271,7 @@ void EnableLowPower(void)
     /*If the master PDO asserts low power mode, all nonessential features will be shut down
      * Currently classified as nonessential:
      * MOSFET_7 --> USB charger
+     * MOSFET_1 --> Reverse Sensor (disables itself)
      * */
     DisableUSBcharger(); //disable MOSFET_7
 }
@@ -777,4 +778,19 @@ void DisableUSBcharger(void)
 void EnableUSBcharger(void)
 {
     GpioDataRegs.GPASET.bit.GPIO3 = 1;
+}
+
+void SwitchReverseSensor(void)
+{
+    if(Acewell_Drive_Ready && 1)
+    {
+        GpioDataRegs.GPASET.bit.GPIO11 = 1;
+        dummy_response = 1;
+    }
+    else if(!Acewell_Drive_Ready || 0 || LowPowerMode)
+    {
+        GpioDataRegs.GPACLEAR.bit.GPIO11 = 1;
+        dummy_response = 0;
+    }
+    CANTransmit(0x1BD, 0, dummy_response, 1, 7);
 }

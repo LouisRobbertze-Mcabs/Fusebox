@@ -87,8 +87,10 @@ __interrupt void can_rx_isr(void)
 {
     //Mailbox 7 - Master: VCU
     //Mailbox 9 - Slave: Control Box
+    //Mailbox ? - Acewell Speedometer
     //RMP4 = NMT_MOSI
     //RMP6 = SDO_MOSI
+    // RMP7????? = Acewell Speedometer
     Uint32 SDO_MISO_Data[9] = {0};
     //Uint32 SDO_MISO_Ctrl = 0;
 
@@ -188,6 +190,17 @@ __interrupt void can_rx_isr(void)
             if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], 0x40, 8, 9); //Transmits the requested information via CAN
             else CANTransmit(0x1BD, 0x06020000, 0x40, 8, 9); //Invalid object reference-object does not exist
         }
+    }
+    else if(ECanaRegs.CANRMP.bit.RMP10 == 1) //Acewell Speedometer
+    {
+        count++;
+        if(ECanaMboxes.MBOX10.MDL.all & 0xFF00000000 == 0x8800000000) //Acewell LED indicator
+        {
+            count++;
+            if(ECanaMboxes.MBOX10.MDL.all & 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
+            else if(!(ECanaMboxes.MBOX10.MDL.all & 0x20)) Acewell_Drive_Ready = 0;
+        }
+        SwitchReverseSensor();
     }
 
     ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags

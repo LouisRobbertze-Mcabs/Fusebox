@@ -21,6 +21,7 @@ void main(void)
 		if(counter_2Hz == 2)
 		{
 			Toggle_LED();
+			//SwitchReverseSensor();
             if(LowPowerMode) EnableLowPower();
             else if(!LowPowerMode) DisableLowPower();
 			ServiceDog();

@@ -37,6 +37,7 @@ void HeadlightBulbCheck(void);
 void HeadlightControl(void);
 void DisableUSBcharger(void);
 void EnableUSBcharger(void);
+void SwitchReverseSensor(void);
 
 
 //#pragma CODE_SECTION(DELAY_US, "ramfuncs");

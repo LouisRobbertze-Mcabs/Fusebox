@@ -76,7 +76,7 @@ __interrupt void cpu_timer2_isr(void)
     Heartbeat_2_Low = (Heartbeat_2_Low<<16) + SdoMessage.FuseErrors;
     Heartbeat_2_High += SdoMessage.VehicleStatus;
     Heartbeat_2_High = (Heartbeat_2_High<<16) + SdoMessage.RelayStatus;
-    CANTransmit(0x63D, Heartbeat_2_High, Heartbeat_2_Low, 8, 7); //Heartbeat_2 Message
+    CANTransmit(0x63D, Heartbeat_2_High, Heartbeat_2_Low, 8, 9); //Heartbeat_2 Message
 
     CpuTimer2.InterruptCount++;
     EDIS;
@@ -119,7 +119,7 @@ __interrupt void can_rx_isr(void)
         NMT_Instruction = ECanaMboxes.MBOX4.MDL.all & 0xFF;
         NMT_Location = ECanaMboxes.MBOX4.MDL.all & 0xFF00;
 
-        if(NMT_Location == 0x1D00 || NMT_Location == 0)
+        if(NMT_Location == 0x3D00 || NMT_Location == 0)
         {
             switch(NMT_Instruction)
             {
@@ -153,7 +153,7 @@ __interrupt void can_rx_isr(void)
                 }
                 break;
             }
-            CANTransmit(0x5BD, 0, Operational_State, 8, 7); //heartbeat_1 response    Double check mailbox
+            CANTransmit(0x5BD, 0, Operational_State, 8, 9); //heartbeat_1 response    Double check mailbox
         }
     }
 
@@ -193,12 +193,10 @@ __interrupt void can_rx_isr(void)
     }
     else if(ECanaRegs.CANRMP.bit.RMP10 == 1) //Acewell Speedometer
     {
-        count++;
         if(ECanaMboxes.MBOX10.MDH.all == 0x88) //Acewell LED indicator
         {
-            count++;
-            if(ECanaMboxes.MBOX10.MDL.all & 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
-            else if(!(ECanaMboxes.MBOX10.MDL.all & 0x20)) Acewell_Drive_Ready = 0;
+            if(ECanaMboxes.MBOX10.MDL.all & 0x20 == 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
+            else if(ECanaMboxes.MBOX10.MDL.all & 0x20 == 0) Acewell_Drive_Ready = 0;
         }
         SwitchReverseSensor();
     }

@@ -39,9 +39,6 @@ volatile Uint16 LowPowerMode = 0;          //as set by master NMT message
 volatile Uint32 ErrorCounter = 0;
 Uint16 CAN_Initialised = 0;
 volatile Uint16 Acewell_Drive_Ready = 0;
-volatile Uint16 dummy_response = 0;
-volatile Uint16 count = 0;
-
 
 
 

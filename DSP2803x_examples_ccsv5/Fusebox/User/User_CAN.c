@@ -119,13 +119,13 @@ void CANMailboxConfig(void)
     ECanaRegs.CANMD.all = 0x0000047E;               // Message Direction (Rx: 1, Tx: 0)         //bartho    0x00000006
 
     // Tx Mailbox (0x00000001)
-    ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000004; // Transmit 4 bytes of data
+    ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000004;     // Transmit 4 bytes of data
 
     // Rx Mailbox (0x00000002)
     ECanaMboxes.MBOX1.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = 1;  // Current address loaded
+    ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = 1;       // Current address loaded
     ECanaLAMRegs.LAM1.all = 0x00000000;             // Accept standard IDs with matching address
-    ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005; // Receive 4 bytes of data
+    ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005;     // Receive 4 bytes of data
 
     // Rx Mailbox (0x00000003)
     ECanaMboxes.MBOX2.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
@@ -149,23 +149,27 @@ void CANMailboxConfig(void)
     ECanaLAMRegs.LAM4.all = 0x00000000;             // Accept standard IDs with matching address
     ECanaMboxes.MBOX4.MSGCTRL.all = 0x00000002;     // Receive 2 bytes of data
 
+
     // Rx Mailbox (0x00000006)                      // PDO1_MOSI
     ECanaMboxes.MBOX5.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
     ECanaMboxes.MBOX5.MSGID.bit.STDMSGID = 0x21D;   // Current address loaded
     ECanaLAMRegs.LAM5.all = 0x00000000;             // Accept standard IDs with matching address
     ECanaMboxes.MBOX5.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data
+    //PDO functionality removed in favour of heartbeat_2 message
 
     // Rx Mailbox (0x00000007)                      // SDO_MOSI
     ECanaMboxes.MBOX6.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX6.MSGID.bit.STDMSGID = 0x61D;   // Current address loaded
+    ECanaMboxes.MBOX6.MSGID.bit.STDMSGID = 0x23C;   // Current address loaded
     ECanaLAMRegs.LAM6.all = 0x00000000;             // Accept standard IDs with matching address
     ECanaMboxes.MBOX6.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data
 
     // Tx Mailbox (0x00000008)                      // Heartbeat_MISO
     ECanaMboxes.MBOX7.MSGCTRL.all = 0x00000001;     // Transmit 1 bytes of data
 
+
     // Tx Mailbox (0x00000009)                      // PDO1_MISO
     ECanaMboxes.MBOX8.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
+     //PDO  functionality removed in favour of heartbeat_2 message
 
     // Tx Mailbox (0x000000010)                     // SDO_MISO
     ECanaMboxes.MBOX9.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data

@@ -76,7 +76,7 @@ __interrupt void cpu_timer2_isr(void)
     Heartbeat_2_Low = (Heartbeat_2_Low<<16) + SdoMessage.FuseErrors;
     Heartbeat_2_High += SdoMessage.VehicleStatus;
     Heartbeat_2_High = (Heartbeat_2_High<<16) + SdoMessage.RelayStatus;
-    CANTransmit(0x63D, Heartbeat_2_High, Heartbeat_2_Low, 8, 9); //Heartbeat_2 Message
+    CANTransmit(0x63D, Heartbeat_2_High, Heartbeat_2_Low, 8, 4); //Heartbeat_2 Message
 
     CpuTimer2.InterruptCount++;
     EDIS;
@@ -114,10 +114,10 @@ __interrupt void can_rx_isr(void)
     {
         //CANSlaveConfig();
     }*/
-    if (ECanaRegs.CANRMP.bit.RMP4 == 1) //State set from NMT (MOSI)
+    if (ECanaRegs.CANRMP.bit.RMP0 == 1) //State set from NMT (MOSI)
     {
-        NMT_Instruction = ECanaMboxes.MBOX4.MDL.all & 0xFF;
-        NMT_Location = ECanaMboxes.MBOX4.MDL.all & 0xFF00;
+        NMT_Instruction = ECanaMboxes.MBOX0.MDL.all & 0xFF;
+        NMT_Location = ECanaMboxes.MBOX0.MDL.all & 0xFF00;
 
         if(NMT_Location == 0x3D00 || NMT_Location == 0)
         {
@@ -153,14 +153,14 @@ __interrupt void can_rx_isr(void)
                 }
                 break;
             }
-            CANTransmit(0x5BD, 0, Operational_State, 8, 9); //heartbeat_1 response    Double check mailbox
+            CANTransmit(0x5BD, 0, Operational_State, 8, 3); //heartbeat_1 response    Double check mailbox
         }
     }
 
-    else if(ECanaRegs.CANRMP.bit.RMP6 == 1)
+    else if(ECanaRegs.CANRMP.bit.RMP1 == 1)
     {
-        SDO_MOSI_Ctrl = ECanaMboxes.MBOX6.MDL.all & 0xFF;
-        SDO_MOSI_Request = (ECanaMboxes.MBOX6.MDL.all>>8) & 0xFFFF;
+        SDO_MOSI_Ctrl = ECanaMboxes.MBOX1.MDL.all & 0xFF;
+        SDO_MOSI_Request = (ECanaMboxes.MBOX1.MDL.all>>8) & 0xFFFF;
 
         //SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
 
@@ -187,16 +187,16 @@ __interrupt void can_rx_isr(void)
             //to follow the 2s pattern
 
             SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2; //converts the SDO request into a value which is used to make a selection from the array above
-            if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], 0x40, 8, 9); //Transmits the requested information via CAN
-            else CANTransmit(0x1BD, 0x06020000, 0x40, 8, 9); //Invalid object reference-object does not exist
+            if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], 0x40, 8, 5); //Transmits the requested information via CAN
+            else CANTransmit(0x1BD, 0x06020000, 0x40, 8, 5); //Invalid object reference-object does not exist
         }
     }
-    else if(ECanaRegs.CANRMP.bit.RMP10 == 1) //Acewell Speedometer
+    else if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
     {
-        if(ECanaMboxes.MBOX10.MDH.all == 0x88) //Acewell LED indicator
+        if(ECanaMboxes.MBOX2.MDH.all == 0x88) //Acewell LED indicator
         {
-            if(ECanaMboxes.MBOX10.MDL.all & 0x20 == 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
-            else if(ECanaMboxes.MBOX10.MDL.all & 0x20 == 0) Acewell_Drive_Ready = 0;
+            if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
+            else if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0) Acewell_Drive_Ready = 0;
         }
         SwitchReverseSensor();
     }
@@ -207,15 +207,18 @@ __interrupt void can_rx_isr(void)
 
 __interrupt void can_tx_isr(void)
 {
-    /*if (ECanaRegs.CANTA.all == 0x00000001)
+    if(ECanaRegs.CANTA.bit.TA3 == 1)                //Transmit Acknowledge: Heartbeat_1_MISO
     {
-        ECanaRegs.CANTA.all = 0xFFFFFFFF;           // Reset tranmission flags
-    }*/
+        ECanaRegs.CANTA.bit.TA3 = 1;
+    }
+    else if(ECanaRegs.CANTA.bit.TA4 == 1)            //Transmit Acknowledge: Heartbeat_2_MISO
+    {
+        ECanaRegs.CANTA.bit.TA4 = 1;
+    }
+    else if(ECanaRegs.CANTA.bit.TA5 == 1)            //Transmit Acknowledge: SDO_MISO
+    {
+        ECanaRegs.CANTA.bit.TA5 = 1;
+    }
 
-
-    ECanaRegs.CANTA.all = 0xFFFFFFFF;
-
-    // Reset tranmission flags
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
+    PieCtrlRegs.PIEACK.bit.ACK9 = 1;                // Acknowledge this interrupt to receive more interrupts from group 9
 }
-

@@ -116,72 +116,36 @@ void CANMailboxConfig(void)
 {
     ECanaRegs.CANGAM.all = 0x00000000;              // Global All-Pass Mask (Don't care: 1, Match: 0)
 
-    ECanaRegs.CANMD.all = 0x0000047E;               // Message Direction (Rx: 1, Tx: 0)         //bartho    0x00000006
+    ECanaRegs.CANMD.all = 0x00000007;               // Message Direction (Rx: 1, Tx: 0)         //bartho    0x00000006
 
-    // Tx Mailbox (0x00000001)
-    ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000004;     // Transmit 4 bytes of data
+    // Rx Mailbox (0x00000001)                      //NMT_MOSI
+    ECanaMboxes.MBOX0.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
+    ECanaMboxes.MBOX0.MSGID.bit.STDMSGID = 0;       // Current address loaded
+    ECanaLAMRegs.LAM0.all = 0x00000000;             // Accept standard IDs with matching address
+    ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000002;     // Receive 2 bytes of data
 
-    // Rx Mailbox (0x00000002)
+    // Rx Mailbox (0x00000002)                      //SDO_MOSI
     ECanaMboxes.MBOX1.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = 1;       // Current address loaded
+    ECanaMboxes.MBOX1.MSGID.bit.STDMSGID = 0x23C;   // Current address loaded
     ECanaLAMRegs.LAM1.all = 0x00000000;             // Accept standard IDs with matching address
-    ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000005;     // Receive 4 bytes of data
+    ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data
 
-    // Rx Mailbox (0x00000003)
+    // Rx Mailbox (0x00000003)                      //AceWell Speedo
     ECanaMboxes.MBOX2.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
-    ECanaMboxes.MBOX2.MSGID.bit.STDMSGID = 0x0611;  // Current address loaded                                           //bartho
+    ECanaMboxes.MBOX2.MSGID.bit.STDMSGID = 0x718;  // Current address loaded                                           //bartho
     ECanaLAMRegs.LAM2.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
     ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data                                              //bartho
 
+    // Tx Mailbox (0x00000004)                      // Heartbeat_1_MISO
+    ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000001;     // Transmit 1 bytes of data
 
-    // Rx Mailbox (0x00000004)
-    ECanaMboxes.MBOX3.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
-    ECanaMboxes.MBOX3.MSGID.bit.STDMSGID = 0x011;   // Current address loaded                                           //bartho
-    ECanaLAMRegs.LAM3.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
-    ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000005;     // Receive 5 bytes of data                                              //bartho
+    // Tx Mailbox (0x00000004)                      // Heartbeat_2_MISO
+    ECanaMboxes.MBOX4.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
 
+    // Tx Mailbox (0x00000004)                      // SDO_MISO
+    ECanaMboxes.MBOX5.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
 
-    // Bartho Edit to ADD CANopen receive and transmit mailboxes
-
-    // Rx Mailbox (0x00000005)                      // NMT_MOSI
-    ECanaMboxes.MBOX4.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX4.MSGID.bit.STDMSGID = 0x00;    // Current address loaded
-    ECanaLAMRegs.LAM4.all = 0x00000000;             // Accept standard IDs with matching address
-    ECanaMboxes.MBOX4.MSGCTRL.all = 0x00000002;     // Receive 2 bytes of data
-
-
-    // Rx Mailbox (0x00000006)                      // PDO1_MOSI
-    ECanaMboxes.MBOX5.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX5.MSGID.bit.STDMSGID = 0x21D;   // Current address loaded
-    ECanaLAMRegs.LAM5.all = 0x00000000;             // Accept standard IDs with matching address
-    ECanaMboxes.MBOX5.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data
-    //PDO functionality removed in favour of heartbeat_2 message
-
-    // Rx Mailbox (0x00000007)                      // SDO_MOSI
-    ECanaMboxes.MBOX6.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX6.MSGID.bit.STDMSGID = 0x23C;   // Current address loaded
-    ECanaLAMRegs.LAM6.all = 0x00000000;             // Accept standard IDs with matching address
-    ECanaMboxes.MBOX6.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data
-
-    // Tx Mailbox (0x00000008)                      // Heartbeat_MISO
-    ECanaMboxes.MBOX7.MSGCTRL.all = 0x00000001;     // Transmit 1 bytes of data
-
-
-    // Tx Mailbox (0x00000009)                      // PDO1_MISO
-    ECanaMboxes.MBOX8.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
-     //PDO  functionality removed in favour of heartbeat_2 message
-
-    // Tx Mailbox (0x000000010)                     // SDO_MISO
-    ECanaMboxes.MBOX9.MSGCTRL.all = 0x00000008;     // Transmit 8 bytes of data
-
-    // Rx Mailbox (0x000000011)                      //Speedometer CAN receive
-    ECanaMboxes.MBOX10.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames
-    ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x718;   // Current address loaded
-    ECanaLAMRegs.LAM10.all = 0x00000000;              // Accept standard IDs with matching address
-    ECanaMboxes.MBOX10.MSGCTRL.all = 0x00000008;     // Receive 5 bytes of data
-
-
-    ECanaRegs.CANME.all = 0x0000047E;               // Enable Rx Mailbox    //bartho    0x00000006
+    ECanaRegs.CANME.all = 0x00000007;               // Enable Rx Mailbox    //bartho    0x00000006
 
     // The Tx Mailbox MSGID has to be set as required and then enabled
 }
@@ -192,7 +156,7 @@ void CANInterruptConfig(void)
 
     EALLOW;
     ECanaRegs.CANGIM.all = 0x00000003;              // Enable ECAN0INT and ECAN0INT interrupt lines
-    ECanaRegs.CANMIM.all = 0x000007FF;              // Allow interrupts for Mailbox 0 ~ 10
+    ECanaRegs.CANMIM.all = 0x0000003F;              // Allow interrupts for Mailbox 0 ~ 5
     ECanaRegs.CANMIL.all = 0x00000381;              // Mailbox 0 triggers ECAN1INT line, Mailbox 1 triggers ECAN0INT line
     PieVectTable.ECAN0INTA = &can_rx_isr;           // Link Rx ISR function
     PieVectTable.ECAN1INTA = &can_tx_isr;           // Link Tx ISR function

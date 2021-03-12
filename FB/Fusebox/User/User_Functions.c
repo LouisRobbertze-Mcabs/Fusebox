@@ -500,7 +500,7 @@ void SetFlags(void)
     if(Forward_In_Sense) SdoMessage.VehicleStatus |= 0x0010;
     //else if(!Forward_In_Sense) SdoMessage.VehicleStatus &= 0xFEF;
 
-    if(Reverse_In_Sense) SdoMessage.VehicleStatus |= 0x0020;
+    //if(Reverse_In_Sense) SdoMessage.VehicleStatus |= 0x0020;
     //else if(!Reverse_In_Sense) SdoMessage.VehicleStatus &= 0xFDF;
 
     if(Flasher_L_Out_Sense) SdoMessage.VehicleStatus |= 0x0040;

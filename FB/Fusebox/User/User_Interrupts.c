@@ -92,13 +92,14 @@ __interrupt void can_rx_isr(void)
     //RMP6 = SDO_MOSI
     // RMP7????? = Acewell Speedometer
     Uint32 SDO_MISO_Data[9] = {0};
-    //Uint32 SDO_MISO_Ctrl = 0;
+    union bits32 SDO_Message;
 
     Uint16 SDO_MOSI_Ctrl = 0;
     Uint16 SDO_ArrayIndex = 0;
     Uint16 NMT_Instruction = 0;
     Uint16 NMT_Location = 0;
     Uint16 SDO_MOSI_Request = 0;
+    Uint16 SDO_MOSI_Data = 0;
 
 
     /*if (ECanaRegs.CANRMP.bit.RMP1 == 1)
@@ -119,7 +120,7 @@ __interrupt void can_rx_isr(void)
         NMT_Instruction = ECanaMboxes.MBOX0.MDL.all & 0xFF;
         NMT_Location = ECanaMboxes.MBOX0.MDL.all & 0xFF00;
 
-        if(NMT_Location == 0x3D00 || NMT_Location == 0)
+        if(NMT_Location == 0x3C00 || NMT_Location == 0)                 //make sure this is in line
         {
             switch(NMT_Instruction)
             {
@@ -161,6 +162,7 @@ __interrupt void can_rx_isr(void)
     {
         SDO_MOSI_Ctrl = ECanaMboxes.MBOX1.MDL.all & 0xFF;
         SDO_MOSI_Request = (ECanaMboxes.MBOX1.MDL.all>>8) & 0xFFFF;
+        SDO_MOSI_Data = ECanaMboxes.MBOX1.MDH.all & 0xFF;
 
         //SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
 
@@ -187,12 +189,32 @@ __interrupt void can_rx_isr(void)
             //to follow the 2s pattern
 
             SDO_ArrayIndex = (SDO_MOSI_Request - 0x900)/2; //converts the SDO request into a value which is used to make a selection from the array above
-            if(SDO_ArrayIndex <= 9) CANTransmit(0x59C, SDO_MISO_Data[SDO_ArrayIndex], 0x40, 8, 5); //Transmits the requested information via CAN
-            else CANTransmit(0x1BD, 0x06020000, 0x40, 8, 5); //Invalid object reference-object does not exist
+            SDO_Message.yourSplitInterger.var1 = 0x40;
+            SDO_Message.yourSplitInterger.var2 = SDO_ArrayIndex&0xFF;
+            SDO_Message.yourSplitInterger.var2 = (SDO_ArrayIndex>>8)&0xFF;
+            if(SDO_ArrayIndex <= 9) CANTransmit(0x1BD, SDO_MISO_Data[SDO_ArrayIndex], SDO_Message.asUint, 8, 5); //Transmits the requested information via CAN
+            else CANTransmit(0x1BD, 0x06020000, SDO_Message.asUint, 8, 5); //Invalid object reference-object does not exist
+        }
+        else if(Operational_State != 4 && SDO_MOSI_Ctrl == 0x22)                //Write data
+        {
+            if(SDO_MOSI_Request == 0x0906)
+            {
+                Mfet_Ctrl_0 = (SDO_MOSI_Data>>5)&0x1;//set mosfet0 = 1;
+                Mfet_Ctrl_1 = (SDO_MOSI_Data>>6)&0x1;//set mosfet1 = 1;
+                Mfet_Ctrl_2 = (SDO_MOSI_Data>>7)&0x1;//set mosfet2 = 1;
+
+                SDO_Message.yourSplitInterger.var1 = 0x60;
+                SDO_Message.yourSplitInterger.var2 = 0x0906&0xFF;
+                SDO_Message.yourSplitInterger.var2 = (0x0906>>8)&0xFF;
+
+                //CAN transmit write acknowledge ID = 0x60
+                CANTransmit(0x23C, 0x0, SDO_Message.asUint, 8, 5); //Invalid object reference-object does not exist
+            }
         }
     }
     else if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
     {
+        //can be removed for future work...
         if(ECanaMboxes.MBOX2.MDH.all == 0x88) //Acewell LED indicator
         {
             if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator

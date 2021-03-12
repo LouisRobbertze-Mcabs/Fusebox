@@ -21,13 +21,20 @@ union bits32
 {
     Uint32 asUint;
     float32 asFloat;
+
+    struct {
+        int32 var1 : 8;
+        int32 var2 : 8;
+        int32 var3 : 8;
+        int32 var4 : 8;
+    } yourSplitInterger;
 };
 
 void Initialise_FuseBox(void);
 void Init_Gpio(void);
 void Toggle_LED(void);
 
- //Henry's Prototypes**************************************************************
+//Henry's Prototypes**************************************************************
 void ClearErrorFlags(Uint16 Flag_Selection);
 void EnableLowPower(void);
 void DisableLowPower(void);

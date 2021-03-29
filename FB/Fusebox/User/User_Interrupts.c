@@ -68,7 +68,7 @@ __interrupt void cpu_timer2_isr(void)
     // It is currently being used to time the Heartbeat_2 message for the CANopen network
 
 
-    EALLOW;
+
     Uint32 Heartbeat_2_Low = 0;
     Uint32 Heartbeat_2_High = 0;
 
@@ -77,7 +77,7 @@ __interrupt void cpu_timer2_isr(void)
     Heartbeat_2_High += SdoMessage.VehicleStatus;
     Heartbeat_2_High = (Heartbeat_2_High<<16) + SdoMessage.RelayStatus;
     CANTransmit(0x63D, Heartbeat_2_High, Heartbeat_2_Low, 8, 4); //Heartbeat_2 Message
-
+    EALLOW;
     CpuTimer2.InterruptCount++;
     EDIS;
 }
@@ -101,20 +101,6 @@ __interrupt void can_rx_isr(void)
     Uint16 SDO_MOSI_Request = 0;
     Uint16 SDO_MOSI_Data = 0;
 
-
-    /*if (ECanaRegs.CANRMP.bit.RMP1 == 1)
-    {
-        //CANSlaveReception();                //handle the receive message
-        ECanaRegs.CANRMP.bit.RMP1 = 1;
-    }
-    else if (ECanaRegs.CANRMP.bit.RMP2 == 1)
-    {
-        //CANChargerReception();
-    }
-    else if(ECanaRegs.CANRMP.bit.RMP3 == 1)
-    {
-        //CANSlaveConfig();
-    }*/
     if (ECanaRegs.CANRMP.bit.RMP0 == 1) //State set from NMT (MOSI)
     {
         NMT_Instruction = ECanaMboxes.MBOX0.MDL.all & 0xFF;

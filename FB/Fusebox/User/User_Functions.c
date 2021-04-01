@@ -407,10 +407,13 @@ void SetFlags(void)
         }
     }
 
-    if(!Fuse_Out_Sense_7)
+    if(Fuse_Out_Sense_7)                                               //think this is an issue - !Fuse_Out_Sense_7
     {
-        SdoMessage.RelayErrors |= 0x0040;
-        SdoMessage.RelayErrorCounter++;
+        SdoMessage.FuseErrors |= 0x0040;
+        SdoMessage.FuseErrorCounter++;
+
+        //SdoMessage.RelayErrors |= 0x0040;       //set fuse error as well
+        //SdoMessage.RelayErrorCounter++;
     }
     else
     {

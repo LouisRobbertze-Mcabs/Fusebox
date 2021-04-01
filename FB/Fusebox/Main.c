@@ -7,7 +7,7 @@
 
 void main(void)
 {
-    Operational_State = 127; //pre op state
+    //Operational_State = 127; //pre op state
     ClearErrorFlags(0);     //Clear all error flags and counters --->see function definition in User_Functions.c for argument definitions
 	Initialise_FuseBox();
 	Operational_State = 5; //operational state

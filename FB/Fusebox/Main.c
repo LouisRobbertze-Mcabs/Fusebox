@@ -17,16 +17,19 @@ void main(void)
 		if(counter_2Hz == 1)
 		{
 		    ServiceDog();
+
 		}
 		if(counter_2Hz == 2)
 		{
-			Toggle_LED();
+		    Toggle_LED();
 			//SwitchReverseSensor();
             if(LowPowerMode) EnableLowPower();
             else if(!LowPowerMode) DisableLowPower();
 			ServiceDog();
 			counter_2Hz = 0;
+
+			}
 		}
 
 	}
-}
+

@@ -263,6 +263,7 @@ void ClearErrorFlags(Uint16 Flag_Selection)
         SdoMessage.RelayStatus = 0;
     }
 
+
     SdoMessage.VehicleStatus = 0;
 }
 
@@ -791,6 +792,6 @@ void SwitchReverseSensor(void)
     }
     else if(!Acewell_Drive_Ready || !Reverse_In_Sense || LowPowerMode)
     {
-        GpioDataRegs.GPACLEAR.bit.GPIO11 = 1; //clear MOSFET_Ctrl_1
+       GpioDataRegs.GPACLEAR.bit.GPIO11 = 1; //clear MOSFET_Ctrl_1
     }
 }

@@ -134,7 +134,7 @@ void CANMailboxConfig(void)
     ECanaMboxes.MBOX2.MSGID.all = 0;                // Standard ID length, acceptance masks used, no remote frames      //bartho
     ECanaMboxes.MBOX2.MSGID.bit.STDMSGID = 0x718;  // Current address loaded                                           //bartho
     ECanaLAMRegs.LAM2.all = 0x00000000;             // Accept standard IDs with matching address                        //bartho
-    ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000008;     // Receive 8 bytes of data                                              //bartho
+    ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000005;     // Receive 8 bytes of data    //5 bytes LR                                          //bartho
 
     // Tx Mailbox (0x00000004)                      // Heartbeat_1_MISO
     ECanaMboxes.MBOX3.MSGCTRL.all = 0x00000001;     // Transmit 1 bytes of data

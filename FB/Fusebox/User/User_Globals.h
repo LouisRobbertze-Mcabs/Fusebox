@@ -49,7 +49,8 @@ extern volatile Uint16 LowPowerMode;            //as set by NMT
 extern volatile Uint32 ErrorCounter;
 extern Uint16 CAN_Initialised;
 extern volatile Uint16 Acewell_Drive_Ready;     //Speedo state of LED - Drive_ready
-
+extern volatile Uint32 RxDataL;
+extern volatile Uint32 RxDataH;
 
 
 

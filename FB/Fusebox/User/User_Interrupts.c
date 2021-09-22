@@ -101,6 +101,27 @@ __interrupt void can_rx_isr(void)
     Uint16 SDO_MOSI_Request = 0;
     Uint16 SDO_MOSI_Data = 0;
 
+    if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
+        {
+            //can be removed for future work...
+              RxDataH = ECanaMboxes.MBOX2.MDH.all & 0xFF;
+            if(RxDataH == 0x88) //Acewell LED ready to drive indicator
+            {
+               RxDataL = ECanaMboxes.MBOX2.MDL.all & 0xFF;
+               if(RxDataL == 0x20)
+               {
+                   Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
+               }
+               else{
+                   Acewell_Drive_Ready = 0;
+               }
+
+            }
+            ECanaRegs.CANRMP.bit.RMP2 = 1;
+            SwitchReverseSensor();
+        }
+
+/*
     if (ECanaRegs.CANRMP.bit.RMP0 == 1) //State set from NMT (MOSI)
     {
         NMT_Instruction = ECanaMboxes.MBOX0.MDL.all & 0xFF;
@@ -113,6 +134,7 @@ __interrupt void can_rx_isr(void)
             case 1:
                 Operational_State = 5;           //Operational State
                 LowPowerMode = 0;
+                GpioDataRegs.GPACLEAR.bit.GPIO27 =1;
                 break;
             case 2:
                 Operational_State = 4;           //Halt state
@@ -143,7 +165,7 @@ __interrupt void can_rx_isr(void)
             CANTransmit(0x5BD, 0, Operational_State, 8, 3); //heartbeat_1 response    Double check mailbox
         }
     }
-
+*/
     else if(ECanaRegs.CANRMP.bit.RMP1 == 1)
     {
         SDO_MOSI_Ctrl = ECanaMboxes.MBOX1.MDL.all & 0xFF;
@@ -198,19 +220,38 @@ __interrupt void can_rx_isr(void)
             }
         }
     }
-    else if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
-    {
-        //can be removed for future work...
-        if(ECanaMboxes.MBOX2.MDH.all == 0x88) //Acewell LED indicator
-        {
-            if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0x20) Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
-            else if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0) Acewell_Drive_Ready = 0;
-        }
-        SwitchReverseSensor();
-    }
 
     ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
+
+    /*else if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
+    {
+        //can be removed for future work...
+        if (GpioDataRegs.GPACLEAR.bit.GPIO27 == 1){
+            GpioDataRegs.GPASET.bit.GPIO27 =1;
+        }else{
+            GpioDataRegs.GPACLEAR.bit.GPIO27 = 1;
+        }
+
+        if(ECanaMboxes.MBOX2.MDH.all & 0x88 == 0x88) //Acewell LED indicator
+        {
+
+           if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0x20) {
+               Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
+
+           }
+           else if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0) {
+               Acewell_Drive_Ready = 0;
+
+           }
+
+        }
+
+        SwitchReverseSensor();
+    }
+*/
+    //ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
+  //  PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
 }
 
 __interrupt void can_tx_isr(void)

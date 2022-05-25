@@ -21,7 +21,7 @@ __interrupt void cpu_timer0_isr(void)
     counter_2Hz++;
     CpuTimer0.InterruptCount++;
     PieCtrlRegs.PIEACK.bit.ACK1 = 1/* PIEACK_GROUP1*/;
-}
+    }
 
 __interrupt void cpu_timer1_isr(void)                           //50Hz loop
 {
@@ -57,9 +57,10 @@ __interrupt void cpu_timer1_isr(void)                           //50Hz loop
     else if(!Key_In_Sense) ResetIgnitionFlag = 0; //resets flag when vehicle is switched off
 
 
-
+    EALLOW;
     CpuTimer1.InterruptCount++;
     EDIS;
+    //PieCtrlRegs.PIEACK.bit.ACK2 = 1/* PIEACK_GROUP2*/;
 }
 
 __interrupt void cpu_timer2_isr(void)
@@ -101,25 +102,9 @@ __interrupt void can_rx_isr(void)
     Uint16 SDO_MOSI_Request = 0;
     Uint16 SDO_MOSI_Data = 0;
 
-    if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
-        {
-            //can be removed for future work...
-              RxDataH = ECanaMboxes.MBOX2.MDH.all & 0xFF;
-            if(RxDataH == 0x88) //Acewell LED ready to drive indicator
-            {
-               RxDataL = ECanaMboxes.MBOX2.MDL.all & 0xFF;
-               if(RxDataL == 0x20)
-               {
-                   Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
-               }
-               else{
-                   Acewell_Drive_Ready = 0;
-               }
 
-            }
-            ECanaRegs.CANRMP.bit.RMP2 = 1;
-            SwitchReverseSensor();
-        }
+
+
 
 /*
     if (ECanaRegs.CANRMP.bit.RMP0 == 1) //State set from NMT (MOSI)
@@ -166,7 +151,7 @@ __interrupt void can_rx_isr(void)
         }
     }
 */
-    else if(ECanaRegs.CANRMP.bit.RMP1 == 1)
+   if(ECanaRegs.CANRMP.bit.RMP1 == 1)
     {
         SDO_MOSI_Ctrl = ECanaMboxes.MBOX1.MDL.all & 0xFF;
         SDO_MOSI_Request = (ECanaMboxes.MBOX1.MDL.all>>8) & 0xFFFF;
@@ -175,7 +160,29 @@ __interrupt void can_rx_isr(void)
         //SDO_MISO_Ctrl = ((Uint32)SDO_MOSI_Request)<<8 | 0x40;
 
         //sets up the error counter word for CAN transmission
-        if(Operational_State != 4 && SDO_MOSI_Ctrl == 0x42)
+        if(SDO_MOSI_Ctrl == 0x22)                //Write data
+                {
+                    if(SDO_MOSI_Request == 0x0906)
+                    {
+                        Mfet_Ctrl_0 = (SDO_MOSI_Data>>5)&0x1;//set mosfet0 = 1;
+                        Mfet_Ctrl_1 = (SDO_MOSI_Data>>6)&0x1;//set mosfet1 = 1;
+                        Mfet_Ctrl_2 = (SDO_MOSI_Data>>7)&0x1;//set mosfet2 = 1;
+
+                        SDO_Message.yourSplitInterger.var1 = 0x60;
+                        SDO_Message.yourSplitInterger.var2 = 0x0906&0xFF;
+                        SDO_Message.yourSplitInterger.var2 = (0x0906>>8)&0xFF;
+
+                        //CAN transmit write acknowledge ID = 0x60
+                        CANTransmit(0x23C, 0x0, SDO_Message.asUint, 8, 5); //Invalid object reference-object does not exist
+                    }else if(SDO_MOSI_Request == 0x0916){                   //Regenerative braking active, need to power brake lights
+                        if(SDO_MOSI_Data == 0x42){
+                            Mfet_Ctrl_2 =1;
+                        }else if(SDO_MOSI_Data == 0x00){        //Regenerative braking not active
+                            Mfet_Ctrl_2 =0;
+                        }
+                    }
+                }
+        else if(SDO_MOSI_Ctrl == 0x42)
         {
 
             //This array acts a holder for all the potential SDO requests.
@@ -203,55 +210,35 @@ __interrupt void can_rx_isr(void)
             if(SDO_ArrayIndex <= 9) CANTransmit(0x1BD, SDO_MISO_Data[SDO_ArrayIndex], SDO_Message.asUint, 8, 5); //Transmits the requested information via CAN
             else CANTransmit(0x1BD, 0x06020000, SDO_Message.asUint, 8, 5); //Invalid object reference-object does not exist
         }
-        else if(Operational_State != 4 && SDO_MOSI_Ctrl == 0x22)                //Write data
-        {
-            if(SDO_MOSI_Request == 0x0906)
-            {
-                Mfet_Ctrl_0 = (SDO_MOSI_Data>>5)&0x1;//set mosfet0 = 1;
-                Mfet_Ctrl_1 = (SDO_MOSI_Data>>6)&0x1;//set mosfet1 = 1;
-                Mfet_Ctrl_2 = (SDO_MOSI_Data>>7)&0x1;//set mosfet2 = 1;
 
-                SDO_Message.yourSplitInterger.var1 = 0x60;
-                SDO_Message.yourSplitInterger.var2 = 0x0906&0xFF;
-                SDO_Message.yourSplitInterger.var2 = (0x0906>>8)&0xFF;
+     }
 
-                //CAN transmit write acknowledge ID = 0x60
-                CANTransmit(0x23C, 0x0, SDO_Message.asUint, 8, 5); //Invalid object reference-object does not exist
-            }
-        }
-    }
+   if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
+           {
+               //can be removed for future work...
+                 RxDataH = ECanaMboxes.MBOX2.MDH.all & 0xFF;
+               if(RxDataH == 0x88) //Acewell LED ready to drive indicator
+               {
+                  RxDataL = ECanaMboxes.MBOX2.MDL.all & 0xFF;
+                  if(RxDataL == 0x20)
+                  {
+                      Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
+                      GpioDataRegs.GPASET.bit.GPIO27 = 1;
+
+                  }
+                  else{
+                      Acewell_Drive_Ready = 0;
+                      GpioDataRegs.GPACLEAR.bit.GPIO27 = 1;
+                  }
+
+               }
+
+               SwitchReverseSensor();
+               ECanaRegs.CANRMP.bit.RMP2 = 1;
+           }
 
     ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
-
-    /*else if(ECanaRegs.CANRMP.bit.RMP2 == 1) //Acewell Speedometer
-    {
-        //can be removed for future work...
-        if (GpioDataRegs.GPACLEAR.bit.GPIO27 == 1){
-            GpioDataRegs.GPASET.bit.GPIO27 =1;
-        }else{
-            GpioDataRegs.GPACLEAR.bit.GPIO27 = 1;
-        }
-
-        if(ECanaMboxes.MBOX2.MDH.all & 0x88 == 0x88) //Acewell LED indicator
-        {
-
-           if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0x20) {
-               Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
-
-           }
-           else if(ECanaMboxes.MBOX2.MDL.all & 0x20 == 0) {
-               Acewell_Drive_Ready = 0;
-
-           }
-
-        }
-
-        SwitchReverseSensor();
-    }
-*/
-    //ECanaRegs.CANRMP.all = 0xFFFFFFFF;              // Reset receive mailbox flags
-  //  PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;         // Acknowledge this interrupt to receive more interrupts from group 9
 }
 
 __interrupt void can_tx_isr(void)

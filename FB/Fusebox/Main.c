@@ -17,14 +17,16 @@ void main(void)
 		if(counter_2Hz == 1)
 		{
 		    ServiceDog();
+		    SwitchReverseSensor();
 
 		}
 		if(counter_2Hz == 2)
 		{
 		    Toggle_LED();
-			//SwitchReverseSensor();
-            if(LowPowerMode) EnableLowPower();
-            else if(!LowPowerMode) DisableLowPower();
+			SwitchReverseSensor();
+            //if(LowPowerMode) EnableLowPower();
+            //else if(!LowPowerMode) DisableLowPower();
+			//GpioDataRegs.GPASET.bit.GPIO11 = 1; //set MOSFET_Ctrl_1
 			ServiceDog();
 			counter_2Hz = 0;
 

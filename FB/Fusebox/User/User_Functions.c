@@ -10,6 +10,8 @@
 void Initialise_FuseBox(void)
 {
 
+
+
     InitSysCtrl();
     //    InitI2CGpio();
     Init_Gpio();
@@ -37,7 +39,7 @@ void Initialise_FuseBox(void)
     InitCpuTimers();
 
     ConfigCpuTimer(&CpuTimer0, 60, 500000); //2 hz
-    ConfigCpuTimer(&CpuTimer1, 60, 20000);  //50 hz
+    ConfigCpuTimer(&CpuTimer1, 60, 200000);  //5 hz
     ConfigCpuTimer(&CpuTimer2, 60, 1e6);    //1 hz         //500
 
     CpuTimer0Regs.TCR.all = 0x4000; // Use write-only instruction to set TSS bit = 0
@@ -55,9 +57,9 @@ void Initialise_FuseBox(void)
     IER |= M_INT14;
 
     // Enable I2C interrupt 1 in the PIE: Group 8 interrupt 1
-    PieCtrlRegs.PIEIER8.bit.INTx1 = 1;
+   // PieCtrlRegs.PIEIER8.bit.INTx1 = 1;
     // Enable I2C INT8 which is connected to PIE group 8
-    IER |= M_INT8;
+   // IER |= M_INT8;
 
     EnableInterrupts();
 
@@ -217,7 +219,7 @@ void Init_Gpio(void)
     GpioCtrlRegs.GPBMUX1.bit.GPIO41 = 0;     //Mfet_Out_Sense_7
     GpioCtrlRegs.GPBDIR.bit.GPIO41 = 0;      //Mfet_Out_Sense_7
 
-    GpioCtrlRegs.GPBPUD.bit.GPIO42 = 1;      //Disable pull-up
+   // GpioCtrlRegs.GPBPUD.bit.GPIO42 = 1;      //Disable pull-up. LR - need pull-up, handbrake pulls pin to ground
     GpioCtrlRegs.GPBMUX1.bit.GPIO42 = 0;     //Handbrake_In_Sense
     GpioCtrlRegs.GPBDIR.bit.GPIO42 = 0;      //Handbrake_In_Sense
 
@@ -776,21 +778,22 @@ void HeadlightControl(void)
 
 void DisableUSBcharger(void)
 {
-    //USB Charger connected to MOSFET_7
+    //USB Charger connected to MOSFET_8
     GpioDataRegs.GPACLEAR.bit.GPIO3 = 1;
 }
 void EnableUSBcharger(void)
 {
+    //USB Charger connected to MOSFET_8
     GpioDataRegs.GPASET.bit.GPIO3 = 1;
 }
 
 void SwitchReverseSensor(void)
 {
-    if(Acewell_Drive_Ready && Reverse_In_Sense)
+    if(Reverse_In_Sense && Acewell_Drive_Ready ==1)
     {
         GpioDataRegs.GPASET.bit.GPIO11 = 1; //set MOSFET_Ctrl_1
     }
-    else if(!Acewell_Drive_Ready || !Reverse_In_Sense || LowPowerMode)
+    else if(!Reverse_In_Sense || Acewell_Drive_Ready ==0)
     {
        GpioDataRegs.GPACLEAR.bit.GPIO11 = 1; //clear MOSFET_Ctrl_1
     }

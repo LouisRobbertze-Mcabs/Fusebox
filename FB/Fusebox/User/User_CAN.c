@@ -157,7 +157,7 @@ void CANInterruptConfig(void)
     EALLOW;
     ECanaRegs.CANGIM.all = 0x00000003;              // Enable ECAN0INT and ECAN0INT interrupt lines
     ECanaRegs.CANMIM.all = 0x0000003F;              // Allow interrupts for Mailbox 0 ~ 5
-    ECanaRegs.CANMIL.all = 0x00000387;              // Mailbox 0 triggers ECAN1INT line, Mailbox 1 triggers ECAN0INT line               0x381
+    ECanaRegs.CANMIL.all = 0x00000383;              // Mailbox 0 triggers ECAN1INT line, Mailbox 1 triggers ECAN0INT line               0x381
     PieVectTable.ECAN0INTA = &can_rx_isr;           // Link Rx ISR function
     PieVectTable.ECAN1INTA = &can_tx_isr;           // Link Tx ISR function
     EDIS;
@@ -167,7 +167,9 @@ void CANInterruptConfig(void)
 
     IER |= M_INT9;                                  // Enable group 9 interrupts
 
+
     EINT;                                           // Global interrupt enable
+
 }
 
 /*void CANChargerReception(void)

@@ -220,11 +220,10 @@ __interrupt void can_rx_isr(void)
                if(RxDataH == 0x88) //Acewell LED ready to drive indicator
                {
                   RxDataL = ECanaMboxes.MBOX2.MDL.all & 0xFF;
-                  if(RxDataL == 0x20)
+                  if(RxDataL == 0x20||0x71||0x24||0x75)
                   {
                       Acewell_Drive_Ready = 1;  //Drive_ready bit of LED indicator
                       GpioDataRegs.GPASET.bit.GPIO27 = 1;
-
                   }
                   else{
                       Acewell_Drive_Ready = 0;

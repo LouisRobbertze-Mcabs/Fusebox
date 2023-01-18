@@ -175,7 +175,7 @@ void Init_Gpio(void)
     GpioCtrlRegs.GPAMUX2.bit.GPIO21 = 0;     //High_Beam_Ctrl_Sense
     GpioCtrlRegs.GPADIR.bit.GPIO21 = 0;      //High_Beam_Ctrl_Sense
 
-    GpioCtrlRegs.GPAPUD.bit.GPIO22 = 1;      //Disable pull-up
+    //GpioCtrlRegs.GPAPUD.bit.GPIO22 = 1;      //Disable pull-up - Pull up needed for 12V side switched
     GpioCtrlRegs.GPAMUX2.bit.GPIO22 = 0;     //Horn_Out_Sense
     GpioCtrlRegs.GPADIR.bit.GPIO22 = 0;      //Horn_Out_Sense
 
@@ -611,9 +611,9 @@ void ADCtoGPIO(void)
     Horn_Signal = (Temp_Values[5] + (72*((1E6*AdcResult.ADCRESULT7))-Temp_Values[5]))/100;                           //add in proper gain
     Temp_Values[5] = Horn_Signal;
     if(Horn_Signal>1E6*2048)
-        Horn_Ctrl_Sense = 0;                           //active high ------>>> LOW
+        Horn_Ctrl_Sense = 1;                           //active high ------>>> LOW
     else
-        Horn_Ctrl_Sense = 1;
+        Horn_Ctrl_Sense = 0;
 
     //E-stop
     //channel A6 - SOC8

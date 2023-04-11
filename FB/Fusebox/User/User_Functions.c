@@ -175,7 +175,7 @@ void Init_Gpio(void)
     GpioCtrlRegs.GPAMUX2.bit.GPIO21 = 0;     //High_Beam_Ctrl_Sense
     GpioCtrlRegs.GPADIR.bit.GPIO21 = 0;      //High_Beam_Ctrl_Sense
 
-    //GpioCtrlRegs.GPAPUD.bit.GPIO22 = 1;      //Disable pull-up - Pull up needed for 12V side switched
+    GpioCtrlRegs.GPAPUD.bit.GPIO22 = 1;      //Disable pull-up LR - Active Horn pulls up pin, thus need pin grounded.
     GpioCtrlRegs.GPAMUX2.bit.GPIO22 = 0;     //Horn_Out_Sense
     GpioCtrlRegs.GPADIR.bit.GPIO22 = 0;      //Horn_Out_Sense
 
@@ -219,7 +219,7 @@ void Init_Gpio(void)
     GpioCtrlRegs.GPBMUX1.bit.GPIO41 = 0;     //Mfet_Out_Sense_7
     GpioCtrlRegs.GPBDIR.bit.GPIO41 = 0;      //Mfet_Out_Sense_7
 
-   // GpioCtrlRegs.GPBPUD.bit.GPIO42 = 1;      //Disable pull-up. LR - need pull-up, handbrake pulls pin to ground
+    //GpioCtrlRegs.GPBPUD.bit.GPIO42 = 1;      //Disable pull-up. LR - need pull-up, handbrake pulls pin to ground
     GpioCtrlRegs.GPBMUX1.bit.GPIO42 = 0;     //Handbrake_In_Sense
     GpioCtrlRegs.GPBDIR.bit.GPIO42 = 0;      //Handbrake_In_Sense
 
@@ -236,7 +236,7 @@ void Init_Gpio(void)
 
 void Toggle_LED(void)
 {
-    GpioDataRegs.GPATOGGLE.bit.GPIO27 = 1;
+   GpioDataRegs.GPATOGGLE.bit.GPIO27 = 1;
 }
 
 //Henry's Functions *******************************************************************************************************
